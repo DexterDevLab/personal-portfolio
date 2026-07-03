@@ -3,11 +3,20 @@ export type Project = {
   name: string;
   blurb: string;
   tags: string[];
-  url: string;
+  /** Live URL — omit for private/internal products (card renders without a link). */
+  url?: string;
   image: string;
 };
 
 export const projects: Project[] = [
+  {
+    slug: "panda-central",
+    name: "Panda Central",
+    blurb:
+      "A self-hosted platform managing 40+ client WordPress sites from one dashboard — automated updates, backups, uptime & vulnerability monitoring, and white-labeled client reports. Private product.",
+    tags: ["Next.js", "TypeScript", "BullMQ", "Postgres"],
+    image: "/images/projects/panda-central.jpg",
+  },
   {
     slug: "kaufbeiuns",
     name: "Kaufbeiuns",
