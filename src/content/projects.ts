@@ -13,8 +13,9 @@ export const projects: Project[] = [
     slug: "panda-central",
     name: "Panda Central",
     blurb:
-      "A self-hosted platform managing 40+ client WordPress sites from one dashboard — automated updates, backups, uptime & vulnerability monitoring, and white-labeled client reports. Private product.",
+      "A self-hosted platform managing 40+ client WordPress sites from one dashboard — automated updates, backups, uptime & vulnerability monitoring, and white-labeled client reports.",
     tags: ["Next.js", "TypeScript", "BullMQ", "Postgres"],
+    url: "https://manager.pandavisuals.cloud/",
     image: "/images/projects/panda-central.jpg",
   },
   {
@@ -61,14 +62,5 @@ export const projects: Project[] = [
     tags: ["WordPress", "Showroom"],
     url: "https://www.kuechen-for-you.de/",
     image: "/images/projects/kuechen-galerie.jpg",
-  },
-  {
-    slug: "perlenweiss",
-    name: "Perlenweiss",
-    blurb:
-      "An elegant, photography-led boutique site for a bridal studio, centred on easy appointment booking.",
-    tags: ["WordPress", "Booking", "Design"],
-    url: "https://www.perlenweiss.com/",
-    image: "/images/projects/perlenweiss.jpg",
   },
 ];
