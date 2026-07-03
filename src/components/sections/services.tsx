@@ -1,6 +1,7 @@
 import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Reveal } from "@/components/reveal";
+import { Spotlight } from "@/components/spotlight";
 import { engagementLine, services } from "@/content/services";
 
 export function Services() {
@@ -14,7 +15,8 @@ export function Services() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {services.map((service, i) => (
           <Reveal key={service.title} delay={i * 0.06}>
-            <div className="group h-full rounded-card border border-border bg-surface p-6 transition-colors hover:border-muted">
+            <div className="group relative h-full rounded-card border border-border bg-surface p-6 transition-colors hover:border-muted">
+              <Spotlight />
               <service.icon
                 className="mb-4 size-5 text-accent"
                 aria-hidden="true"

@@ -4,6 +4,7 @@ import { Section } from "@/components/ui/section";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Tag } from "@/components/ui/tag";
 import { Reveal } from "@/components/reveal";
+import { Spotlight } from "@/components/spotlight";
 import { projects } from "@/content/projects";
 import { site } from "@/lib/site";
 
@@ -22,15 +23,16 @@ export function Work() {
               href={project.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group block h-full rounded-card border border-border bg-surface transition-[border-color,transform] duration-200 hover:-translate-y-1 hover:border-muted"
+              className="group relative block h-full rounded-card border border-border bg-surface transition-[border-color,transform] duration-200 hover:-translate-y-1 hover:border-muted"
             >
+              <Spotlight />
               <div className="overflow-hidden rounded-t-card border-b border-border">
                 <Image
                   src={project.image}
                   alt={`Screenshot of the ${project.name} website`}
                   width={800}
                   height={500}
-                  className="aspect-[16/10] w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="aspect-16/10 w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.02]"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </div>
