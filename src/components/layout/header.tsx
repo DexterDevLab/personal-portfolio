@@ -36,11 +36,11 @@ export function Header() {
       </a>
       <nav
         aria-label="Main"
-        className="mx-auto flex h-16 w-full max-w-[1120px] items-center justify-between px-6"
+        className="mx-auto flex h-16 w-full max-w-280 items-center justify-between px-6"
       >
         <Link
           href="#top"
-          className="font-mono text-sm font-semibold tracking-tight"
+          className="font-mono text-base font-semibold tracking-tight"
         >
           DexterDevLab
         </Link>
@@ -85,7 +85,7 @@ export function Header() {
               <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex w-72 flex-col border-l border-border bg-background p-6">
                 <Dialog.Title className="sr-only">Menu</Dialog.Title>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-sm font-semibold">
+                  <span className="font-mono text-base font-semibold">
                     DexterDevLab
                   </span>
                   <Dialog.Close asChild>
