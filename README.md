@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# dexteriglesia.com — DexterDevLab
 
-## Getting Started
+Personal portfolio of **Dexter Dela Iglesia** (DexterDevLab) — a frontend developer with 10+ years building fast, modern websites and web apps for businesses, agencies, and startups.
 
-First, run the development server:
+Premium-minimal, dark-first, single-page site built as both a client-facing portfolio and a living proof of React/Next.js capability.
+
+## Stack
+
+- **Next.js 16** (App Router, TypeScript, RSC, fully static)
+- **Tailwind CSS v4** with CSS-variable design tokens (dark + light themes)
+- **Framer Motion** — subtle scroll reveals, `prefers-reduced-motion` respected
+- **Radix UI** (accessible mobile drawer) · **lucide-react** icons
+- **React Hook Form + Zod → Brevo API** contact form (server action, honeypot, zero-dependency fetch)
+- **Geist Sans / Geist Mono** via `next/font`
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local   # add your Brevo API key
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+All content is typed local data in `src/content/` — projects, services, skills, and testimonials. Site-wide constants (name, domain, email, GitHub) live in `src/lib/site.ts`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To-do before launch:
 
-## Learn More
+- [ ] Drop `resume.pdf` into `/public`
+- [ ] Add 2–3 testimonials to `src/content/testimonials.ts` (section auto-appears)
+- [ ] Set `BREVO_API_KEY` in Vercel env (sender email must be verified in Brevo)
 
-To learn more about Next.js, take a look at the following resources:
+## Plan
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The full PRD / design brief that guided this build is in [`portfolio-plan.md`](./portfolio-plan.md).
