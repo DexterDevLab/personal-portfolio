@@ -45,7 +45,7 @@ Sections marked `⏳ TBD` are pending answers. Sections marked `✅` are decided
 - **AI-assisted angle ✅:** **Supporting theme, not headline.** Framing: *"I ship fast by pairing AI leverage with real engineering judgment."* One-line/one-section treatment.
 - **React/Next.js truthful claim level ✅:** "Shipped 1–2 real Next.js/React apps (AI-assisted); actively deepening." This site's code is Exhibit A.
 - **Brand name ✅:** **DexterDevLab** (studio-style wordmark) as the visual logo. Signals a service/brand → reinforces freelance/client tilt.
-- **Domain ✅:** **dexteriglesia.com** (personal name; canonical `https://www.dexteriglesia.com/`).
+- **Domain ✅:** **dexteriglesia.com** (personal name; canonical `https://dexteriglesia.com/` — apex primary, www redirects to apex).
 - **Brand/domain reconciliation ✅:** logo/wordmark = **"DexterDevLab"**; person name = **"Dexter Iglesia"** (used in `<title>`, About, footer, JSON-LD `Person`). Personal-name domain = better SEO + human trust; studio wordmark = brand feel. Best-of-both.
 - **Voice ✅:** **Calm & confident + Warm & human** = "premium but approachable / a pro you'd enjoy working with." Short, precise, first-person, no hype.
 - **⚑ Emphasis correction (panel, Round 4):** User chose a studio brand + targets = SMB + agencies + startups, and did NOT select "established tech companies." → Real center of gravity is **client/freelance work**, startup-friendly as bonus. **Flip Round 1's "recruiters-first" to "client/'work-with-me'-first, with a clean profile startup recruiters also respect."** (Pending explicit confirmation.)
@@ -251,7 +251,7 @@ Built on **shadcn/ui** primitives (Radix a11y) + custom, styled with Tailwind. I
 
 ## 11. SEO Plan ✅ (v1)
 - **Primary keywords:** "freelance frontend developer Philippines", "web developer Philippines (remote)", "WordPress developer Philippines", "React / Next.js developer", "modern website design". Blend local (PH) + remote/global intent.
-- **Metadata:** Next.js Metadata API — `metadataBase: https://www.dexteriglesia.com`; unique `<title>`/description per route; canonical URLs.
+- **Metadata:** Next.js Metadata API — `metadataBase: https://dexteriglesia.com`; unique `<title>`/description per route; canonical URLs.
   - Home `<title>`: *"Dexter Iglesia — Frontend Developer | DexterDevLab"*; description: *"Frontend developer with 5+ years building fast, modern websites and web apps for businesses, agencies, and startups. Based in the Philippines, working worldwide."*
 - **Open Graph / Twitter:** custom OG image (1200×630, on-brand) — ideally dynamic via `next/og`. `summary_large_image` cards.
 - **Structured data (JSON-LD):** `Person` (name "Dexter Dela Iglesia", jobTitle "Frontend Developer", url dexteriglesia.com, `sameAs`: [github.com/DexterDevLab], knowsAbout: [React, Next.js, WordPress, WooCommerce, TypeScript, Tailwind]) + `WebSite`; `CreativeWork`/`Project` for featured work.

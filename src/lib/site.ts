@@ -3,7 +3,7 @@ export const site = {
   person: "Dexter Dela Iglesia",
   shortPerson: "Dexter Iglesia",
   role: "Frontend Developer",
-  url: "https://www.dexteriglesia.com",
+  url: "https://dexteriglesia.com",
   email: "info@dexteriglesia.com",
   github: "https://github.com/DexterDevLab",
   title: "Dexter Iglesia — Frontend Developer | DexterDevLab",
