@@ -112,11 +112,11 @@ export function ContactForm() {
         />
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center gap-2 rounded-button bg-accent-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="inline-flex shrink-0 items-center gap-2 rounded-button bg-accent-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {isSubmitting && (
             <LoaderCircle
@@ -126,7 +126,7 @@ export function ContactForm() {
           )}
           {isSubmitting ? "Sending…" : "Send message"}
         </button>
-        <div aria-live="polite">
+        <div aria-live="polite" className="min-w-0">
           {status.type === "sent" && (
             <p className="text-sm text-emerald-500">
               Thanks — your message is on its way. I&rsquo;ll reply soon.
