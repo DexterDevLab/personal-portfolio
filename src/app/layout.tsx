@@ -4,14 +4,19 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { site } from "@/lib/site";
 import "./globals.css";
 
+// display: "optional" — if the font misses first paint, keep the
+// size-adjusted fallback instead of swapping. A late swap repaints the
+// hero text and pushes LCP to the swap moment on slow connections.
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "optional",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "optional",
 });
 
 export const metadata: Metadata = {
