@@ -88,6 +88,54 @@ h3 {
 }
 
 /* ---------------------------------- */
+/* Entrance animations — §9           */
+/* ---------------------------------- */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hero entrance: pure CSS so the text appears with first paint instead of
+   waiting for JS to hydrate (the old framer-motion reveal cost ~2s of LCP
+   on slow mobile). */
+.animate-rise {
+  animation: rise-in 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+  animation-delay: var(--rise-delay, 0s);
+}
+
+/* Scroll reveal (below the fold): hidden until the Reveal component's
+   IntersectionObserver adds .is-visible. */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    transform 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------- */
 /* Living aurora (hero) — §9          */
 /* ---------------------------------- */
 @keyframes aurora-drift {

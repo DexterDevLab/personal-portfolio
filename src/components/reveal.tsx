@@ -1,10 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 /**
  * Scroll-reveal wrapper (§9): fade + 16px rise, once, staggered children.
- * Falls back to opacity-only under prefers-reduced-motion.
+ * CSS transition + IntersectionObserver — replaced framer-motion, whose
+ * bundle/hydration cost delayed LCP and interactivity on mobile.
+ * Falls back to fully visible under prefers-reduced-motion (see globals.css).
  */
 export function Reveal({
   className,
@@ -15,17 +18,35 @@ export function Reveal({
   delay?: number;
   children: React.ReactNode;
 }) {
-  const reduceMotion = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "-80px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+    <div
+      ref={ref}
+      className={cn("reveal", className)}
+      style={
+        delay
+          ? ({ "--reveal-delay": `${delay}s` } as React.CSSProperties)
+          : undefined
+      }
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
