@@ -15,8 +15,10 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10"
       >
-        <div className="animate-aurora absolute left-1/2 top-[-20%] h-125 w-200 -translate-x-1/2 rounded-full bg-accent-weak blur-[120px]" />
-        <div className="animate-aurora-alt absolute left-1/2 top-[10%] h-80 w-140 -translate-x-1/3 rounded-full bg-accent-weak blur-[100px]" />
+        {/* Phones: cheap gradient glow. md+: animated blurred blobs. */}
+        <div className="aurora-gradient absolute inset-0 md:hidden" />
+        <div className="animate-aurora absolute left-1/2 top-[-20%] hidden h-125 w-200 -translate-x-1/2 rounded-full bg-accent-weak blur-[120px] md:block" />
+        <div className="animate-aurora-alt absolute left-1/2 top-[10%] hidden h-80 w-140 -translate-x-1/3 rounded-full bg-accent-weak blur-[100px] md:block" />
       </div>
 
       <Container className="flex min-h-[min(92svh,860px)] flex-col justify-center pb-16 pt-32">

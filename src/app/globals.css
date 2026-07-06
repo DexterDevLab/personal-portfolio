@@ -138,6 +138,14 @@ h3 {
 /* ---------------------------------- */
 /* Living aurora (hero) — §9          */
 /* ---------------------------------- */
+/* Small screens get the glow as radial gradients instead of blur():
+   rasterizing the giant blurred blobs held the phone's first paint
+   for ~2s (black screen until the blur finished). */
+.aurora-gradient {
+  background:
+    radial-gradient(56rem 30rem at 50% -12%, var(--accent-weak), transparent 62%),
+    radial-gradient(36rem 20rem at 66% 16%, var(--accent-weak), transparent 60%);
+}
 @keyframes aurora-drift {
   0%,
   100% {
