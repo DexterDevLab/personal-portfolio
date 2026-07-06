@@ -81,7 +81,9 @@ export function Header() {
               </button>
             </Dialog.Trigger>
             <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
+              {/* No backdrop-blur — blurring the full page is what made
+                  open/close laggy on mobile; a darker scrim reads the same. */}
+              <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
               <Dialog.Content className="fixed inset-y-0 right-0 z-50 flex w-72 flex-col border-l border-border bg-background p-6">
                 <Dialog.Title className="sr-only">Menu</Dialog.Title>
                 <div className="flex items-center justify-between">

@@ -118,7 +118,9 @@ h3 {
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Animating huge blurred layers is too costly on phone GPUs — the aurora
+   stays a static glow below md and only drifts on larger screens. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
   .animate-aurora {
     animation: aurora-drift 14s ease-in-out infinite;
   }
