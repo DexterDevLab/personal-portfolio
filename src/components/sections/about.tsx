@@ -6,7 +6,7 @@ import { Reveal } from "@/components/reveal";
 export function About() {
   return (
     <Section id="about">
-      <SectionHeading title="Reliable, and easy to work with." />
+      <SectionHeading eyebrow="About" title="Reliable, and easy to work with." />
       <div className="grid items-start gap-10 md:grid-cols-[240px_1fr]">
         <Reveal>
           <Image

@@ -9,7 +9,7 @@ export function Testimonials() {
 
   return (
     <Section id="testimonials">
-      <SectionHeading title="Kind words." />
+      <SectionHeading eyebrow="What clients say" title="Kind words." />
       <div className="grid gap-4 md:grid-cols-3">
         {testimonials.map((t, i) => (
           <Reveal key={t.name} delay={i * 0.06}>

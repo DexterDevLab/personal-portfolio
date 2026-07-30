@@ -8,6 +8,7 @@ export function Services() {
   return (
     <Section id="services">
       <SectionHeading
+        eyebrow="What I do"
         title="Design, build, ship — end to end."
         description="Fast turnaround without the sloppy result. I ship polished, modern sites quickly."
       />

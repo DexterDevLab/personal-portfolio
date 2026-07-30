@@ -68,6 +68,7 @@ export function Work() {
   return (
     <Section id="work">
       <SectionHeading
+        eyebrow="Selected work"
         title="Real sites, shipped for real clients."
         description="A self-built management platform, e-commerce, rental, multilingual and booking sites, across many industries."
       />
