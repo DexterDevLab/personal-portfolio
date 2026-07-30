@@ -7,14 +7,14 @@ export function SectionHeading({
   description,
   className,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description?: string;
   className?: string;
 }) {
   return (
     <div className={cn("mb-12 max-w-2xl md:mb-16", className)}>
-      <Eyebrow className="mb-3">{eyebrow}</Eyebrow>
+      {eyebrow ? <Eyebrow className="mb-3">{eyebrow}</Eyebrow> : null}
       <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
         {title}
       </h2>

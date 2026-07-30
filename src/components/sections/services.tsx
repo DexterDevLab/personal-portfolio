@@ -8,9 +8,8 @@ export function Services() {
   return (
     <Section id="services">
       <SectionHeading
-        eyebrow="What I do"
         title="Design, build, ship — end to end."
-        description="Fast turnaround without the sloppy result — I ship polished, modern sites quickly."
+        description="Fast turnaround without the sloppy result. I ship polished, modern sites quickly."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {services.map((service, i) => (
@@ -30,7 +29,7 @@ export function Services() {
         ))}
       </div>
       <Reveal delay={0.2}>
-        <p className="mt-8 text-sm text-muted">{engagementLine}</p>
+        <p className="mt-8 max-w-2xl text-sm text-muted">{engagementLine}</p>
       </Reveal>
     </Section>
   );

@@ -34,14 +34,14 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub profile"
-            className="inline-flex size-9 items-center justify-center rounded-button border border-border text-muted transition-colors hover:border-muted hover:text-foreground"
+            className="inline-flex size-11 items-center justify-center rounded-button border border-border text-muted transition-colors hover:border-muted hover:text-foreground"
           >
             <GithubIcon />
           </a>
           <a
             href={`mailto:${site.email}`}
             aria-label="Email me"
-            className="inline-flex size-9 items-center justify-center rounded-button border border-border text-muted transition-colors hover:border-muted hover:text-foreground"
+            className="inline-flex size-11 items-center justify-center rounded-button border border-border text-muted transition-colors hover:border-muted hover:text-foreground"
           >
             <Mail className="size-4" aria-hidden="true" />
           </a>

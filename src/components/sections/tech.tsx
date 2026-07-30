@@ -7,10 +7,7 @@ import { skillGroups } from "@/content/skills";
 export function Tech() {
   return (
     <Section id="tech">
-      <SectionHeading
-        eyebrow="Tech & tools"
-        title="A modern, practical stack."
-      />
+      <SectionHeading title="A modern, practical stack." />
       <div className="flex flex-col gap-6">
         {skillGroups.map((group, i) => (
           <Reveal key={group.label} delay={i * 0.06}>

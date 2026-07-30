@@ -21,7 +21,7 @@ function ProjectCard({ project }: { project: Project }) {
           alt={`Screenshot of ${project.name}`}
           width={800}
           height={500}
-          className="aspect-16/10 w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.02]"
+          className="aspect-16/10 w-full object-cover object-top"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
       </div>
@@ -68,9 +68,8 @@ export function Work() {
   return (
     <Section id="work">
       <SectionHeading
-        eyebrow="Selected work"
         title="Real sites, shipped for real clients."
-        description="A self-built management platform, e-commerce, rental, multilingual and booking sites — across many industries."
+        description="A self-built management platform, e-commerce, rental, multilingual and booking sites, across many industries."
       />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project, i) => (
@@ -80,7 +79,7 @@ export function Work() {
         ))}
       </div>
       <Reveal delay={0.2}>
-        <p className="mt-8 text-sm text-muted">
+        <p className="mt-8 max-w-2xl text-sm text-muted">
           More work available on request —{" "}
           <a
             href={`mailto:${site.email}`}

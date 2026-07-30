@@ -10,7 +10,6 @@ export function Contact() {
   return (
     <Section id="contact">
       <SectionHeading
-        eyebrow="Contact"
         title="Let’s build something."
         description="Have a project in mind, or just want to say hi? Send a message and I’ll get back to you within a day or two."
       />
