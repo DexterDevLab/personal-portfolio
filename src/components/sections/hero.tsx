@@ -33,7 +33,7 @@ export function Hero() {
         </div>
         <div className="animate-rise" style={rise(0.16)}>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
-            I&rsquo;m Dexter Iglesia — a frontend developer with 10+ years
+            I&rsquo;m Dexter Iglesia, a frontend developer with 10+ years
             building sites for clients. I help businesses, agencies, and
             startups ship polished, fast websites using modern tools and an
             AI-accelerated workflow. Based in the Philippines, working with

@@ -16,7 +16,7 @@ export const services: Service[] = [
   {
     title: "Web apps (React / Next.js)",
     description:
-      "Interactive, modern web applications built with React and Next.js — from idea to deployment.",
+      "Interactive, modern web applications built with React and Next.js, from idea to deployment.",
     icon: Rocket,
   },
   {
@@ -28,10 +28,10 @@ export const services: Service[] = [
   {
     title: "Redesigns & performance",
     description:
-      "Refresh an aging site or speed up a slow one — modern design plus better Core Web Vitals.",
+      "Refresh an aging site or speed up a slow one: modern design plus better Core Web Vitals.",
     icon: Wrench,
   },
 ];
 
 export const engagementLine =
-  "Work with me on a fixed-scope project, ongoing care & maintenance, or hourly consulting — and I’m open to the right full-time role.";
+  "Work with me on a fixed-scope project, ongoing care & maintenance, or hourly consulting. I’m also open to the right full-time role.";

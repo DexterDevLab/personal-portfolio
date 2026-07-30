@@ -13,7 +13,7 @@ export const projects: Project[] = [
     slug: "panda-central",
     name: "Panda Central",
     blurb:
-      "A self-hosted platform managing 40+ client WordPress sites from one dashboard — automated updates, backups, uptime & vulnerability monitoring, and white-labeled client reports.",
+      "A self-hosted platform managing 40+ client WordPress sites from one dashboard: automated updates, backups, uptime & vulnerability monitoring, and white-labeled client reports.",
     tags: ["Next.js", "TypeScript", "BullMQ", "Postgres"],
     url: "https://manager.pandavisuals.cloud/",
     image: "/images/projects/panda-central.jpg",
@@ -31,7 +31,7 @@ export const projects: Project[] = [
     slug: "glanzstueck",
     name: "Glanzstück",
     blurb:
-      "A rental platform for an events-equipment company — WooCommerce reshaped into a clean “rent, don’t buy” experience.",
+      "A rental platform for an events-equipment company: WooCommerce reshaped into a clean “rent, don’t buy” experience.",
     tags: ["WordPress", "WooCommerce", "Rental"],
     url: "https://www.glanzstueck-verleih.de/",
     image: "/images/projects/glanzstueck.jpg",
