@@ -1,0 +1,27 @@
+---
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/Reveal.astro";
+import { processSteps } from "@/data/process";
+---
+
+<Section id="process" compact class="border-t border-border">
+  <SectionHeading eyebrow="How I work" title="Plain steps, no surprises." />
+  <ol class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      processSteps.map((step, i) => (
+        <Reveal delay={i * 0.06}>
+          <li class="flex gap-4 lg:block">
+            <span class="font-mono text-sm text-accent lg:mb-4 lg:block" aria-hidden="true">
+              0{i + 1}
+            </span>
+            <div>
+              <h3 class="text-base font-medium">{step.title}</h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted">{step.description}</p>
+            </div>
+          </li>
+        </Reveal>
+      ))
+    }
+  </ol>
+</Section>

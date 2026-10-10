@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dexteriglesia.com/sitemap-index.xml

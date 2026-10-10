@@ -1,0 +1,30 @@
+---
+import { getCollection } from "astro:content";
+import Base from "@/layouts/Base.astro";
+import JsonLd from "@/components/JsonLd.astro";
+import Hero from "@/components/sections/Hero.astro";
+import Featured from "@/components/sections/Featured.astro";
+import Work from "@/components/sections/Work.astro";
+import Services from "@/components/sections/Services.astro";
+import Process from "@/components/sections/Process.astro";
+import About from "@/components/sections/About.astro";
+import Contact from "@/components/sections/Contact.astro";
+
+const work = (await getCollection("work")).sort((a, b) => a.data.order - b.data.order);
+const featured = work.find((entry) => entry.data.featured);
+if (!featured) throw new Error("Mark exactly one entry in src/content/work as `featured: true`.");
+const clientWork = work.filter((entry) => !entry.data.featured);
+---
+
+<Base>
+  <Fragment slot="head">
+    <JsonLd projects={work} />
+  </Fragment>
+  <Hero featured={featured} />
+  <Featured project={featured} />
+  <Work projects={clientWork} />
+  <Services />
+  <Process />
+  <About />
+  <Contact />
+</Base>

@@ -1,0 +1,33 @@
+---
+import { ArrowUp } from "@lucide/astro";
+---
+
+<!-- Hidden until #top leaves the viewport; the observer keeps work off the scroll thread. -->
+<button
+  type="button"
+  aria-label="Back to top"
+  tabindex="-1"
+  data-back-to-top
+  class="pointer-events-none fixed right-5 bottom-5 z-40 inline-flex size-11 translate-y-3 items-center justify-center rounded-button border border-border bg-surface text-muted opacity-0 shadow-lg shadow-black/25 transition-[opacity,transform,color,border-color] duration-200 hover:border-border-strong hover:text-foreground data-[visible]:pointer-events-auto data-[visible]:translate-y-0 data-[visible]:opacity-100 sm:right-6 sm:bottom-6"
+>
+  <ArrowUp class="size-5" aria-hidden="true" />
+</button>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>("[data-back-to-top]");
+  const top = document.getElementById("top");
+
+  if (button && top) {
+    const observer = new IntersectionObserver(([entry]) => {
+      const visible = !entry.isIntersecting;
+      button.toggleAttribute("data-visible", visible);
+      button.tabIndex = visible ? 0 : -1;
+    });
+    observer.observe(top);
+
+    button.addEventListener("click", () => {
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    });
+  }
+</script>

@@ -1,0 +1,90 @@
+import { BREVO_API_KEY, CONTACT_EMAIL } from "astro:env/server";
+import { contactSchema } from "@/lib/contact-schema";
+import { CONTACT_MESSAGES } from "@/lib/contact-messages";
+import { site } from "@/data/site";
+
+export type ContactErrorCode =
+  | "invalid-name"
+  | "invalid-email"
+  | "invalid-message"
+  | "invalid"
+  | "not-configured"
+  | "failed";
+
+export type ContactResult =
+  | { ok: true }
+  | { ok: false; code: ContactErrorCode; error: string; status: number };
+
+/** Message for a given error code — used by the no-JS error page. */
+export function messageForCode(code: string | null): string {
+  switch (code) {
+    case "invalid-name":
+      return contactSchema.shape.name.safeParse("").error?.issues[0]?.message ?? CONTACT_MESSAGES.invalid;
+    case "invalid-email":
+      return contactSchema.shape.email.safeParse("x").error?.issues[0]?.message ?? CONTACT_MESSAGES.invalid;
+    case "invalid-message":
+      return contactSchema.shape.message.safeParse("").error?.issues[0]?.message ?? CONTACT_MESSAGES.invalid;
+    case "invalid":
+      return CONTACT_MESSAGES.invalid;
+    case "not-configured":
+      return CONTACT_MESSAGES.notConfigured;
+    default:
+      return CONTACT_MESSAGES.failed;
+  }
+}
+
+/**
+ * Validates the submission and delivers it through Brevo's transactional
+ * email API. Reads BREVO_API_KEY / CONTACT_EMAIL from the server environment.
+ */
+export async function sendContact(input: unknown): Promise<ContactResult> {
+  const parsed = contactSchema.safeParse(input);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    const field = issue?.path[0];
+    const code: ContactErrorCode =
+      field === "name" || field === "email" || field === "message" ? `invalid-${field}` : "invalid";
+    return { ok: false, code, error: issue?.message ?? CONTACT_MESSAGES.invalid, status: 400 };
+  }
+
+  // Honeypot tripped — pretend success so bots learn nothing.
+  if (parsed.data.company) {
+    return { ok: true };
+  }
+
+  const apiKey = BREVO_API_KEY;
+  const to = CONTACT_EMAIL ?? site.email;
+  if (!apiKey) {
+    console.error("BREVO_API_KEY is not configured.");
+    return { ok: false, code: "not-configured", error: CONTACT_MESSAGES.notConfigured, status: 503 };
+  }
+
+  const { name, email, message } = parsed.data;
+
+  try {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": apiKey,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: { name: "Portfolio Contact", email: to },
+        to: [{ email: to, name: site.person }],
+        replyTo: { email, name },
+        subject: `Portfolio inquiry from ${name}`,
+        textContent: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("Brevo error:", res.status, await res.text());
+      return { ok: false, code: "failed", error: CONTACT_MESSAGES.failed, status: 502 };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error("sendContact failed:", err);
+    return { ok: false, code: "failed", error: CONTACT_MESSAGES.failed, status: 502 };
+  }
+}

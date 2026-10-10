@@ -1,0 +1,20 @@
+---
+import Container from "./Container.astro";
+
+interface Props {
+  id?: string;
+  class?: string;
+  /** Tighter vertical rhythm for secondary sections. */
+  compact?: boolean;
+}
+const { id, class: className, compact = false } = Astro.props;
+---
+
+<section
+  id={id}
+  class:list={[compact ? "py-14 md:py-20" : "py-16 md:py-24", className]}
+>
+  <Container>
+    <slot />
+  </Container>
+</section>

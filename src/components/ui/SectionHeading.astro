@@ -1,0 +1,23 @@
+---
+import Eyebrow from "./Eyebrow.astro";
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  class?: string;
+}
+const { eyebrow, title, description, class: className } = Astro.props;
+---
+
+<div class:list={["mb-10 max-w-2xl md:mb-14", className]}>
+  {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
+  <h2 class="text-3xl font-semibold leading-tight md:text-4xl">{title}</h2>
+  {
+    description && (
+      <p class="mt-4 text-base leading-relaxed text-muted md:text-lg">
+        {description}
+      </p>
+    )
+  }
+</div>

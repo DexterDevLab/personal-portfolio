@@ -8,59 +8,62 @@ web
 
 ## Users
 
-Prospective clients evaluating a freelance frontend developer to hire — weighted **equally** across three audiences:
+Prospective clients evaluating a freelance web developer to hire:
 
-- **Small & local businesses** — owners who want a fast, modern site and value reliability over jargon.
-- **Agencies** — studios looking to subcontract frontend / overflow work to a dependable dev (white-label capable).
-- **Startups** — founders needing polished product UI and web apps shipped quickly.
+- **Small and local businesses** that need a site built, fixed, or kept running.
+- **Agencies and designers** looking for a dependable developer to handle the build side.
+- **Founders and teams** that need a custom web app or an internal tool.
 
-Typical situation: a visitor lands on dexteriglesia.com, skims the work and services, and decides whether to reach out. The job to be done is "decide whether Dexter is the right person to build/fix my website or web app, then make contact."
+Typical situation: a visitor lands on dexteriglesia.com, skims the work and services, and decides whether to reach out. The job to be done is "decide whether Dexter is the right person to build, fix, or maintain my website or web app, then make contact."
 
 ## Product Purpose
 
-A personal portfolio for **Dexter Iglesia** (brand: **DexterDevLab**) that converts visitors into qualified freelance inquiries by demonstrating credibility, range, and craft. Success = a contact-form submission (or résumé download / GitHub visit) from a real prospect.
+A personal portfolio for **Dexter Iglesia** (brand: **DexterDevLab**) that converts visitors into freelance inquiries by showing real work, a clear offer, and a practical, persistent way of working. Success = a contact-form submission or direct email from a real prospect.
 
 ## Positioning
 
-Lead differentiator: an **AI-accelerated workflow** — modern tools plus AI to ship polished, fast websites and web apps faster than a typical freelancer. This is substantiated (not a gimmick) by 10+ years of experience and a real production platform, so the claim reads as "faster *and* dependable," never "cheap shortcut."
+**Freelance web developer who builds, troubleshoots, launches, and maintains websites and web apps.** Strongest in WordPress/WooCommerce, HTML/CSS/JavaScript, some PHP; building custom web apps (Panda Central is the proof). Works with a designer colleague when a project needs design; clients can hire Dexter directly or the two of them as a team.
+
+AI-assisted development is part of the workflow and is stated plainly, but it is a supporting theme, not the headline. Do not position Dexter as a graphic designer, branding expert, agency, or an expert in technologies the work doesn't substantiate.
 
 ## Operating Context
 
-- Single-page site at **dexteriglesia.com**. Work, Services, About, and Contact are scroll-anchor sections on `/`, not separate routes (Search Console correctly reports one indexed page).
-- Contact runs through a **Brevo**-powered form delivering to **info@dexteriglesia.com** (MX/SPF/DKIM live). This flow must keep working.
-- A downloadable **résumé** is served at `public/resume.pdf`.
+- Homepage at **dexteriglesia.com** with anchor sections (`#work`, `#services`, `#about`, `#contact`) plus one case-study route, `/work/panda-central`.
+- Contact runs through a **Brevo**-powered form delivering to **info@dexteriglesia.com**. Works without JavaScript (server redirect to a status page). This flow must keep working.
+- A downloadable **résumé** is served at `/resume.pdf`.
 - Deployed on Vercel, auto-deploying on push to `main`.
 
 ## Capabilities and Constraints
 
-- **Services presented:** Website design & build · Web apps (React / Next.js) · WordPress development · Redesigns & performance.
-- **Work section:** 7 real projects.
-- **Tech constraint:** built on a modified Next.js 16 — per AGENTS.md, read `node_modules/next/dist/docs/` before writing framework code.
-- **Motion is intentionally capped** (aurora glow + cursor spotlight + scroll reveals only); do not add more without cause.
-- **Performance is a hard constraint, not a nice-to-have** — the live site is PSI mobile ~99 / LCP ~1.5s. Above-the-fold content must not reintroduce framer-motion, backdrop-blur, or opacity-entrances that regressed LCP previously.
+- **Services presented:** Website development (with designer collaboration) · WordPress & WooCommerce troubleshooting · Custom web applications · Hosting, deployment & maintenance.
+- **Work section:** 1 featured project (Panda Central, with case study) + 5 client WordPress sites credited as "Development · Design by a designer colleague".
+- **Tech constraint:** Astro 7, static output, no UI framework; see `AGENTS.md`.
+- **Motion is intentionally capped** (aurora glow, scroll reveals, a light hero-frame tilt on hover only); respect `prefers-reduced-motion`.
+- **Performance is a hard constraint.** The hero image is the LCP element and loads eagerly; nothing above the fold waits for JavaScript; no backdrop-blur or opacity entrances above the fold.
 
 ## Brand Commitments
 
-- **Wordmark:** DexterDevLab. **Person:** Dexter Dela Iglesia (short: Dexter Iglesia). **Role:** Frontend Developer.
-- **Colors:** accent `#4f7cff`, near-black background `#0a0a0b`. **Type:** Geist (sans) / Geist Mono (mono wordmark).
+- **Wordmark:** DexterDevLab. **Person:** Dexter Dela Iglesia (short: Dexter Iglesia). **Role:** Freelance Web Developer.
+- **Colors:** accent `#4f7cff`, near-black background `#0a0a0b`; light theme is a first-class citizen. **Type:** Geist (sans) / Geist Mono (mono wordmark and section kickers).
+- **Section kickers** (mono uppercase labels) are a deliberate brand element — keep them.
 - **Contact identity:** info@dexteriglesia.com · GitHub DexterDevLab.
-- **Copy claims to preserve as-is:** "10+ years" building sites, Philippines-based / working worldwide, available for freelance projects.
+- **Copy claims to preserve:** "10+ years", Philippines-based / working worldwide, "Available for freelance projects" (configurable in `src/data/site.ts`).
 
 ## Evidence on Hand
 
-- **`public/resume.pdf`** — real résumé backing the 10+ years claim (keep in sync with any copy changes).
-- **7 real projects** in the work section.
-- **Panda Central** (manager.pandavisuals.cloud; private repo DexterDevLab/wp-management) — a real Next.js/TS/BullMQ/Postgres platform managing 40+ client WordPress sites; the flagship proof that Dexter builds real systems, not just brochure sites.
-- **No testimonials yet** — `src/content/testimonials.ts` is an empty array and the section only renders when real entries are added. Future work must **not fabricate** testimonials, clients, metrics, or press.
+- **`public/resume.pdf`** backs the 10+ years claim.
+- **Panda Central** (manager.pandavisuals.cloud, login-gated) — real internal web app managing client WordPress sites; one dashboard screenshot on hand. Backups / uptime / vulnerability monitoring are described features carried over from earlier copy, not visible in the screenshot.
+- **5 real client sites** with live URLs and screenshots.
+- **No testimonials, metrics, logos, awards, or certifications** — never fabricate them. No empty testimonial sections.
 
 ## Product Principles
 
-1. **Every choice serves the inquiry.** Credibility and clarity over decoration; the page exists to earn a contact.
-2. **Truthful and verifiable.** Real experience, real projects, real platform — never invent testimonials, clients, or numbers.
-3. **The site is the sample.** It must itself exemplify the fast, modern craft it sells; performance regressions undermine the pitch.
-4. **One message, broad reach.** Serve businesses, agencies, and startups without diluting the AI-accelerated-yet-dependable positioning.
+1. **Every choice serves the inquiry.** Clarity and credibility over decoration.
+2. **Truthful and verifiable.** Real projects, real contribution, honest about AI assistance and collaboration.
+3. **The site is the sample.** Fast, accessible, and maintainable, because that is what's being sold.
+4. **Easy to maintain.** Content lives in markdown and small TS files; no CMS.
 5. **Brand and confirmed copy are fixed authority.** Preserve wordmark, palette, type, and existing claims unless the user changes them.
 
 ## Accessibility & Inclusion
 
-No formal standard was set as a product requirement. Baseline good practice is already in the code (visible focus rings, AA-passing accent for button text, reduced-motion fallbacks) and should be maintained as a floor.
+Baseline: semantic HTML and heading hierarchy, keyboard-accessible navigation and dialog, visible focus rings, labelled form fields with inline validation, meaningful alt text, AA contrast in both themes, 44px touch targets, reduced-motion fallbacks, no hover-only information.

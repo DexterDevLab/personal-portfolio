@@ -1,0 +1,60 @@
+---
+import { ArrowRight, ArrowUpRight } from "@lucide/astro";
+import type { CollectionEntry } from "astro:content";
+import Button from "@/components/ui/Button.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import Section from "@/components/ui/Section.astro";
+import Tag from "@/components/ui/Tag.astro";
+import Reveal from "@/components/Reveal.astro";
+
+interface Props {
+  project: CollectionEntry<"work">;
+}
+const { project } = Astro.props;
+const { data } = project;
+---
+
+<Section id="featured" compact class="border-t border-border">
+  <Reveal>
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-14">
+      <div>
+        <Eyebrow class="mb-3">Featured project</Eyebrow>
+        <h2 class="text-3xl font-semibold leading-tight md:text-4xl">{data.title}</h2>
+        <p class="mt-3 text-sm text-muted">
+          {data.statusLabel ?? "Live"} · {data.role}
+        </p>
+        <div class="mt-5 flex flex-wrap gap-2">
+          {data.stack.map((tag) => <Tag>{tag}</Tag>)}
+        </div>
+      </div>
+      <div class="max-w-2xl">
+        <h3 class="text-base font-medium">The problem</h3>
+        <p class="mt-2 leading-relaxed text-muted">
+          Every client WordPress site needs the same recurring care: core, plugin, and theme updates, backups,
+          uptime checks, and a periodic report. Across many sites, doing that one admin login at a time is slow
+          and easy to get wrong.
+        </p>
+        <h3 class="mt-6 text-base font-medium">What I built</h3>
+        <p class="mt-2 leading-relaxed text-muted">
+          A self-hosted dashboard that shows every managed site in one place, runs updates as queued background
+          jobs, logs every action and failure, and groups sites by client for reporting. My designer colleague and
+          I shaped the idea; I planned and developed it with substantial AI assistance, and we use it every day.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <Button href={`/work/${project.id}`}>
+            Read the case study
+            <ArrowRight class="size-4" aria-hidden="true" />
+          </Button>
+          {
+            data.liveUrl && (
+              <Button href={data.liveUrl} external variant="secondary">
+                Open {data.title}
+                <ArrowUpRight class="size-4 text-muted" aria-hidden="true" />
+              </Button>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </Reveal>
+</Section>

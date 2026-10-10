@@ -1,0 +1,61 @@
+---
+import { Picture } from "astro:assets";
+import { ArrowUpRight, Lock } from "@lucide/astro";
+import type { CollectionEntry } from "astro:content";
+import Screenshot from "@/components/ui/Screenshot.astro";
+import Tag from "@/components/ui/Tag.astro";
+
+interface Props {
+  project: CollectionEntry<"work">;
+}
+const { project } = Astro.props;
+const { data } = project;
+const host = data.liveUrl ? new URL(data.liveUrl).host.replace(/^www\./, "") : undefined;
+---
+
+<article class="group flex h-full flex-col">
+  <Screenshot label={host} class="transition-[border-color] duration-200 group-hover:border-border-strong">
+    <Picture
+      src={data.screenshot}
+      alt={data.screenshotAlt}
+      formats={["avif", "webp"]}
+      widths={[400, 640, 800]}
+      sizes="(max-width: 640px) calc(100vw - 2.5rem), (max-width: 1024px) 50vw, 33vw"
+      loading="lazy"
+      class="aspect-16/10 w-full object-cover object-top"
+    />
+  </Screenshot>
+  <div class="flex flex-1 flex-col pt-4">
+    <h3 class="text-base font-medium">
+      {
+        data.liveUrl ? (
+          <a
+            href={data.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 after:absolute after:inset-0 after:content-['']"
+          >
+            {data.title}
+            <ArrowUpRight
+              class="size-4 text-muted transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
+              aria-hidden="true"
+            />
+          </a>
+        ) : (
+          <span class="inline-flex items-center gap-1.5">
+            {data.title}
+            <Lock class="size-3.5 text-muted" aria-hidden="true" />
+          </span>
+        )
+      }
+    </h3>
+    <p class="mt-2 text-sm leading-relaxed text-muted">{data.summary}</p>
+    <p class="mt-3 text-xs text-muted">
+      <span class="font-medium text-foreground">{data.role}</span>
+      {data.design && <span> · Design by {data.design}</span>}
+    </p>
+    <div class="mt-4 flex flex-wrap gap-2">
+      {data.stack.map((tag) => <Tag>{tag}</Tag>)}
+    </div>
+  </div>
+</article>

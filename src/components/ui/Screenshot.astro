@@ -1,0 +1,36 @@
+---
+/**
+ * Consistent frame for project screenshots: a thin "window" chrome with a
+ * neutral bezel so screenshots of very different sites read as one set.
+ * The image itself is passed as the default slot.
+ */
+interface Props {
+  class?: string;
+  /** Show the three window dots in the top bar. */
+  chrome?: boolean;
+  /** Optional label rendered in the title bar (e.g. a domain). */
+  label?: string;
+}
+const { class: className, chrome = true, label } = Astro.props;
+---
+
+<div
+  class:list={[
+    "overflow-hidden rounded-card border border-border bg-frame shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]",
+    className,
+  ]}
+>
+  {
+    chrome && (
+      <div class="flex h-8 items-center gap-1.5 border-b border-border px-3" aria-hidden="true">
+        <span class="size-2 rounded-full bg-border-strong" />
+        <span class="size-2 rounded-full bg-border-strong" />
+        <span class="size-2 rounded-full bg-border-strong" />
+        {label && (
+          <span class="ml-3 truncate font-mono text-[11px] leading-none text-muted">{label}</span>
+        )}
+      </div>
+    )
+  }
+  <slot />
+</div>

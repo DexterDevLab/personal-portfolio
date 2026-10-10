@@ -1,0 +1,60 @@
+---
+import { Image } from "astro:assets";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/Reveal.astro";
+import Tag from "@/components/ui/Tag.astro";
+import portrait from "@/assets/portrait.jpg";
+import { site } from "@/data/site";
+
+const stack = [
+  "WordPress",
+  "WooCommerce",
+  "HTML & CSS",
+  "JavaScript",
+  "PHP",
+  "Next.js & TypeScript",
+  "Astro",
+  "Git",
+  "Vercel",
+  "AI-assisted development",
+];
+---
+
+<Section id="about" class="border-t border-border">
+  <SectionHeading eyebrow="About" title="A developer who sticks with the problem." />
+  <div class="grid items-start gap-10 md:grid-cols-[240px_1fr]">
+    <Reveal>
+      <Image
+        src={portrait}
+        alt={`Portrait of ${site.person}`}
+        width={480}
+        densities={[1, 2]}
+        loading="lazy"
+        class="aspect-4/5 w-full max-w-60 rounded-card border border-border object-cover object-top"
+      />
+    </Reveal>
+    <Reveal delay={0.08}>
+      <div class="max-w-2xl space-y-4 text-base leading-relaxed text-muted">
+        <p>
+          I've been building websites for over 10 years, starting with WordPress and growing from there into
+          custom web applications. I'm a programmer first: what I enjoy is working out why something doesn't
+          behave, and building the thing that makes it work.
+        </p>
+        <p>
+          I work with {site.designer} who brings in clients and handles design; I take projects from setup through
+          development, launch, and maintenance. You can hire me directly or work with the two of us together. It's
+          a two-person collaboration, not an agency.
+        </p>
+        <p>
+          AI-assisted development is part of how I work now. I use it to move faster on implementation and to
+          explore approaches, and I take responsibility for reviewing, testing, and shipping what comes out of it.
+          Panda Central is the clearest example: a production tool, built that way.
+        </p>
+      </div>
+      <div class="mt-6 flex flex-wrap gap-2">
+        {stack.map((item) => <Tag>{item}</Tag>)}
+      </div>
+    </Reveal>
+  </div>
+</Section>

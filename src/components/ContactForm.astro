@@ -1,0 +1,167 @@
+---
+import { LoaderCircle } from "@lucide/astro";
+
+/**
+ * Progressive-enhancement contact form. Without JS the browser enforces the
+ * native constraints and POSTs to /api/contact, which redirects to a status
+ * page. With JS the script below validates with the shared zod schema, posts
+ * JSON, and renders the result inline.
+ */
+const inputClasses =
+  "w-full rounded-button border border-border bg-surface px-4 py-3 text-base placeholder:text-muted focus:border-accent focus:outline-none aria-invalid:border-danger sm:py-2.5 sm:text-sm";
+---
+
+<form method="post" action="/api/contact" class="space-y-4" data-contact-form>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <label for="name" class="mb-1.5 block text-sm font-medium">Name</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        autocomplete="name"
+        placeholder="Your name"
+        required
+        minlength="2"
+        maxlength="100"
+        aria-describedby="name-error"
+        class={inputClasses}
+      />
+      <p id="name-error" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+    </div>
+    <div>
+      <label for="email" class="mb-1.5 block text-sm font-medium">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        required
+        aria-describedby="email-error"
+        class={inputClasses}
+      />
+      <p id="email-error" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+    </div>
+  </div>
+
+  <div>
+    <label for="message" class="mb-1.5 block text-sm font-medium">Message</label>
+    <textarea
+      id="message"
+      name="message"
+      rows="5"
+      placeholder="Tell me a little about your project…"
+      required
+      minlength="10"
+      maxlength="5000"
+      aria-describedby="message-error"
+      class:list={[inputClasses, "resize-y"]}></textarea>
+    <p id="message-error" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+  </div>
+
+  <!-- Honeypot — visually hidden, real users never fill this -->
+  <div aria-hidden="true" class="absolute top-auto -left-[9999px]">
+    <label for="company">Company</label>
+    <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+    <button
+      type="submit"
+      data-submit
+      class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-button bg-accent-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+    >
+      <span class="inline-flex" data-spinner hidden>
+        <LoaderCircle class="size-4 animate-spin" aria-hidden="true" />
+      </span>
+      <span data-submit-label>Send message</span>
+    </button>
+    <p aria-live="polite" class="min-w-0 text-sm data-[tone=error]:text-danger data-[tone=success]:text-success" data-status></p>
+  </div>
+</form>
+
+<script>
+  import { contactSchema } from "@/lib/contact-schema";
+  import { CONTACT_MESSAGES } from "@/lib/contact-messages";
+
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+
+  if (form) {
+    // JS takes over validation so messages match the server exactly.
+    form.noValidate = true;
+
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;
+    const label = form.querySelector<HTMLElement>("[data-submit-label]")!;
+    const spinner = form.querySelector<HTMLElement>("[data-spinner]")!;
+    const status = form.querySelector<HTMLElement>("[data-status]")!;
+    const fields = ["name", "email", "message"] as const;
+
+    const setStatus = (tone: "success" | "error" | "", text: string) => {
+      status.textContent = text;
+      if (tone) status.dataset.tone = tone;
+      else delete status.dataset.tone;
+    };
+
+    const setFieldError = (field: string, message?: string) => {
+      const input = form.elements.namedItem(field) as HTMLInputElement | null;
+      const error = form.querySelector<HTMLElement>(`#${field}-error`);
+      if (!input || !error) return;
+      input.setAttribute("aria-invalid", message ? "true" : "false");
+      error.textContent = message ?? "";
+      error.hidden = !message;
+    };
+
+    const setBusy = (busy: boolean) => {
+      submit.disabled = busy;
+      spinner.hidden = !busy;
+      label.textContent = busy ? "Sending…" : "Send message";
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setStatus("", "");
+
+      const data = Object.fromEntries(new FormData(form));
+      const parsed = contactSchema.safeParse(data);
+
+      fields.forEach((f) => setFieldError(f));
+      if (!parsed.success) {
+        let firstInvalid: string | undefined;
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0]);
+          const error = form.querySelector<HTMLElement>(`#${field}-error`);
+          if (error && error.hidden) {
+            setFieldError(field, issue.message);
+            firstInvalid ??= field;
+          }
+        }
+        (form.elements.namedItem(firstInvalid ?? "name") as HTMLElement | null)?.focus();
+        return;
+      }
+
+      setBusy(true);
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          headers: { "content-type": "application/json", accept: "application/json" },
+          body: JSON.stringify(parsed.data),
+        });
+        const result = (await res.json().catch(() => null)) as
+          | { ok: true }
+          | { ok: false; error?: string }
+          | null;
+        if (result?.ok) {
+          form.reset();
+          setStatus("success", CONTACT_MESSAGES.success);
+        } else {
+          setStatus("error", result?.error ?? CONTACT_MESSAGES.failed);
+        }
+      } catch {
+        setStatus("error", CONTACT_MESSAGES.failed);
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+</script>

@@ -1,0 +1,40 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { site } from "@/data/site";
+
+interface Props {
+  projects: CollectionEntry<"work">[];
+}
+const { projects } = Astro.props;
+
+const data = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      name: site.person,
+      alternateName: site.shortPerson,
+      jobTitle: "Web Developer",
+      url: site.url,
+      email: `mailto:${site.email}`,
+      sameAs: [site.github],
+      knowsAbout: ["WordPress", "WooCommerce", "JavaScript", "PHP", "Next.js", "Astro"],
+      address: { "@type": "PostalAddress", addressCountry: "PH" },
+    },
+    {
+      "@type": "WebSite",
+      name: site.name,
+      url: site.url,
+    },
+    ...projects.map((p) => ({
+      "@type": "CreativeWork",
+      name: p.data.title,
+      url: p.data.caseStudy ? `${site.url}/work/${p.id}` : p.data.liveUrl,
+      description: p.data.summary,
+      contributor: { "@type": "Person", name: site.person },
+    })),
+  ],
+};
+---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(data)} />
