@@ -388,6 +388,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     if (robot) {
       robot.roaming = false;
       robotPoint(seq, robot, station.focus);
+      if (!state.reducedMotion) robot.say(STATION_BY_ID[id].label + "!", 2.6);
     }
     travelTo(station.pose, () => {
       setPhase("station");
@@ -520,12 +521,15 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     // A loop through the free floor between the stations (clear of the
     // desks, the bench, the terminal, the notebook table and the lamp).
     robot.setPath([
-      new Vector3(1.6, 0, -0.8),
-      new Vector3(0.3, 0, -1.0),
-      new Vector3(-0.6, 0, 0.1),
-      new Vector3(-0.4, 0, 1.45),
+      new Vector3(1.6, 0, -0.8), // beside the console
+      new Vector3(0.3, 0, -0.9),
+      new Vector3(-0.6, 0, -0.4),
+      new Vector3(-2.55, 0, -1.6), // along the experiment shelves…
+      new Vector3(-2.7, 0, -0.1), // …to their front end
+      new Vector3(-0.7, 0, 0.2),
+      new Vector3(-0.4, 0, 1.45), // between the bench and the terminal
       new Vector3(0.5, 0, 0.5),
-      new Vector3(1.9, 0, -0.2),
+      new Vector3(1.9, 0, -0.2), // past the notebook
     ]);
     robot.group.rotation.y = -0.6;
     robot.roaming = !state.reducedMotion;
@@ -639,6 +643,9 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       },
       stations: STATION_BY_ID,
       gsap,
+      get robot() {
+        return robot;
+      },
       /** Run one frame synchronously (useful when rAF is paused, e.g. hidden tabs). */
       step: () => {
         gsap.ticker.tick();

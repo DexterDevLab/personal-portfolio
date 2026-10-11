@@ -1,4 +1,4 @@
-import { Group, MathUtils, Mesh, Vector3 } from "three";
+import { CanvasTexture, Group, MathUtils, Mesh, SRGBColorSpace, Sprite, SpriteMaterial, Vector3 } from "three";
 import { PALETTE } from "../config";
 import { contactShadow, cyl, plane, rbox, sphere } from "../geometry";
 import type { Animator, BuildContext } from "./types";
@@ -26,6 +26,22 @@ export class Robot {
   busy = false;
   /** Walk the loop when true (overview); stops while a station is focused. */
   roaming = true;
+  /** Lines the robot "thinks" while pausing on its walk. */
+  idleLines = [
+    "What are you looking for?",
+    "Try the repair bench!",
+    "The console runs Panda Central.",
+    "Need a website fixed?",
+    "Drag to look around.",
+    "Client sites are on the shelves.",
+  ];
+
+  private readonly bubble: Sprite;
+  private readonly bubbleCanvas: HTMLCanvasElement;
+  private readonly bubbleTexture: CanvasTexture;
+  private bubbleUntil = 0;
+  private bubbleScale = 0;
+  private lastLine = -1;
 
   private blinkAt = 2.5;
   private phase = 0;
@@ -119,7 +135,82 @@ export class Robot {
     this.armRight = makeArm(1);
     this.body.add(this.armLeft, this.armRight);
 
+    // Thought bubble: a camera-facing sprite drawn on a canvas, hidden until say()
+    this.bubbleCanvas = document.createElement("canvas");
+    this.bubbleCanvas.width = 512;
+    this.bubbleCanvas.height = 288;
+    this.bubbleTexture = new CanvasTexture(this.bubbleCanvas);
+    this.bubbleTexture.colorSpace = SRGBColorSpace;
+    this.bubble = new Sprite(new SpriteMaterial({ map: this.bubbleTexture, transparent: true, depthWrite: false, toneMapped: false }));
+    this.bubble.center.set(0.12, 0); // anchor near the bottom-left tail
+    this.bubble.position.set(0.22, 1.62, 0);
+    this.bubble.scale.set(0, 0, 1);
+    this.bubble.renderOrder = 10;
+    this.body.add(this.bubble);
+
     g.add(contactShadow(ctx.shared, 0.3, { position: [0, 0, 0] }));
+  }
+
+  /** Show a cartoon thought bubble above the head for `seconds`. */
+  say(text: string, seconds = 3.2) {
+    this.drawBubble(text);
+    this.bubbleUntil = -1; // resolved on the next animator tick (needs its clock)
+    this.pendingBubbleSeconds = seconds;
+  }
+  private pendingBubbleSeconds = 0;
+
+  private drawBubble(text: string) {
+    const c = this.bubbleCanvas.getContext("2d");
+    if (!c) return;
+    const W = this.bubbleCanvas.width;
+    const H = this.bubbleCanvas.height;
+    c.clearRect(0, 0, W, H);
+    c.font = `600 40px "Geist Mono", ui-monospace, monospace`;
+    // Wrap into at most two lines
+    const words = text.split(" ");
+    const lines: string[] = [];
+    let line = "";
+    for (const w of words) {
+      const probe = line ? `${line} ${w}` : w;
+      if (c.measureText(probe).width > W - 120 && line) {
+        lines.push(line);
+        line = w;
+      } else line = probe;
+    }
+    if (line) lines.push(line);
+    const body = { x: 56, y: 16, w: W - 72, h: lines.length > 1 ? 190 : 140, r: 44 };
+    const stroke = () => {
+      c.lineWidth = 9;
+      c.strokeStyle = "#24242a";
+      c.fillStyle = "#fff8ec";
+    };
+    // Bubble body (cloud-like: rounded rect with bumps on top)
+    stroke();
+    c.beginPath();
+    c.roundRect(body.x, body.y, body.w, body.h, body.r);
+    c.fill();
+    c.stroke();
+    // Tail: two shrinking circles toward the head (bottom-left)
+    for (const [x, y, r] of [
+      [body.x + 28, body.y + body.h + 28, 20],
+      [body.x - 4, body.y + body.h + 62, 11],
+    ] as const) {
+      c.beginPath();
+      c.arc(x, y, r, 0, Math.PI * 2);
+      c.fill();
+      c.stroke();
+    }
+    // Cover the body stroke where the first tail circle overlaps, for a clean join
+    c.fillStyle = "#fff8ec";
+    c.beginPath();
+    c.arc(body.x + 28, body.y + body.h + 28, 16, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = "#24242a";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    const cy = body.y + body.h / 2;
+    lines.forEach((l, i) => c.fillText(l, body.x + body.w / 2, cy + (i - (lines.length - 1) / 2) * 50));
+    this.bubbleTexture.needsUpdate = true;
   }
 
   /** Waypoints (world space, y ignored) the robot walks between in a loop. */
@@ -161,7 +252,13 @@ export class Robot {
             this.progress = 0;
             this.segment = (this.segment + 1) % this.path.length;
             this.group.position.copy(b);
-            this.pauseUntil = t + 2 + Math.random() * 3; // look around for a bit
+            this.pauseUntil = t + 2.5 + Math.random() * 3; // look around for a bit
+            if (Math.random() < 0.7 && this.idleLines.length) {
+              let i = Math.floor(Math.random() * this.idleLines.length);
+              if (i === this.lastLine) i = (i + 1) % this.idleLines.length;
+              this.lastLine = i;
+              this.say(this.idleLines[i]!, 3);
+            }
           } else {
             this.group.position.lerpVectors(this.from, this.to, this.progress);
           }
@@ -204,6 +301,14 @@ export class Robot {
           this.eyes.forEach((e) => (e.visible = open));
           this.blinkAt = t + (open ? 2.5 + Math.random() * 3 : 0.12);
         }
+
+        // Thought bubble: pop in, hold, shrink away
+        if (this.bubbleUntil === -1) this.bubbleUntil = t + this.pendingBubbleSeconds;
+        const wantBubble = t < this.bubbleUntil ? 1 : 0;
+        this.bubbleScale = MathUtils.damp(this.bubbleScale, wantBubble, wantBubble ? 14 : 10, dt);
+        const s = this.bubbleScale < 0.01 ? 0 : this.bubbleScale;
+        this.bubble.scale.set(1.5 * s, 0.84 * s, 1);
+        this.bubble.visible = s > 0;
         return true;
       },
     };

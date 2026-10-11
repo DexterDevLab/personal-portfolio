@@ -95,7 +95,7 @@ export function buildRoom(ctx: BuildContext): RoomParts {
   // The runtime hides it while the console is focused.
   const lamp = new Group();
   lamp.name = "lamp";
-  lamp.position.set(-1.25, 0, -1.05);
+  lamp.position.set(-1.05, 0, -1.5); // clear of the robot's walk
   lamp.rotation.y = 0.5; // arm reaches toward the console
   const lampBase = new Mesh(cyl(0.2, 0.3, 0.08, 16), metal.toon(PALETTE.charcoal));
   lampBase.position.y = 0.04;
