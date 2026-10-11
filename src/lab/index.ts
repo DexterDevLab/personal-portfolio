@@ -81,8 +81,11 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   /** Orbit limits for exploring the whole room vs. looking at one station. */
   const LIMITS = {
     overview: { minPolar: 0.3, maxPolar: 1.3, minDistance: 2.4, maxDistance: 17 },
-    station: { minPolar: 0.25, maxPolar: 1.5, minDistance: 1.6, maxDistance: 9 },
+    // A station view can be zoomed all the way out: past STATION_EXIT_DISTANCE
+    // the station releases and you are back in the overview.
+    station: { minPolar: 0.25, maxPolar: 1.5, minDistance: 1.6, maxDistance: 17 },
   } as const;
+  const STATION_EXIT_DISTANCE = 8.5;
   const applyLimits = (mode: keyof typeof LIMITS) => {
     const l = LIMITS[mode];
     controls.minPolarAngle = l.minPolar; // never straight down
@@ -162,11 +165,14 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       const remaining = controls.maxDistance - zoomOut.distance;
       const f = remaining > 0.05 ? MathUtils.clamp((now - zoomOut.distance) / remaining, 0, 1) : 0.35;
       zoomOut = null;
-      if (f > 0 && controls.target.distanceToSquared(homeTarget) > 1e-6) {
-        controls.target.lerp(homeTarget, f);
+      // From a station, zooming out heads for the overview's home, not the station's.
+      const home = state.active ? OVERVIEW_POSE.target : homeTarget;
+      if (f > 0 && controls.target.distanceToSquared(home) > 1e-6) {
+        controls.target.lerp(home, f);
         controls.update();
         dirty = true;
       }
+      if (state.active && state.phase === "station" && now >= STATION_EXIT_DISTANCE) releaseStation();
     }
     if (!camera.position.equals(lastCam)) {
       lastCam.copy(camera.position);
@@ -450,6 +456,25 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       onArrive();
       drainPending();
     });
+  }
+
+  /** Leave the station where the camera already is (no travel): zoomed out past it. */
+  function releaseStation() {
+    runDeselect();
+    state.active = null;
+    state.pending = null;
+    savedView = null;
+    homeTarget.copy(OVERVIEW_POSE.target);
+    applyLimits("overview");
+    applyViewOffset();
+    controls.update();
+    if (robot) {
+      robotPoint(seq, robot, null);
+      robot.roaming = !state.reducedMotion;
+    }
+    setPhase("overview");
+    emit("lab:station", { id: null, source: "api" });
+    requestRender();
   }
 
   function back() {
