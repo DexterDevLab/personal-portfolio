@@ -72,14 +72,16 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   controls.target.copy(OVERVIEW_POSE.target);
   controls.enablePan = false;
   controls.enableZoom = true;
+  // Zoom toward the pointer so "zoom in" lands on what you're looking at.
+  controls.zoomToCursor = true;
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.rotateSpeed = 0.55;
-  controls.zoomSpeed = 0.6;
+  controls.zoomSpeed = 0.9;
   /** Orbit limits for exploring the whole room vs. looking at one station. */
   const LIMITS = {
-    overview: { minPolar: 0.3, maxPolar: 1.3, minDistance: 5, maxDistance: 22 },
-    station: { minPolar: 0.25, maxPolar: 1.5, minDistance: 1.8, maxDistance: 9 },
+    overview: { minPolar: 0.3, maxPolar: 1.3, minDistance: 2.4, maxDistance: 17 },
+    station: { minPolar: 0.25, maxPolar: 1.5, minDistance: 1.6, maxDistance: 9 },
   } as const;
   const applyLimits = (mode: keyof typeof LIMITS) => {
     const l = LIMITS[mode];
@@ -135,7 +137,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   };
   const tick = (now: number) => {
     raf = 0;
-    const dt = Math.min(0.05, last ? (now - last) / 1000 : 0);
+    const dt = MathUtils.clamp(last ? (now - last) / 1000 : 0, 0, 0.05);
     last = now;
     let any = false;
     if (pointerDirty) {
@@ -383,7 +385,10 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     applyViewOffset();
     // Orbiting stays available around the station, within a tight range.
     applyLimits("station");
-    if (robot) robotPoint(seq, robot, station.focus);
+    if (robot) {
+      robot.roaming = false;
+      robotPoint(seq, robot, station.focus);
+    }
     travelTo(station.pose, () => {
       setPhase("station");
       controls.enabled = true;
@@ -401,7 +406,10 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     state.pending = null;
     applyViewOffset();
     applyLimits("overview");
-    if (robot) robotPoint(seq, robot, null);
+    if (robot) {
+      robotPoint(seq, robot, null);
+      robot.roaming = !state.reducedMotion;
+    }
     travelTo(pose, () => {
       controls.enabled = true;
       setPhase("overview");
@@ -509,9 +517,18 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     }
 
     robot = new Robot(ctx);
-    // Stands right of the console, out of every station's line of sight.
-    robot.group.position.set(1.55, 0, -0.75);
+    // A loop through the free floor between the stations (clear of the
+    // desks, the bench, the terminal, the notebook table and the lamp).
+    robot.setPath([
+      new Vector3(1.6, 0, -0.8),
+      new Vector3(0.3, 0, -1.0),
+      new Vector3(-0.6, 0, 0.1),
+      new Vector3(-0.4, 0, 1.45),
+      new Vector3(0.5, 0, 0.5),
+      new Vector3(1.9, 0, -0.2),
+    ]);
     robot.group.rotation.y = -0.6;
+    robot.roaming = !state.reducedMotion;
     scene.add(robot.group);
     animators.push(robot.animator());
 
@@ -626,6 +643,14 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       step: () => {
         gsap.ticker.tick();
         tick(performance.now());
+      },
+      /** Simulate `seconds` of animation at 60 fps synchronously (tests only). */
+      advance: (seconds: number) => {
+        let sim = Math.max(last, performance.now());
+        for (let i = 0; i < Math.ceil(seconds * 60); i++) {
+          sim += 1000 / 60;
+          tick(sim);
+        }
       },
     },
   };

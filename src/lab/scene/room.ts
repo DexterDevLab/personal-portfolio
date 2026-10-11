@@ -1,7 +1,7 @@
 import { CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneGeometry, SRGBColorSpace } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PALETTE, ROOM } from "../config";
-import { box, cyl, rbox } from "../geometry";
+import { box, cyl, rbox, sphere } from "../geometry";
 import type { BuildContext } from "./types";
 
 export interface RoomParts {
@@ -96,19 +96,31 @@ export function buildRoom(ctx: BuildContext): RoomParts {
   const lamp = new Group();
   lamp.name = "lamp";
   lamp.position.set(-1.25, 0, -1.05);
-  const lampBase = new Mesh(cyl(0.22, 0.26, 0.06, 16), metal.toon(PALETTE.charcoal));
-  lampBase.position.y = 0.03;
-  const pole = new Mesh(cyl(0.025, 0.025, 2.55, 8), metal.toon(PALETTE.charcoal));
-  pole.position.y = 1.33;
-  const armLen = 0.55;
-  const lampArm = new Mesh(cyl(0.02, 0.02, armLen, 8), metal.toon(PALETTE.charcoal));
-  lampArm.rotation.z = Math.PI / 2;
-  lampArm.position.set(armLen / 2, 2.6, 0);
-  const shade = new Mesh(cyl(0.1, 0.26, 0.22, 16), metal.toon(PALETTE.orange));
-  shade.position.set(armLen, 2.48, 0);
-  const bulb = new Mesh(cyl(0.05, 0.05, 0.03, 10), shared.ledTeal);
-  bulb.position.set(armLen, 2.36, 0);
-  lamp.add(lampBase, pole, lampArm, shade, bulb);
+  lamp.rotation.y = 0.5; // arm reaches toward the console
+  const lampBase = new Mesh(cyl(0.2, 0.3, 0.08, 16), metal.toon(PALETTE.charcoal));
+  lampBase.position.y = 0.04;
+  const poleH = 2.3;
+  const pole = new Mesh(cyl(0.04, 0.05, poleH, 10), metal.toon(PALETTE.metalDark));
+  pole.position.y = 0.08 + poleH / 2;
+  const elbow = new Mesh(sphere(0.08, 12, 10), metal.toon(PALETTE.orange));
+  elbow.position.y = 0.08 + poleH;
+  // Arm angles up and out from the elbow, then the shade hangs from its end
+  const armLen = 0.8;
+  const armAngle = 0.95; // from vertical
+  const lampArm = new Mesh(cyl(0.035, 0.035, armLen, 10), metal.toon(PALETTE.metalDark));
+  lampArm.rotation.z = -armAngle;
+  lampArm.position.set(Math.sin(armAngle) * (armLen / 2), elbow.position.y + Math.cos(armAngle) * (armLen / 2), 0);
+  const armEndX = Math.sin(armAngle) * armLen;
+  const armEndY = elbow.position.y + Math.cos(armAngle) * armLen;
+  const hinge = new Mesh(sphere(0.06, 10, 8), metal.toon(PALETTE.orange));
+  hinge.position.set(armEndX, armEndY, 0);
+  const shade = new Mesh(cyl(0.09, 0.32, 0.3, 18), metal.toon(PALETTE.orange));
+  shade.position.set(armEndX, armEndY - 0.17, 0);
+  const shadeHull = new Mesh(shade.geometry, shared.outline);
+  shadeHull.position.copy(shade.position);
+  const bulb = new Mesh(cyl(0.07, 0.07, 0.03, 12), shared.ledTeal);
+  bulb.position.set(armEndX, armEndY - 0.33, 0);
+  lamp.add(lampBase, pole, elbow, lampArm, hinge, shade, shadeHull, bulb);
   group.add(lamp);
 
   // Wordmark painted on the back wall above the console backdrop. It is a

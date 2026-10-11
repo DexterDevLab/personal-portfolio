@@ -37,8 +37,8 @@ export function robotPoint(ctx: SequenceContext, robot: Robot, point: Vector3 | 
   const duration = ctx.reducedMotion ? 0 : 0.5;
   gsap.killTweensOf([robot.body.rotation, robot.armRight.rotation, robot.armLeft.rotation]);
   gsap.to(robot.body.rotation, { y: yaw, duration, ease: "power2.out", onUpdate: ctx.requestRender });
-  gsap.to(robot.armRight.rotation, { z: point ? -1.9 : 0.25, x: point ? -0.4 : 0, duration, ease: "power2.out", onUpdate: ctx.requestRender });
-  gsap.to(robot.armLeft.rotation, { z: -0.25, duration, ease: "power2.out", onUpdate: ctx.requestRender });
+  gsap.to(robot.armRight.rotation, { z: point ? -1.9 : 0.15, x: point ? -0.4 : 0, duration, ease: "power2.out", onUpdate: ctx.requestRender });
+  gsap.to(robot.armLeft.rotation, { z: -0.15, x: 0, duration, ease: "power2.out", onUpdate: ctx.requestRender });
 }
 
 /**
