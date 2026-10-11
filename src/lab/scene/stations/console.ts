@@ -121,14 +121,15 @@ export function buildConsole(ctx: BuildContext): StationDefinition {
     })(),
   ];
 
-  const focus = new Vector3(X, 1.6, Z + 0.1);
+  const focus = new Vector3(X, 1.55, Z + 0.1);
   return {
     id: "console",
     group,
     hotspots,
     materials: mats,
     pressTarget: group,
-    pose: poseFor(focus, new Vector3(0.35, 0, 1), 4.0, 1.0, 0.1),
+    // Approach from the left so the comms terminal never sits in the line of sight.
+    pose: poseFor(focus, new Vector3(-0.3, 0, 1), 5.2, 0.9, 0.15),
     focus,
     animators,
   };

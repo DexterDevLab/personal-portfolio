@@ -69,7 +69,7 @@ export function buildComms(ctx: BuildContext): StationDefinition {
     hotspots,
     materials: mats,
     pressTarget: group,
-    pose: poseFor(focus, new Vector3(0.5, 0, 1), 3.1, 1.0, 0.05),
+    pose: poseFor(focus, new Vector3(0.5, 0, 1), 3.9, 1.2, 0.05),
     focus,
     animators,
   };

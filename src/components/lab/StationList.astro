@@ -1,6 +1,11 @@
 ---
 import { STATIONS } from "@/lab/stations";
 
+/**
+ * Accessible equivalents of the 3D hotspots. Each button expands its
+ * station's panel (aria-expanded / aria-controls); src/lab/ui.ts keeps the
+ * state in sync whether the station was chosen here or in the scene.
+ */
 interface Props {
   class?: string;
 }
@@ -13,8 +18,9 @@ const { class: className } = Astro.props;
       <button
         type="button"
         data-station={station.id}
-        aria-pressed="false"
-        class="group/st inline-flex min-h-11 items-center gap-2 rounded-button border border-border bg-background/85 px-3.5 py-2 text-sm text-foreground backdrop-blur-sm transition-colors hover:border-border-strong aria-pressed:border-accent aria-pressed:bg-accent-weak data-[hover]:border-accent"
+        aria-expanded="false"
+        aria-controls={`panel-${station.id}`}
+        class="inline-flex min-h-11 items-center gap-2 rounded-button border border-border bg-background/85 px-3.5 py-2 text-sm text-foreground backdrop-blur-sm transition-colors hover:border-border-strong aria-expanded:border-accent aria-expanded:bg-accent-weak data-[hover]:border-accent"
       >
         <span class="font-mono text-[11px] text-accent" aria-hidden="true">
           0{station.index}

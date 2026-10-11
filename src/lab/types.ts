@@ -36,14 +36,19 @@ export interface LabHandle {
   /** Resolves when textures are loaded and the first frame rendered. */
   ready: Promise<void>;
   select(id: StationId, source?: SelectSource): void;
+  /** Leave the station and return to where the visitor was exploring. */
   back(): void;
+  /** Return to the default overview framing. */
+  resetView(): void;
+  /** Orbit by an angle in radians (positive = counter-clockwise from above). */
+  rotate(radians: number): void;
   hover(id: StationId | null): void;
   pause(): void;
   resume(): void;
   requestRender(): void;
   getState(): Readonly<LabState>;
   dispose(): void;
-  /** Dev inspection: renderer / scene / camera and frame counter. */
+  /** Dev inspection: renderer / scene / camera / controls and a frame counter. */
   debug: Record<string, unknown>;
 }
 

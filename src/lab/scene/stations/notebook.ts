@@ -73,7 +73,7 @@ export function buildNotebook(ctx: BuildContext): StationDefinition {
     hotspots,
     materials: mats,
     pressTarget: group,
-    pose: poseFor(focus, new Vector3(-0.2, 0, 1), 2.7, 1.3, 0.05),
+    pose: poseFor(focus, new Vector3(-0.2, 0, 1), 3.2, 1.5, 0.05),
     focus,
     animators: [],
   };

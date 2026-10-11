@@ -16,6 +16,7 @@ const meta = STATION_BY_ID[id];
 ---
 
 <dialog
+  id={`panel-${id}`}
   data-station-panel={id}
   aria-labelledby={`panel-${id}-title`}
   class="lab-panel fixed inset-x-0 bottom-0 top-auto m-0 max-h-[62dvh] w-full max-w-none overflow-y-auto border-t border-border bg-background p-5 text-foreground shadow-2xl shadow-black/30 md:inset-y-0 md:top-16 md:right-0 md:left-auto md:max-h-none md:w-[min(460px,100vw)] md:border-t-0 md:border-l md:p-7"

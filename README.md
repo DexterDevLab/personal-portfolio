@@ -7,7 +7,7 @@ The homepage is an explorable cartoon inventor's laboratory (Three.js) whose six
 ## Stack
 
 - **Astro 7** — static output; one on-demand route (`/api/contact`) and the no-JS contact error page run as Vercel functions via `@astrojs/vercel`
-- **Three.js + GSAP** — the laboratory (`src/lab/`), loaded lazily as its own chunk; procedural geometry, toon shading, click-to-explore camera
+- **Three.js + GSAP** — the laboratory (`src/lab/`), loaded lazily as its own chunk; procedural geometry, toon shading, OrbitControls (drag to rotate 360°, bounded zoom) plus click-to-explore station travel
 - **Tailwind CSS 4** with CSS-variable design tokens (`light-dark()` for both themes) in `src/styles/global.css`
 - **Content collections** for projects (`src/content/work/*.md`), plain TS for site constants and services
 - **Zod → Brevo** contact form (progressive enhancement: works without JavaScript)

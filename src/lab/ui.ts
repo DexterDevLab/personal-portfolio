@@ -1,8 +1,8 @@
 /**
  * Light UI layer for the lab (no Three.js). Owns the view mode (lab/page),
- * the station panels, the station list, hash deep links, focus management,
- * and booting the heavy runtime. Works on its own when the runtime never
- * loads (mobile page view, no WebGL, load failure).
+ * the station panels, the station list, view controls, hash deep links,
+ * focus management, and booting the heavy runtime. Works on its own when the
+ * runtime never loads (mobile page view, no WebGL, load failure).
  */
 import { HASH_TO_STATION, STATION_BY_ID, isStationId, type StationId } from "./stations";
 import type { LabEvents, LabHandle, LabRuntimeModule } from "./types";
@@ -14,6 +14,7 @@ export interface LabUiOptions {
 }
 
 const BOOT_TIMEOUT_MS = 20_000;
+const ROTATE_STEP = Math.PI / 8;
 
 export function initLabUi(root: HTMLElement, options: LabUiOptions) {
   const html = document.documentElement;
@@ -88,7 +89,7 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     if (trigger) lastTrigger = trigger;
     if (!panel.open) panel.show();
     root.dataset.panel = id;
-    stationButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.station === id)));
+    stationButtons.forEach((b) => b.setAttribute("aria-expanded", String(b.dataset.station === id)));
     const meta = STATION_BY_ID[id];
     if (status) status.textContent = `Viewing: ${meta.label}`;
     if (location.hash !== meta.hash) history.replaceState(null, "", location.pathname + location.search + meta.hash);
@@ -104,7 +105,7 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     panel?.close();
     openId = null;
     delete root.dataset.panel;
-    stationButtons.forEach((b) => b.setAttribute("aria-pressed", "false"));
+    stationButtons.forEach((b) => b.setAttribute("aria-expanded", "false"));
     if (!silent) {
       if (status) status.textContent = "Back at the lab overview";
       if (location.hash) history.replaceState(null, "", location.pathname + location.search);
@@ -112,14 +113,13 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     if (restoreFocus) lastTrigger?.focus({ preventScroll: true });
   }
 
+  const runtimeReady = () => !!lab && lab.getState().phase !== "loading" && lab.getState().phase !== "error";
+
   /** Station request from any source: list button, hotspot, hash, link. */
   function requestStation(id: StationId, trigger: HTMLElement | null) {
     if (trigger) lastTrigger = trigger;
-    if (lab && lab.getState().phase !== "loading" && lab.getState().phase !== "error") {
-      lab.select(id, "api");
-    } else {
-      openPanel(id, trigger);
-    }
+    if (runtimeReady()) lab!.select(id, "api");
+    else openPanel(id, trigger);
   }
 
   function goBack() {
@@ -223,6 +223,30 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
   });
 
   root.querySelectorAll<HTMLButtonElement>("[data-lab-back]").forEach((b) => b.addEventListener("click", goBack));
+
+  root.querySelectorAll<HTMLButtonElement>("[data-lab-rotate]").forEach((b) => {
+    const dir = b.dataset.labRotate === "left" ? 1 : -1;
+    b.addEventListener("click", () => lab?.rotate(dir * ROTATE_STEP));
+  });
+  root.querySelector<HTMLButtonElement>("[data-lab-reset]")?.addEventListener("click", () => {
+    if (openId) closePanel({ restoreFocus: false });
+    lab?.resetView();
+    if (status) status.textContent = "View reset to the overview";
+  });
+
+  // Arrow keys rotate while focus is inside the lab section (not in a form field).
+  root.addEventListener("keydown", (event) => {
+    if (!lab || view() !== "lab") return;
+    const target = event.target as HTMLElement | null;
+    if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      lab.rotate(ROTATE_STEP);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      lab.rotate(-ROTATE_STEP);
+    }
+  });
 
   root.querySelectorAll<HTMLAnchorElement>("[data-mode-link]").forEach((a) => {
     a.addEventListener("click", (event) => {

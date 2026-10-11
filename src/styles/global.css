@@ -318,15 +318,14 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 [data-lab-state="ready"] .lab-canvas {
   opacity: 1;
 }
-/* Intro card slides out of the way once the scene is up; it stays on narrow
-   screens where the scene itself is secondary. */
-.lab-intro-card {
+/* The intro column steps aside while a station panel is open on wide screens. */
+.lab-intro {
   transition:
-    opacity 0.4s ease,
-    translate 0.4s ease;
+    opacity 0.3s ease,
+    translate 0.3s ease;
 }
-@media (min-width: 1024px) {
-  [data-lab-state="ready"][data-panel] .lab-intro-card {
+@media (min-width: 768px) {
+  [data-lab-state="ready"][data-panel] .lab-intro {
     opacity: 0;
     translate: 0 -8px;
     pointer-events: none;
@@ -334,7 +333,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 }
 @media (prefers-reduced-motion: reduce) {
   .lab-canvas,
-  .lab-intro-card {
+  .lab-intro {
     transition: none;
   }
 }
@@ -350,19 +349,15 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 .lab-progress::-webkit-progress-value {
   background: var(--accent);
 }
-/* Narrow screens: once the scene is up the intro shrinks to its headline so
-   the room is visible; while a panel (bottom sheet) is open it hides. */
+/* Narrow screens: the intro, stage and station row stack. Once the scene is
+   up the intro drops its one-liner so the room gets the height; while a
+   bottom-sheet panel is open the station row is covered anyway. */
 @media (max-width: 767px) {
   [data-lab-state="ready"] [data-lab-intro-copy] {
     display: none;
   }
-  [data-lab-state="ready"] .lab-intro-card h1 {
-    font-size: 1.25rem;
-    line-height: 1.2;
-  }
-  [data-lab-state="ready"][data-panel] .lab-intro-card,
-  [data-lab-state="ready"][data-panel] .lab-station-list {
-    display: none;
+  [data-lab-state="ready"][data-panel] .lab-hud {
+    visibility: hidden;
   }
 }
 .lab-panel {

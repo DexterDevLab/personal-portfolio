@@ -1,17 +1,18 @@
 /**
  * Lab runtime entry. Builds the Three.js scene, owns the single animation
- * loop, the station state machine, pointer interaction, and teardown.
- * Loaded lazily by src/lab/ui.ts; communicates back through CustomEvents.
+ * loop, the orbit controls, the station state machine, pointer gestures,
+ * and teardown. Loaded lazily by src/lab/ui.ts; talks back via CustomEvents.
  */
 import { gsap } from "gsap";
-import { DirectionalLight, HemisphereLight, Material, Raycaster, Scene, Vector2 } from "three";
-import { CAMERA } from "./config";
+import { DirectionalLight, HemisphereLight, Material, MathUtils, Raycaster, Scene, Vector2, Vector3, type Mesh } from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CAMERA, ROOM } from "./config";
 import { OVERVIEW_POSE, createCamera, frame, type CameraPose } from "./camera";
 import { createRenderer, applyPixelRatio } from "./renderer";
 import { loadTextures } from "./loader";
 import { MaterialSet, makeGradientMap, makeSharedMaterials } from "./materials";
 import { disposeRenderer, disposeTree } from "./dispose";
-import { buildRoom } from "./scene/room";
+import { buildRoom, type RoomParts } from "./scene/room";
 import { Robot } from "./scene/robot";
 import { MechArm } from "./scene/arm";
 import { buildStations } from "./scene/stations";
@@ -37,9 +38,17 @@ if (import.meta.hot) {
   import.meta.hot.dispose(() => window.__lab?.dispose());
 }
 
+const UP = new Vector3(0, 1, 0);
+/** Pointer travel (px) beyond which a gesture counts as a drag, not a click. */
+const DRAG_THRESHOLD = 6;
+
 function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOptions): LabHandle {
   const emit = <K extends keyof LabEvents>(type: K, detail: LabEvents[K]) =>
     root.dispatchEvent(new CustomEvent(type, { detail }));
+
+  // The canvas is sized to its stage element (full section on desktop, the
+  // middle row of the mobile layout), never to the window.
+  const stage = canvas.parentElement ?? root;
 
   const state: LabState = {
     phase: "loading",
@@ -55,9 +64,32 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   const { signal } = abort;
   const renderer = createRenderer(canvas);
   const scene = new Scene();
-  const camera = createCamera(root.clientWidth / Math.max(1, root.clientHeight));
-  const lookTarget = OVERVIEW_POSE.target.clone();
+  const camera = createCamera(stage.clientWidth / Math.max(1, stage.clientHeight));
   camera.position.copy(OVERVIEW_POSE.position);
+
+  // ----- orbit controls -----
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.copy(OVERVIEW_POSE.target);
+  controls.enablePan = false;
+  controls.enableZoom = true;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.rotateSpeed = 0.55;
+  controls.zoomSpeed = 0.6;
+  /** Orbit limits for exploring the whole room vs. looking at one station. */
+  const LIMITS = {
+    overview: { minPolar: 0.3, maxPolar: 1.3, minDistance: 5, maxDistance: 22 },
+    station: { minPolar: 0.25, maxPolar: 1.5, minDistance: 1.8, maxDistance: 9 },
+  } as const;
+  const applyLimits = (mode: keyof typeof LIMITS) => {
+    const l = LIMITS[mode];
+    controls.minPolarAngle = l.minPolar; // never straight down
+    controls.maxPolarAngle = l.maxPolar; // never below the floor
+    controls.minDistance = l.minDistance;
+    controls.maxDistance = l.maxDistance;
+  };
+  applyLimits("overview");
+  controls.update();
 
   scene.add(new HemisphereLight(0xfff6ea, 0x8a7f74, 1.25));
   const sun = new DirectionalLight(0xffffff, 2.1);
@@ -69,23 +101,30 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   const materialSets: MaterialSet[] = [];
   const gsapCtx = gsap.context(() => {});
 
+  // ----- scene refs -----
+  const animators: Animator[] = [];
+  const raycaster = new Raycaster();
+  const pointer = new Vector2(-2, -2);
+  const hotspotMeshes: Mesh[] = [];
+  const stations = new Map<StationId, StationDefinition>();
+  let room: RoomParts | null = null;
+  let robot: Robot | null = null;
+  let arm: MechArm | null = null;
+  let repairParts: ReturnType<typeof buildStations>["repair"] | null = null;
+  let currentPose: CameraPose = OVERVIEW_POSE;
+  /** Where the visitor was exploring before selecting a station. */
+  let savedView: CameraPose | null = null;
+  let travel: gsap.core.Timeline | null = null;
+  let selectCleanup: (() => void) | null = null;
+
   // ----- loop -----
   let raf = 0;
   let last = 0;
   let dirty = true;
   let frames = 0;
-  const animators: Animator[] = [];
-  const pointer = new Vector2(-2, -2);
   let pointerDirty = false;
-  const raycaster = new Raycaster();
-  let hotspots: { mesh: import("three").Mesh; id: StationId }[] = [];
-  let stations = new Map<StationId, StationDefinition>();
-  let robot: Robot | null = null;
-  let arm: MechArm | null = null;
-  let repairParts: ReturnType<typeof buildStations>["repair"] | null = null;
-  let currentPose: CameraPose = OVERVIEW_POSE;
-  let travel: gsap.core.Timeline | null = null;
-  let selectCleanup: (() => void) | null = null;
+  let paused = false;
+  const lastCam = new Vector3(Infinity, Infinity, Infinity);
 
   const requestRender = () => {
     dirty = true;
@@ -108,7 +147,14 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       const t = now / 1000;
       for (const a of animators) any = a.update(dt, t) || any;
     }
-    camera.lookAt(lookTarget);
+    // Damping keeps the controls moving after the pointer is released. While a
+    // camera travel owns the camera the controls stay out of the way.
+    if (controls.enabled && controls.update(dt)) any = true;
+    if (!camera.position.equals(lastCam)) {
+      lastCam.copy(camera.position);
+      updateWalls();
+      dirty = true;
+    }
     if (dirty || any) {
       renderer.render(scene, camera);
       frames++;
@@ -118,46 +164,64 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     else last = 0;
   };
 
+  /** Roofless dollhouse: hide whichever wall the camera is looking through. */
+  const updateWalls = () => {
+    if (!room) return;
+    const { back, left, right, skirtBack, skirtLeft, skirtRight } = room.walls;
+    const p = camera.position;
+    const showBack = p.z > ROOM.minZ + 0.4;
+    const showLeft = p.x > ROOM.minX + 0.4;
+    const showRight = p.x < ROOM.maxX - 0.4 || p.z > ROOM.rightWallEndZ + 0.4;
+    back.visible = skirtBack.visible = showBack;
+    left.visible = skirtLeft.visible = showLeft;
+    right.visible = skirtRight.visible = showRight;
+  };
+
   // ----- sizing -----
+  const stageSize = () => ({ w: stage.clientWidth, h: stage.clientHeight });
+  const narrow = () => stageSize().w < 768;
+
   const resize = () => {
-    const w = root.clientWidth;
-    const h = root.clientHeight;
+    const { w, h } = stageSize();
     if (!w || !h) return;
     applyPixelRatio(renderer);
     renderer.setSize(w, h, false);
     const framed = frame(camera, currentPose, w / h);
     if (travel?.isActive()) {
       travel.kill();
-      travel = cameraTravel(seq, framed, 0.3);
-    } else if (state.phase !== "transitioning") {
+      travelTo(currentPose, travelArrival, 0.3);
+    } else if (state.phase === "overview" && state.active === null && !userOrbited) {
       camera.position.copy(framed.position);
-      lookTarget.copy(framed.target);
+      controls.target.copy(framed.target);
     }
     applyViewOffset();
+    controls.update();
     requestRender();
   };
   const ro = new ResizeObserver(() => resize());
-  ro.observe(root);
+  ro.observe(stage);
+
+  /** Has the visitor moved the camera away from the default framing? */
+  let userOrbited = false;
+  controls.addEventListener("start", () => {
+    userOrbited = true;
+  });
+  controls.addEventListener("change", () => requestRender());
 
   /**
-   * Shift the frustum so the room sits right of the intro card in the
-   * overview, and left of the side panel when a station is open (wide
-   * screens only; narrow screens use the full viewport).
+   * Shift the frustum so the room sits beside the intro column in the
+   * overview, left of the side panel in a station view (wide screens), or
+   * above the bottom sheet (narrow screens).
    */
   const applyViewOffset = () => {
-    const w = root.clientWidth;
-    const h = root.clientHeight;
+    const { w, h } = stageSize();
     const stationView = state.active !== null || (state.phase === "transitioning" && state.pending !== "overview");
     if (w >= 1024 && stationView) {
       camera.setViewOffset(w, h, Math.min(460, w) * 0.5, 0, w, h);
     } else if (w >= 1024) {
-      camera.setViewOffset(w, h, -w * 0.11, h * 0.03, w, h);
+      camera.setViewOffset(w, h, -w * 0.1, h * 0.03, w, h);
     } else if (w < 768 && stationView) {
-      // Bottom-sheet panel: keep the station in the upper part of the screen.
-      camera.setViewOffset(w, h, 0, h * 0.28, w, h);
-    } else if (w < 768) {
-      // Compact intro card at the top: sit the room a little lower.
-      camera.setViewOffset(w, h, 0, -h * 0.06, w, h);
+      camera.setViewOffset(w, h, 0, h * 0.26, w, h);
     } else {
       camera.clearViewOffset();
     }
@@ -166,8 +230,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   // ----- visibility -----
   const io = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting && document.visibilityState === "visible"));
   io.observe(root);
-  document.addEventListener("visibilitychange", () => setVisible(document.visibilityState === "visible" && !paused), { signal });
-  let paused = false;
+  document.addEventListener("visibilitychange", () => setVisible(document.visibilityState === "visible"), { signal });
   function setVisible(v: boolean) {
     const next = v && !paused;
     if (state.visible === next) return;
@@ -181,15 +244,15 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     }
   }
 
-  // ----- hover / pointer -----
-  const seq = { camera, lookTarget, reducedMotion: state.reducedMotion, requestRender };
+  // ----- hover / gestures -----
+  const seq = { camera, lookTarget: controls.target, reducedMotion: state.reducedMotion, requestRender };
 
   function setHover(id: StationId | null) {
     if (state.hovered === id) return;
     if (state.hovered) stations.get(state.hovered)?.materials.setHighlight(false);
     state.hovered = id;
     if (id) stations.get(id)?.materials.setHighlight(true);
-    canvas.style.cursor = id ? "pointer" : "";
+    canvas.style.cursor = id ? "pointer" : dragging ? "grabbing" : "grab";
     if (robot && state.phase === "overview") {
       robot.lookTarget.copy(id ? stations.get(id)!.focus : camera.position);
     }
@@ -198,53 +261,79 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   }
 
   function pick(): StationId | null {
-    if (!hotspots.length) return null;
+    if (!hotspotMeshes.length) return null;
     raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(
-      hotspots.map((h) => h.mesh),
-      false,
-    );
+    const hits = raycaster.intersectObjects(hotspotMeshes, false);
     const id = hits[0]?.object.userData.station;
     return isStationId(id) ? id : null;
   }
 
   function updateHover() {
-    if (state.phase === "transitioning" || state.phase === "loading") return;
+    if (state.phase === "transitioning" || state.phase === "loading" || dragging) return;
     setHover(pick());
   }
 
-  let downAt: { x: number; y: number; t: number } | null = null;
   const toNdc = (e: PointerEvent) => {
     const r = canvas.getBoundingClientRect();
     pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   };
+
+  // Gesture discrimination: a press that moves more than DRAG_THRESHOLD is a
+  // drag (OrbitControls handles it); anything shorter is a click/tap that
+  // raycasts once on release. Hover raycasts run at most once per frame while
+  // the pointer moves, never while dragging.
+  let down: { x: number; y: number; id: number } | null = null;
+  let dragging = false;
+  canvas.style.cursor = "grab";
+
+  canvas.addEventListener(
+    "pointerdown",
+    (e) => {
+      if (e.button !== 0 && e.pointerType === "mouse") return;
+      down = { x: e.clientX, y: e.clientY, id: e.pointerId };
+      dragging = false;
+    },
+    { signal },
+  );
   canvas.addEventListener(
     "pointermove",
     (e) => {
-      if (e.pointerType === "touch") return;
+      if (down && down.id === e.pointerId && !dragging) {
+        if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > DRAG_THRESHOLD) {
+          dragging = true;
+          setHover(null);
+          canvas.style.cursor = "grabbing";
+        }
+      }
+      if (e.pointerType === "touch" || dragging) return;
       toNdc(e);
       pointerDirty = true;
       schedule();
     },
     { signal, passive: true },
   );
-  canvas.addEventListener("pointerleave", () => setHover(null), { signal });
-  canvas.addEventListener("pointerdown", (e) => (downAt = { x: e.clientX, y: e.clientY, t: performance.now() }), { signal });
+  const endGesture = (e: PointerEvent, click: boolean) => {
+    if (!down || down.id !== e.pointerId) return;
+    const wasDrag = dragging;
+    down = null;
+    dragging = false;
+    canvas.style.cursor = "grab";
+    if (!click || wasDrag) return;
+    if (state.phase === "loading" || state.phase === "transitioning") return;
+    toNdc(e);
+    const id = pick();
+    if (!id) return;
+    const station = stations.get(id)!;
+    press(seq, station.pressTarget);
+    select(id, "pointer");
+  };
+  canvas.addEventListener("pointerup", (e) => endGesture(e, true), { signal });
+  canvas.addEventListener("pointercancel", (e) => endGesture(e, false), { signal });
   canvas.addEventListener(
-    "pointerup",
+    "pointerleave",
     (e) => {
-      if (!downAt) return;
-      const moved = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y);
-      const held = performance.now() - downAt.t;
-      downAt = null;
-      if (moved > 8 || held > 500) return;
-      if (state.phase === "loading" || state.phase === "transitioning") return;
-      toNdc(e);
-      const id = pick();
-      if (!id) return;
-      const station = stations.get(id)!;
-      press(seq, station.pressTarget);
-      select(id, "pointer");
+      if (!down) setHover(null);
+      else if (e.pointerType === "mouse") endGesture(e, false);
     },
     { signal },
   );
@@ -256,14 +345,20 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     emit("lab:phase", { phase });
   }
 
-  function travelTo(pose: CameraPose, onArrive: () => void) {
+  let travelArrival: () => void = () => {};
+
+  function travelTo(pose: CameraPose, onArrive: () => void, seconds: number = CAMERA.travelSeconds) {
     travel?.kill();
     currentPose = pose;
-    const framed = frame(camera, pose, root.clientWidth / Math.max(1, root.clientHeight));
-    const tl = cameraTravel(seq, framed, CAMERA.travelSeconds);
+    travelArrival = onArrive;
+    const { w, h } = stageSize();
+    const framed = frame(camera, pose, w / Math.max(1, h));
+    controls.enabled = false;
+    const tl = cameraTravel(seq, framed, seconds);
     travel = tl;
     tl.eventCallback("onComplete", () => {
       if (travel === tl) travel = null;
+      controls.update();
       onArrive();
     });
     if (state.reducedMotion) tl.progress(1);
@@ -276,6 +371,9 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       return;
     }
     if (state.active === id) return;
+    if (state.active === null) {
+      savedView = { position: camera.position.clone(), target: controls.target.clone() };
+    }
     runDeselect();
     const station = stations.get(id)!;
     setHover(null);
@@ -283,12 +381,32 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     state.pending = null;
     state.active = id;
     applyViewOffset();
+    // Orbiting stays available around the station, within a tight range.
+    applyLimits("station");
     if (robot) robotPoint(seq, robot, station.focus);
     travelTo(station.pose, () => {
       setPhase("station");
+      controls.enabled = true;
       const cleanup = station.onSelect?.();
       selectCleanup = typeof cleanup === "function" ? cleanup : null;
       emit("lab:station", { id, source });
+      drainPending();
+    });
+  }
+
+  function leaveStation(pose: CameraPose, onArrive: () => void) {
+    runDeselect();
+    state.active = null;
+    setPhase("transitioning");
+    state.pending = null;
+    applyViewOffset();
+    applyLimits("overview");
+    if (robot) robotPoint(seq, robot, null);
+    travelTo(pose, () => {
+      controls.enabled = true;
+      setPhase("overview");
+      emit("lab:station", { id: null, source: "api" });
+      onArrive();
       drainPending();
     });
   }
@@ -300,16 +418,46 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       return;
     }
     if (state.phase === "overview") return;
-    runDeselect();
-    state.active = null;
+    const pose = savedView ?? OVERVIEW_POSE;
+    leaveStation(pose, () => {});
+  }
+
+  function resetView() {
+    if (state.phase === "loading" || state.phase === "error") return;
+    savedView = null;
+    userOrbited = false;
+    if (state.phase === "transitioning") {
+      state.pending = "overview";
+      return;
+    }
+    if (state.active !== null) {
+      leaveStation(OVERVIEW_POSE, () => {});
+      return;
+    }
     setPhase("transitioning");
-    state.pending = null;
-    applyViewOffset();
-    if (robot) robotPoint(seq, robot, null);
     travelTo(OVERVIEW_POSE, () => {
+      controls.enabled = true;
       setPhase("overview");
-      emit("lab:station", { id: null, source: "api" });
       drainPending();
+    }, 0.8);
+  }
+
+  /** Keyboard/button orbit: rotate the camera around the current target. */
+  function rotate(radians: number) {
+    if (state.phase === "transitioning" || state.phase === "loading" || state.phase === "error") return;
+    userOrbited = true;
+    const offset = camera.position.clone().sub(controls.target);
+    const proxy = { a: 0 };
+    const start = offset.clone();
+    gsap.killTweensOf(proxy);
+    gsap.to(proxy, {
+      a: radians,
+      duration: state.reducedMotion ? 0 : 0.45,
+      ease: "power2.out",
+      onUpdate: () => {
+        camera.position.copy(start).applyAxisAngle(UP, proxy.a).add(controls.target);
+        requestRender();
+      },
     });
   }
 
@@ -348,19 +496,21 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       },
     };
 
-    scene.add(buildRoom(ctx));
+    room = buildRoom(ctx);
+    scene.add(room.group);
     const built = buildStations(ctx);
     repairParts = built.repair;
     for (const s of built.list) {
       scene.add(s.group);
       stations.set(s.id, s);
-      for (const h of s.hotspots) hotspots.push({ mesh: h, id: s.id });
+      hotspotMeshes.push(...s.hotspots);
       animators.push(...s.animators);
     }
 
     robot = new Robot(ctx);
-    robot.group.position.set(-0.55, 0, -0.55);
-    robot.group.rotation.y = 0.8;
+    // Stands right of the console, out of every station's line of sight.
+    robot.group.position.set(1.55, 0, -0.75);
+    robot.group.rotation.y = -0.6;
     scene.add(robot.group);
     animators.push(robot.animator());
 
@@ -371,7 +521,20 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
 
     repairStation.onSelect = () => repairSequence(seq, repairParts!, arm!, robot!, shared);
 
+    // The lamp would hang between the camera and the monitor; tuck it away
+    // while the console is in focus.
+    const consoleStation = stations.get("console")!;
+    consoleStation.onSelect = () => {
+      room!.lamp.visible = false;
+      requestRender();
+      return () => {
+        room!.lamp.visible = true;
+        requestRender();
+      };
+    };
+
     resize();
+    updateWalls();
     renderer.render(scene, camera);
     frames++;
     setPhase("overview");
@@ -400,6 +563,8 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     ready,
     select,
     back,
+    resetView,
+    rotate,
     hover: (id) => {
       if (state.phase === "overview" || state.phase === "station") setHover(id);
     },
@@ -424,6 +589,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       gsapCtx.revert();
       gsap.globalTimeline.clear();
       runDeselect();
+      controls.dispose();
       disposeTree(scene);
       materialSets.forEach((m) => m.dispose());
       Object.values(shared).forEach((m) => {
@@ -437,16 +603,29 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       renderer,
       scene,
       camera,
+      controls,
       get frames() {
         return frames;
       },
       get animators() {
         return animators;
       },
+      get azimuth() {
+        return MathUtils.radToDeg(controls.getAzimuthalAngle());
+      },
+      get polar() {
+        return MathUtils.radToDeg(controls.getPolarAngle());
+      },
+      get distance() {
+        return controls.getDistance();
+      },
       stations: STATION_BY_ID,
-      lookTarget,
+      gsap,
       /** Run one frame synchronously (useful when rAF is paused, e.g. hidden tabs). */
-      step: () => tick(performance.now()),
+      step: () => {
+        gsap.ticker.tick();
+        tick(performance.now());
+      },
     },
   };
   return handle;

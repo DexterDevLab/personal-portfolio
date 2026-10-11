@@ -1,14 +1,24 @@
 import { Group, Mesh, PlaneGeometry } from "three";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PALETTE, ROOM } from "../config";
 import { box, cyl, rbox } from "../geometry";
 import type { BuildContext } from "./types";
 
+export interface RoomParts {
+  group: Group;
+  /** Walls that get hidden when the camera orbits behind them. */
+  walls: { back: Mesh; left: Mesh; right: Mesh; skirtBack: Mesh; skirtLeft: Mesh; skirtRight: Mesh };
+  /** Hanging lamp, hidden while the console is focused so it never blocks the monitor. */
+  lamp: Group;
+}
+
 /**
- * The room shell: floor with a subtle tile grid, back and left walls, a
- * short right wall so the front-right stays open to the camera, skirting,
- * a ceiling rail for the mechanical arm and one hanging lamp.
+ * The room shell: a roofless dollhouse. Floor with a subtle tile grid, back
+ * and left walls, a short right wall, skirting, a ceiling rail for the arm
+ * and one hanging lamp. Walls are plain meshes so the runtime can toggle
+ * their visibility depending on where the camera is.
  */
-export function buildRoom(ctx: BuildContext) {
+export function buildRoom(ctx: BuildContext): RoomParts {
   const { shared } = ctx;
   const group = new Group();
   group.name = "room";
@@ -23,39 +33,33 @@ export function buildRoom(ctx: BuildContext) {
   floor.position.set(cx, -0.15, cz);
   group.add(floor);
 
-  // Tile grid lines on the floor
-  const lines = new Group();
-  const lineGeoX = new PlaneGeometry(width, 0.012);
-  const lineGeoZ = new PlaneGeometry(0.012, depth);
+  // Tile grid lines on the floor, merged into one mesh (one draw call)
+  const lineParts: PlaneGeometry[] = [];
   for (let z = ROOM.minZ + 1; z < ROOM.maxZ; z += 1) {
-    const l = new Mesh(lineGeoX, shared.floorLine);
-    l.rotation.x = -Math.PI / 2;
-    l.position.set(cx, 0.002, z);
-    lines.add(l);
+    const g = new PlaneGeometry(width, 0.012);
+    g.rotateX(-Math.PI / 2);
+    g.translate(cx, 0.002, z);
+    lineParts.push(g);
   }
   for (let x = ROOM.minX + 1; x < ROOM.maxX; x += 1) {
-    const l = new Mesh(lineGeoZ, shared.floorLine);
-    l.rotation.x = -Math.PI / 2;
-    l.position.set(x, 0.002, cz);
-    lines.add(l);
+    const g = new PlaneGeometry(0.012, depth);
+    g.rotateX(-Math.PI / 2);
+    g.translate(x, 0.002, cz);
+    lineParts.push(g);
   }
-  group.add(lines);
+  const grid = mergeGeometries(lineParts, false);
+  lineParts.forEach((g) => g.dispose());
+  if (grid) group.add(new Mesh(grid, shared.floorLine));
 
-  // Back wall
+  // Walls
   const back = new Mesh(box(width + t * 2, ROOM.height, t), shared.wall);
   back.position.set(cx, ROOM.height / 2, ROOM.minZ - t / 2);
-  group.add(back);
-
-  // Left wall
   const left = new Mesh(box(t, ROOM.height, depth + t), shared.wallShade);
   left.position.set(ROOM.minX - t / 2, ROOM.height / 2, cz - t / 2);
-  group.add(left);
-
-  // Short right wall (back portion only)
   const rightLen = ROOM.rightWallEndZ - ROOM.minZ;
   const right = new Mesh(box(t, ROOM.height, rightLen + t), shared.wallShade);
   right.position.set(ROOM.maxX + t / 2, ROOM.height / 2, ROOM.minZ + rightLen / 2 - t / 2);
-  group.add(right);
+  group.add(back, left, right);
 
   // Skirting boards (charcoal band at the base of each wall)
   const skirtMat = ctx.makeMaterials().toon(PALETTE.charcoal);
@@ -67,13 +71,14 @@ export function buildRoom(ctx: BuildContext) {
   skirtRight.position.set(ROOM.maxX - 0.02, 0.07, ROOM.minZ + rightLen / 2);
   group.add(skirtBack, skirtLeft, skirtRight);
 
-  // A chalkboard-style strip on the back wall gives the console a backdrop
+  // A chalkboard-style strip on the back wall gives the console a backdrop.
+  // It sits just inside the wall so it stays when the wall is hidden.
   const stripMat = ctx.makeMaterials().toon(PALETTE.charcoalLight);
-  const strip = new Mesh(box(3.6, 1.9, 0.03), stripMat);
-  strip.position.set(0, 1.85, ROOM.minZ + 0.02);
+  const strip = new Mesh(box(3.6, 1.9, 0.05), stripMat);
+  strip.position.set(0, 1.85, ROOM.minZ + 0.03);
   group.add(strip);
 
-  // Ceiling rail for the arm (front-left) and a hanging lamp over the console
+  // Ceiling rail for the arm (front-left)
   const metal = ctx.makeMaterials();
   const rail = new Mesh(cyl(0.035, 0.035, 2.6), metal.toon(PALETTE.metalDark));
   rail.rotation.z = Math.PI / 2;
@@ -85,15 +90,19 @@ export function buildRoom(ctx: BuildContext) {
   railPostB.position.x = -0.8;
   group.add(railPostA, railPostB);
 
-  const lampX = 1.1;
-  const lampZ = -0.7;
-  const cord = new Mesh(cyl(0.012, 0.012, 0.7), metal.toon(PALETTE.charcoal));
-  cord.position.set(lampX, ROOM.height - 0.35, lampZ);
-  const shade = new Mesh(cyl(0.12, 0.34, 0.26, 16), metal.toon(PALETTE.orange));
-  shade.position.set(lampX, ROOM.height - 0.78, lampZ);
-  const bulb = new Mesh(cyl(0.06, 0.06, 0.04, 10), shared.ledTeal);
-  bulb.position.set(lampX, ROOM.height - 0.92, lampZ);
-  group.add(cord, shade, bulb);
+  // Hanging lamp over the middle of the room, high enough to clear every
+  // station view; the runtime hides it while the console is focused.
+  const lamp = new Group();
+  lamp.name = "lamp";
+  lamp.position.set(-1.1, 0, -0.9);
+  const cord = new Mesh(cyl(0.012, 0.012, 0.5), metal.toon(PALETTE.charcoal));
+  cord.position.y = ROOM.height - 0.25;
+  const shade = new Mesh(cyl(0.12, 0.3, 0.22, 16), metal.toon(PALETTE.orange));
+  shade.position.y = ROOM.height - 0.58;
+  const bulb = new Mesh(cyl(0.05, 0.05, 0.04, 10), shared.ledTeal);
+  bulb.position.y = ROOM.height - 0.7;
+  lamp.add(cord, shade, bulb);
+  group.add(lamp);
 
-  return group;
+  return { group, walls: { back, left, right, skirtBack, skirtLeft, skirtRight }, lamp };
 }
