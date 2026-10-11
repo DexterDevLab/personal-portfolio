@@ -2,7 +2,15 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Fix pass: 360° orbit, composition, framing (latest)
+## Scene fixes (latest)
+
+- **Notebook table**: the tilt sign was inverted relative to the surface helper, so legs stopped short of the raised edge and the sketch lines floated; fixed (`tilt = 0.35`, `surf(z)`), legs now reach the top, stretchers + feet added, pencil/mug/pages sit on the surface, the table faces the station camera so the portrait reads upright, and the camera looks down steeply enough to show the open page.
+- **Desk lamp** rebuilt as a mounted anglepoise (base → two arm segments → shade aimed at the page) instead of three loose parts.
+- **Room lamp**: the ceiling-hung lamp had nothing to hang from in a roofless room; it is now a floor lamp beside the console (still hidden while the console is focused).
+- **Wall wordmark**: "DexterDevLab" painted on the back wall above the console backdrop (canvas texture in Geist Mono, redrawn once the web font loads; a child of the wall so it hides with it when you orbit behind). Edit the text in `buildWordmark()` in `src/lab/scene/room.ts`.
+- Supports on the other stations were checked against their tops (bench legs, console cabinet, comms pedestal) and are flush.
+
+## Fix pass: 360° orbit, composition, framing
 
 ### Root causes found
 
