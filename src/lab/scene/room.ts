@@ -1,4 +1,4 @@
-import { Group, Mesh, PlaneGeometry } from "three";
+import { CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneGeometry, SRGBColorSpace } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PALETTE, ROOM } from "../config";
 import { box, cyl, rbox } from "../geometry";
@@ -90,19 +90,69 @@ export function buildRoom(ctx: BuildContext): RoomParts {
   railPostB.position.x = -0.8;
   group.add(railPostA, railPostB);
 
-  // Hanging lamp over the middle of the room, high enough to clear every
-  // station view; the runtime hides it while the console is focused.
+  // Tall floor lamp (the room has no ceiling to hang one from): weighted
+  // base, pole, a short arm and a shade pointing down over the console side.
+  // The runtime hides it while the console is focused.
   const lamp = new Group();
   lamp.name = "lamp";
-  lamp.position.set(-1.1, 0, -0.9);
-  const cord = new Mesh(cyl(0.012, 0.012, 0.5), metal.toon(PALETTE.charcoal));
-  cord.position.y = ROOM.height - 0.25;
-  const shade = new Mesh(cyl(0.12, 0.3, 0.22, 16), metal.toon(PALETTE.orange));
-  shade.position.y = ROOM.height - 0.58;
-  const bulb = new Mesh(cyl(0.05, 0.05, 0.04, 10), shared.ledTeal);
-  bulb.position.y = ROOM.height - 0.7;
-  lamp.add(cord, shade, bulb);
+  lamp.position.set(-1.25, 0, -1.05);
+  const lampBase = new Mesh(cyl(0.22, 0.26, 0.06, 16), metal.toon(PALETTE.charcoal));
+  lampBase.position.y = 0.03;
+  const pole = new Mesh(cyl(0.025, 0.025, 2.55, 8), metal.toon(PALETTE.charcoal));
+  pole.position.y = 1.33;
+  const armLen = 0.55;
+  const lampArm = new Mesh(cyl(0.02, 0.02, armLen, 8), metal.toon(PALETTE.charcoal));
+  lampArm.rotation.z = Math.PI / 2;
+  lampArm.position.set(armLen / 2, 2.6, 0);
+  const shade = new Mesh(cyl(0.1, 0.26, 0.22, 16), metal.toon(PALETTE.orange));
+  shade.position.set(armLen, 2.48, 0);
+  const bulb = new Mesh(cyl(0.05, 0.05, 0.03, 10), shared.ledTeal);
+  bulb.position.set(armLen, 2.36, 0);
+  lamp.add(lampBase, pole, lampArm, shade, bulb);
   group.add(lamp);
 
+  // Wordmark painted on the back wall above the console backdrop. It is a
+  // child of the wall so it hides together with it.
+  const sign = buildWordmark(ctx, "DexterDevLab");
+  sign.position.set(0, ROOM.height / 2 - 0.1, t / 2 + 0.01 + 0.03);
+  back.add(sign);
+
   return { group, walls: { back, left, right, skirtBack, skirtLeft, skirtRight }, lamp };
+}
+
+/**
+ * Text rendered to a canvas texture on a plane, in the site's mono face.
+ * Drawn with the fallback first and redrawn once the web font is ready.
+ */
+function buildWordmark(ctx: BuildContext, text: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 192;
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.anisotropy = 4;
+
+  const draw = () => {
+    const c = canvas.getContext("2d");
+    if (!c) return;
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    c.font = `700 118px "Geist Mono", ui-monospace, monospace`;
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillStyle = "#4f7cff";
+    c.fillText(text, canvas.width / 2, canvas.height / 2 + 6);
+    texture.needsUpdate = true;
+    ctx.requestRender?.();
+  };
+  draw();
+  document.fonts?.load('700 118px "Geist Mono"').then(draw).catch(() => {});
+
+  // Plate behind the lettering so it reads on the wall colour
+  const plate = new Mesh(new PlaneGeometry(2.9, 0.56), ctx.makeMaterials().toon(PALETTE.charcoal));
+  const letters = new Mesh(new PlaneGeometry(2.56, 0.48), new MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }));
+  letters.position.z = 0.012;
+  const sign = new Group();
+  sign.name = "wordmark";
+  sign.add(plate, letters);
+  return sign;
 }

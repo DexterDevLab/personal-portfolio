@@ -32,4 +32,6 @@ export interface BuildContext {
   textures: LabTextures;
   reducedMotion: boolean;
   makeMaterials(): MaterialSet;
+  /** Ask the runtime for a frame (e.g. after a texture finished drawing). */
+  requestRender?(): void;
 }

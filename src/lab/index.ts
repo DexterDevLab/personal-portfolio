@@ -494,6 +494,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
         materialSets.push(set);
         return set;
       },
+      requestRender,
     };
 
     room = buildRoom(ctx);
