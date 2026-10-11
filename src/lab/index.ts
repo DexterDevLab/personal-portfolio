@@ -116,6 +116,9 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   let currentPose: CameraPose = OVERVIEW_POSE;
   /** Where the visitor was exploring before selecting a station. */
   let savedView: CameraPose | null = null;
+  /** Orbit target of the current framing (overview or station); zoom-out eases back to it. */
+  const homeTarget = OVERVIEW_POSE.target.clone();
+  let zoomOut: { distance: number } | null = null;
   let travel: gsap.core.Timeline | null = null;
   let selectCleanup: (() => void) | null = null;
 
@@ -152,6 +155,19 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     // Damping keeps the controls moving after the pointer is released. While a
     // camera travel owns the camera the controls stay out of the way.
     if (controls.enabled && controls.update(dt)) any = true;
+    // Zooming in may have pulled the target toward the cursor; as the visitor
+    // zooms back out, ease the target home so the far end is the original framing.
+    if (zoomOut && controls.enabled) {
+      const now = controls.getDistance();
+      const remaining = controls.maxDistance - zoomOut.distance;
+      const f = remaining > 0.05 ? MathUtils.clamp((now - zoomOut.distance) / remaining, 0, 1) : 0.35;
+      zoomOut = null;
+      if (f > 0 && controls.target.distanceToSquared(homeTarget) > 1e-6) {
+        controls.target.lerp(homeTarget, f);
+        controls.update();
+        dirty = true;
+      }
+    }
     if (!camera.position.equals(lastCam)) {
       lastCam.copy(camera.position);
       updateWalls();
@@ -288,6 +304,21 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   let dragging = false;
   canvas.style.cursor = "grab";
 
+  // Runs before OrbitControls' own wheel handler (capture phase): zoom in
+  // toward the pointer, zoom out straight back and remember where we started.
+  canvas.addEventListener(
+    "wheel",
+    (e) => {
+      const zoomingIn = e.deltaY < 0;
+      controls.zoomToCursor = zoomingIn;
+      if (!zoomingIn && controls.enabled) {
+        zoomOut = { distance: controls.getDistance() };
+        schedule();
+      }
+    },
+    { signal, capture: true, passive: true },
+  );
+
   canvas.addEventListener(
     "pointerdown",
     (e) => {
@@ -355,6 +386,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     travelArrival = onArrive;
     const { w, h } = stageSize();
     const framed = frame(camera, pose, w / Math.max(1, h));
+    homeTarget.copy(framed.target);
     controls.enabled = false;
     const tl = cameraTravel(seq, framed, seconds);
     travel = tl;
