@@ -2,7 +2,14 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Scene fixes (latest)
+## Robot, zoom and lamp (latest)
+
+- **Robot** — what was wrong: the dome head sat 0.14 units inside the torso (no neck), the arm pivots were inside a 0.5-wide body so the arms were hidden, the "visor" read as a stripe through the head, and it stood on a hover ring and never moved. Rebuilt (`src/lab/scene/robot.ts`): legs + feet, pelvis, rounded torso with chest panel and belt, neck, boxy head with visor, two eyes, ear discs and antenna, arms on shoulder joints outside the body. It now **walks** a loop of six waypoints through the free floor (`robot.setPath([...])` in `src/lab/index.ts`), with a leg/arm gait and body bob, turns toward its direction of travel, pauses 2–5 s at each stop to look around, keeps tracking what you hover, stops and points while a station is focused, resumes on Back, and stands still under reduced motion.
+- **Zoom** — `zoomToCursor` on OrbitControls (zoom lands on what you point at), zoom speed 0.9, overview distance 2.4–17 (was 5–22, which kept you far away and let the room shrink to a thumbnail), station 1.6–9, near plane 0.25.
+- **Floor lamp** — the arm was a 2 cm charcoal rod against a charcoal backdrop, so the shade floated beside a bare post; now a thicker metal pole, orange elbow, angled arm, hinge and a larger outlined shade.
+- Verified in Chrome via `__lab.debug.advance(seconds)` (synchronous simulated frames, since the automation window is hidden): the robot reached its first waypoint in 4 s with legs swinging and continued; close-up renders of the robot and lamp; a single wheel event zooms toward the cursor and clamps at 2.4 / 17. Note: wheel input is ignored while a camera travel is in flight (controls disabled), by design.
+
+## Scene fixes
 
 - **Notebook table**: the tilt sign was inverted relative to the surface helper, so legs stopped short of the raised edge and the sketch lines floated; fixed (`tilt = 0.35`, `surf(z)`), legs now reach the top, stretchers + feet added, pencil/mug/pages sit on the surface, the table faces the station camera so the portrait reads upright, and the camera looks down steeply enough to show the open page.
 - **Desk lamp** rebuilt as a mounted anglepoise (base → two arm segments → shade aimed at the page) instead of three loose parts.
