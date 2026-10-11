@@ -203,7 +203,6 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
 
   // ----- sizing -----
   const stageSize = () => ({ w: stage.clientWidth, h: stage.clientHeight });
-  const narrow = () => stageSize().w < 768;
 
   const resize = () => {
     const { w, h } = stageSize();
@@ -239,12 +238,14 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
    */
   const applyViewOffset = () => {
     const { w, h } = stageSize();
-    const stationView = state.active !== null || (state.phase === "transitioning" && state.pending !== "overview");
-    if (w >= 1024 && stationView) {
-      camera.setViewOffset(w, h, Math.min(460, w) * 0.5, 0, w, h);
-    } else if (w >= 1024) {
-      camera.setViewOffset(w, h, -w * 0.1, h * 0.03, w, h);
-    } else if (w < 768 && stationView) {
+    // `active` is set before the travel to a station and cleared before the travel back.
+    const stationView = state.active !== null;
+    const sidePanel = window.innerWidth >= 768; // the station panel is a side panel from md (StationPanel.astro)
+    if (stationView && sidePanel) {
+      // Keep the station in the part of the stage the panel does not cover.
+      const covered = Math.max(0, Math.min(460, window.innerWidth) - (window.innerWidth - stage.getBoundingClientRect().right));
+      camera.setViewOffset(w, h, Math.min(covered, w * 0.6) * 0.5, 0, w, h);
+    } else if (stationView) {
       camera.setViewOffset(w, h, 0, h * 0.26, w, h);
     } else {
       camera.clearViewOffset();
@@ -676,6 +677,11 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     zoom,
     hover: (id) => {
       if (state.phase === "overview" || state.phase === "station") setHover(id);
+    },
+    pulse: () => {
+      if (state.reducedMotion || state.phase === "loading" || state.phase === "error") return;
+      stations.get("console")?.pulse?.();
+      requestRender();
     },
     pause: () => {
       paused = true;

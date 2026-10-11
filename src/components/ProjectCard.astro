@@ -14,15 +14,17 @@ interface Props {
   project: CollectionEntry<"work">;
   index?: number;
   wide?: boolean;
+  /** Mark the frame as an experiment display the signal switches on (Work section). */
+  display?: boolean;
 }
-const { project, index = 1, wide = false } = Astro.props;
+const { project, index = 1, wide = false, display = false } = Astro.props;
 const { data } = project;
 const host = data.liveUrl ? new URL(data.liveUrl).host.replace(/^www\./, "") : undefined;
 const number = `EXP-${String(index).padStart(2, "0")}`;
 ---
 
 <article class="group relative flex h-full flex-col">
-  <Screenshot label={host} tag={number} class="transition-transform duration-200 group-hover:-translate-y-0.5">
+  <Screenshot label={host} tag={number} display={display} class="transition-transform duration-200 group-hover:-translate-y-0.5">
     <Picture
       src={data.screenshot}
       alt={data.screenshotAlt}

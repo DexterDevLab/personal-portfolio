@@ -2,7 +2,7 @@
 
 Personal portfolio of **Dexter Iglesia** (DexterDevLab), a freelance web developer based in the Philippines: websites and web apps, WordPress & WooCommerce troubleshooting, hosting, deployment, and maintenance.
 
-The whole site is styled as one cartoon inventor's laboratory: the homepage opens with the rotatable 3D room (Three.js) whose six stations open the portfolio content, and the same content continues below as a normal scrolling page with lab props travelling in the margins. Visitors can turn the 3D lab off at any time; no-WebGL browsers and no-JS visitors get the static hero.
+The whole site is styled as one cartoon inventor's laboratory: the homepage opens with the rotatable 3D room (Three.js) whose six stations open the portfolio content, and the same content continues below as a normal scrolling page, tied together by a signal that travels down a cable from the console through every section. Visitors can turn the 3D lab off at any time; no-WebGL browsers and no-JS visitors get the static hero.
 
 ## Stack
 
@@ -45,7 +45,7 @@ npm run brand                # regenerate favicon / og.png from scripts/generate
 | Lab palette, room size, camera, DPR caps | `src/lab/config.ts`; props per station in `src/lab/scene/stations/` |
 | 3D lab on/off default (WebGL check) | inline script in `src/layouts/Base.astro` |
 | Design tokens, button/plate/bezel/paper components | `src/styles/global.css` |
-| Flying props and scroll choreography intensity | `src/scroll/config.ts` (routes, sizes, breakpoint, scrub); props art in `src/components/decor/PropsLayer.astro` |
+| Scroll choreography (signal cable, section actions) | `src/scroll/motion.ts` (breakpoint, scrub, timing); per-section timelines in `src/scroll/sections/`; cable/diagram art in `src/components/decor/{Trunk,NetworkArt}.astro` |
 | Service illustrations | `src/components/decor/ServiceArt.astro` |
 | Colours, fonts, motion, prose styles | `src/styles/global.css` |
 | Metadata, favicon links, theme script | `src/layouts/Base.astro` |

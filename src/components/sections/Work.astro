@@ -20,6 +20,7 @@ const rest = projects.slice(2);
 
 <Section id="work" tone="deep" class="border-b-2 border-border-strong">
   <SectionHeading
+    port="work"
     eyebrow="Experiments · completed builds"
     title="Client sites I've developed."
     description="WordPress and WooCommerce sites for businesses in Germany and Spain: a B2B shop, a rental platform, multilingual and showroom sites. I handled development; design came from my designer colleague."
@@ -28,7 +29,7 @@ const rest = projects.slice(2);
     {
       top.map((project, i) => (
         <Reveal delay={i * 0.06} class="relative">
-          <ProjectCard project={project} index={i + 1} wide />
+          <ProjectCard project={project} index={i + 1} wide display />
         </Reveal>
       ))
     }
@@ -38,7 +39,7 @@ const rest = projects.slice(2);
     {
       rest.map((project, i) => (
         <Reveal delay={(i % 3) * 0.06} class="relative">
-          <ProjectCard project={project} index={i + 3} />
+          <ProjectCard project={project} index={i + 3} display />
         </Reveal>
       ))
     }

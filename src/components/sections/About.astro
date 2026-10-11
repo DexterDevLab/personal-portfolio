@@ -17,11 +17,15 @@ import { aboutParagraphs, stack } from "@/data/about";
 ---
 
 <Section id="about">
-  <SectionHeading eyebrow="Lab notebook" title="A developer who sticks with the problem." />
+  <SectionHeading port="about" eyebrow="Lab notebook" title="A developer who sticks with the problem." />
   <Reveal>
-    <div class="notebook outlined grid overflow-hidden rounded-card md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+    <div class="notebook outlined grid overflow-hidden rounded-card md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]" data-notebook>
       <div class="paper relative border-b-2 border-border-strong p-6 sm:p-8 md:border-r-2 md:border-b-0">
-        <div class="relative mx-auto w-full max-w-60 rotate-[-2deg]">
+        <!-- Decorative cover, opened by the choreography when the section comes into view -->
+        <div class="cover" data-notebook-cover aria-hidden="true">
+          <span class="cover-label label-mono">Lab notebook</span>
+        </div>
+        <div class="relative mx-auto w-full max-w-60 rotate-[-2deg]" data-notebook-photo>
           <span class="tape -top-3 left-6" aria-hidden="true"></span>
           <span class="tape -top-3 right-6" aria-hidden="true"></span>
           <Image

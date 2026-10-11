@@ -2,7 +2,45 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Refinement pass: mobile intro, navigation, contrast, palette, typography (latest)
+## Viewport hero + connected signal choreography (latest)
+
+### Layout changes (`src/components/lab/Lab.astro`, `src/styles/global.css`)
+- The desktop hero (≥ 1024 px) is a CSS grid with three areas and no absolute positioning: **introduction** (first column = page gutter + 24 rem), **room** (second column; the canvas is sized to this cell), and a **control bar** spanning both columns at the bottom (station buttons, view controls, the interaction hint on a readable chip, the "Scroll to read" cue). The section is `min-height: 100svh` with the header's 4 rem as top padding, so it fills the first viewport and grows when content needs more room (short laptops, large text) instead of clipping.
+- Measured at 1440 × 757: hero 757 px tall, intro ends at y 541, control bar starts at 589, CTA fully visible, stage 861 × 573 px. At 1280 × 477 the section grows to 651 px (scrolls); at 150 % text it grows to 992 px with the three areas still stacked without overlap. Horizontal overflow 0 everywhere.
+- Narrow screens keep a natural column: intro → stage (`clamp(16rem, 56svh, 30rem)`) → control bar; view controls stay in the disclosure below `md`; the hint chip is hidden below `sm`. Checked at 390 × 844, 360 × 740, 844 × 390 (landscape) and 820 × 1180.
+- Renderer: the overview no longer shifts the frustum (the room used to be pushed right behind the intro). The station-view offset now keys on the panel's own breakpoint (`md`) and on how much of the stage the side panel covers; `stationView` is simply `state.active !== null` (the old pending-based test left a stale offset after leaving a station). Orbit limits, drag threshold, keyboard and reset are unchanged: 360° rotation (azimuth 37 → 127 → −143 → −53 → 37), repair/console selection, back and reset verified with simulated time.
+
+### Removed decorations
+`src/components/decor/PropsLayer.astro` and `src/scroll/config.ts` (the screwdriver, gear, board, plug, sheet and robot-head props flying down the margins) are gone, together with their CSS. The process cable, shelf lines, notebook and comms console stay.
+
+### The motif and the section choreography (`src/scroll/`)
+One teal cable with a charcoal outline carries an orange signal through the laboratory: *enter the lab → Panda Central → client work → services → how I work → about → contact.*
+- **Trunk** (`src/components/decor/Trunk.astro`, `sections/trunk.ts`, ≥ 1280 px): one SVG strip in the left margin of the page body, laid out from the live DOM (one tap + socket per section at its `h2`). The signal follows the viewport's 45 % line (scrubbed). Below 1280 px each heading carries a short vertical stub + socket instead (`SectionHeading port=…`), so nothing runs under text at any width.
+- **Ports** (`[data-signal-port]`, HTML and SVG): `pending` (dark) → `active` (orange, the visitor is in this section) → `done` (teal). Reversible on purpose: they say where the visitor is. The hero's socket (`.hero-port`, both heroes, aligned with the trunk through `--col-left`) turns done as the hero leaves; in lab view it also calls `lab.pulse()` — the console's tile lights run and its link cables speed up for ~1.2 s (material-only; no camera motion, works from any angle).
+- **Panda Central**: `NetworkArt.astro` (four site cards wired to one dashboard) under the right column; signals travel from the sites into the hub once on entry. Separate from the real screenshot; no numbers.
+- **Client work**: each display frame (`Screenshot display`) switches on once as it enters — teal ring + orange status light via CSS classes; images untouched, nothing delayed.
+- **Services**: `ServiceArt.astro` now draws each service's *finished* state with `data-part` groups; on entry (once) components assemble into the page, the faulty device is repaired (antenna straightens, red "!" badge → teal check, lamp recolours, wrench nudge), modules slide together and the cables draw, the server's cable draws and its lights come on in order.
+- **How I work**: the signal is scrubbed along the cable (horizontal ≥ lg, a vertical rail beside the badges below); the reached step is `data-step="current"` (badge scales, orange ring), earlier steps `done` (teal badge). Text never fades.
+- **About**: a decorative teal cover over the portrait page opens once (`rotateY`), the taped photo settles; biography, portrait and résumé never transform.
+- **Contact**: the console strip is dim until it enters, then a short press and the lights come on. The form, validation, submitting/error/success states are untouched; nothing simulates delivery.
+- Scroll behaviour: natural scrolling, no pinning, scrub only on the two travelling signals; everything else is a short play-once entry action (`entryOnce` in `signal.ts`): if its trigger is already past at setup (deep link, header jump) the finished state is applied without animating, and ScrollTrigger fires skipped triggers on jumps so nothing is left half-way.
+- Lifecycle: one `initChoreography()` per page load (module guard; Astro has no client router here), one `gsap.context` reverted on teardown, a debounced `ScrollTrigger.refresh()` from a `ResizeObserver` on the body (covers fonts/images and the lab on/off hero swap). Mode switches live on media-query change: `full` (≥ 1280), `simple` (narrower: no trunk, shorter distances), `static` (reduced motion: GSAP never loads, every port done, signal parked at the last step, illustrations complete because the markup *is* the complete state).
+
+### Where to adjust
+`src/scroll/motion.ts` — breakpoint, scrub, the port/enter lines, entry duration/stagger, travel distances, the animated colours. Per-section timing in `src/scroll/sections/*.ts`. Trunk/port/display/cover/console CSS states in `global.css` under "Signal choreography".
+
+### Checks
+- `npm run check` (0 errors), `npm run build` (GSAP and ScrollTrigger remain separate lazy chunks).
+- Chrome 1440 × 757 and 1280 × 477, light and dark: hero measurements above; each section's end state after scrolling forward (ports, trunk signal y = 45 % line, network dots at the hub, displays on, services finished, process steps, cover open, console on, contact controls unobstructed); scrolling back to the top returns every port to pending and the hero to active; hash jump `#about` from the top leaves earlier sections finished and opens no panel; `/#contact` reload opens no panel; `?motion=reduce` → `data-choreo="static"`, no `__choreo`, all ports done; `?view=page` → static hero with its socket aligned with the trunk (x 112 at 1440) and the choreography running.
+- 21 ScrollTriggers at init, 10 once the play-once ones have fired. Lab renderer after this pass: 179 draw calls, 49.5 k triangles, 9 programs (the previous 160–176 / 41 k / 7 were measured before the robot's thought bubble and wordmark were added; nothing in this pass touches the scene's geometry).
+- Contact endpoint: GET 405, bad JSON 400, no-JS invalid form 303. No message sent.
+
+### Limitations
+- The automation tab is hidden, so GSAP timelines were driven by manual ticks and the lab by simulated frames; the *feel* of the entry actions and the trunk scrub (0.6 s) should be checked once in a visible window, as should touch rotation on a device.
+- Deep-link loads could not be exercised end-to-end here (smooth scrolling never completes in a hidden tab); the jump-after-load path was.
+- In the static (reduced-motion) mode the trunk still draws; only its signal is hidden.
+
+## Refinement pass: mobile intro, navigation, contrast, palette, typography
 
 ### Root causes found
 1. **Mobile intro missing** — a `@media (max-width: 767px)` rule hid `[data-lab-intro-text]` (added when the headline was clipped under the header). Removed; the intro column now shows the headline and a short introduction on every width, and the hero stage has a minimum height so the room is never squeezed out.

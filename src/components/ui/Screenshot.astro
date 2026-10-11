@@ -9,15 +9,17 @@ interface Props {
   label?: string;
   /** Experiment number or status shown on the right of the title bar. */
   tag?: string;
+  /** A display the scroll choreography switches on (status light + ring). */
+  display?: boolean;
 }
-const { class: className, chrome = true, label, tag } = Astro.props;
+const { class: className, chrome = true, label, tag, display = false } = Astro.props;
 ---
 
-<div class:list={["bezel overflow-hidden", className]}>
+<div class:list={["bezel overflow-hidden", className]} data-display={display ? "" : undefined}>
   {
     chrome && (
       <div class="flex h-9 items-center gap-1.5 border-b-2 border-[#3d3d45] px-3" aria-hidden="true">
-        <span class="size-2.5 rounded-full bg-orange" />
+        <span class="size-2.5 rounded-full bg-orange" data-display-led={display ? "" : undefined} />
         <span class="size-2.5 rounded-full bg-teal" />
         <span class="size-2.5 rounded-full bg-accent" />
         {label && <span class="ml-3 truncate font-mono text-[11px] leading-none text-[#b9b3a7]">{label}</span>}

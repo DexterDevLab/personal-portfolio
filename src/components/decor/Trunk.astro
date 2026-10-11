@@ -1,0 +1,28 @@
+---
+/**
+ * The trunk cable: one vertical teal cable in the left margin of the page
+ * body, with a tap and a socket for each section. Geometry (height, tap
+ * positions) is filled in by src/scroll/sections/trunk.ts from the live
+ * layout; this markup only provides the elements. Shown at ≥ 1280px, where
+ * the margin is wide enough; below that each section heading carries its
+ * own short stub instead (SectionHeading.astro).
+ */
+const taps = ["panda-central", "work", "services", "process", "about", "contact"];
+---
+
+<div class="trunk" data-trunk aria-hidden="true">
+  <svg viewBox="0 0 40 100" preserveAspectRatio="none" data-trunk-svg>
+    <path class="cable-outline" data-trunk-line d="M20 0v100" />
+    <path class="cable-core" data-trunk-line d="M20 0v100" />
+    {
+      taps.map((id) => (
+        <g data-trunk-tap={id} data-signal-port={id}>
+          <path class="cable-outline" data-tap-line d="M20 0h12" />
+          <path class="cable-core" data-tap-line d="M20 0h12" />
+          <circle class="port-led" data-tap-led cx="34" cy="0" r="6" />
+        </g>
+      ))
+    }
+    <circle class="signal-dot" data-trunk-signal cx="20" cy="0" r="7" />
+  </svg>
+</div>

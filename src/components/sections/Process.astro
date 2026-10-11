@@ -6,40 +6,49 @@ import { processSteps } from "@/data/process";
 
 /**
  * Four steps joined by a cable. On wide screens the cable runs behind the
- * steps and a signal travels along it as the section scrolls into view
- * (src/scroll/choreography.ts); without JS or motion the signal sits at
- * the first step. On narrow screens the cable is a vertical rail.
+ * step markers; on narrow screens it is a vertical rail beside them. The
+ * orange signal travels along it as the section scrolls, and the step it
+ * has reached is emphasised by its badge (src/scroll/sections/process.ts).
+ * Without JS or motion the signal sits at the last step and every step is
+ * marked done.
  */
 const short = ["Understand", "Collaborate", "Build & test", "Launch & maintain"];
 ---
 
 <Section id="process" compact tone="plain" class="border-y-2 border-border-strong">
-  <SectionHeading eyebrow="How I work" title="Plain steps, no surprises." />
-  <div class="relative">
+  <SectionHeading port="process" eyebrow="How I work" title="Plain steps, no surprises." />
+  <div class="relative" data-process>
+    <!-- Wide: horizontal cable through the markers -->
     <svg
-      data-process-cable
       class="pointer-events-none absolute inset-x-0 -top-0.5 hidden h-12 w-full lg:block"
       viewBox="0 0 1200 48"
       preserveAspectRatio="none"
       aria-hidden="true"
+      data-process-cable="wide"
     >
-      <path
-        data-cable-path
-        d="M24 24 C 200 24, 240 40, 400 24 S 600 8, 776 24 S 1000 40, 1176 24"
-        fill="none"
-        stroke="var(--line)"
-        stroke-width="4"
-        vector-effect="non-scaling-stroke"
-      ></path>
-      <circle data-cable-signal cx="24" cy="24" r="8" fill="var(--orange)" stroke="var(--line)" stroke-width="3" vector-effect="non-scaling-stroke"></circle>
+      <path class="cable-outline" d="M24 24 C 200 24, 240 40, 400 24 S 600 8, 776 24 S 1000 40, 1176 24" vector-effect="non-scaling-stroke"></path>
+      <path data-cable-path class="cable-core" d="M24 24 C 200 24, 240 40, 400 24 S 600 8, 776 24 S 1000 40, 1176 24" vector-effect="non-scaling-stroke"></path>
+      <circle data-cable-signal class="signal-dot" cx="1176" cy="24" r="8" vector-effect="non-scaling-stroke"></circle>
+    </svg>
+    <!-- Narrow: vertical rail beside the markers -->
+    <svg
+      class="pointer-events-none absolute top-0 bottom-0 left-0 w-11 lg:hidden"
+      viewBox="0 0 44 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      data-process-cable="narrow"
+    >
+      <path class="cable-outline" d="M22 4V96" vector-effect="non-scaling-stroke"></path>
+      <path data-cable-path class="cable-core" d="M22 4V96" vector-effect="non-scaling-stroke"></path>
+      <circle data-cable-signal class="signal-dot" cx="22" cy="96" r="8" vector-effect="non-scaling-stroke"></circle>
     </svg>
     <ol class="relative grid gap-6 lg:grid-cols-4 lg:gap-8">
       {
         processSteps.map((step, i) => (
           <Reveal delay={i * 0.06}>
-            <li class="relative flex gap-4 lg:block">
+            <li class="relative flex gap-4 lg:block" data-step="done" data-step-index={i}>
               <span
-                class="outlined-sm z-10 flex size-11 shrink-0 items-center justify-center rounded-full bg-orange font-mono text-sm font-bold text-[#2b2b30] lg:mb-5"
+                class="step-badge outlined-sm z-10 flex size-11 shrink-0 items-center justify-center rounded-full bg-orange font-mono text-sm font-bold text-[#2b2b30] lg:mb-5"
                 aria-hidden="true"
               >
                 0{i + 1}

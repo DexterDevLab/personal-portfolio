@@ -7,11 +7,22 @@ interface Props {
   description?: string;
   class?: string;
   tone?: "teal" | "orange" | "blue";
+  /** Section id: adds the signal stub + port shown where there is no trunk cable. */
+  port?: string;
 }
-const { eyebrow, title, description, class: className, tone } = Astro.props;
+const { eyebrow, title, description, class: className, tone, port } = Astro.props;
 ---
 
 <div class:list={["relative z-10 mb-10 max-w-2xl md:mb-12", className]}>
+  {
+    port && (
+      <svg class="signal-stub" viewBox="0 0 40 44" data-signal-port={port} aria-hidden="true">
+        <path class="cable-outline" d="M20 -4v22" />
+        <path class="cable-core" d="M20 -4v22" />
+        <circle class="port-led" cx="20" cy="30" r="6" />
+      </svg>
+    )
+  }
   {eyebrow && <Eyebrow class="mb-3 text-teal-deep" tone={tone}>{eyebrow}</Eyebrow>}
   <h2 class="display text-[2rem] md:text-[2.8rem]">{title}</h2>
   {

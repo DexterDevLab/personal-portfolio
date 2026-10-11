@@ -76,6 +76,9 @@
   --danger: light-dark(#c4332c, #ff7b74);
   --shadow: light-dark(#25252b, #0b0b0d);
   --frame: light-dark(#25252b, #0f0f11);
+  /* Left edge of the 70rem content column (Container.astro): shared by the
+     hero port and the trunk cable so they line up by construction. */
+  --col-left: max(1.5rem, (100vw - 70rem) / 2);
 }
 .dark {
   color-scheme: dark;
@@ -304,6 +307,25 @@ h3 {
       inset 0 0 0 6px #3d3d45;
   }
 
+  /* Interaction hint on a readable surface (lab control bar) */
+  .hint-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.5rem;
+    padding: 0.35rem 0.75rem;
+    border: 2px solid var(--line-soft);
+    border-radius: var(--radius-button);
+    background: var(--bg-deep);
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+  .hint-chip kbd {
+    font-family: var(--font-geist-mono);
+    color: var(--ink);
+  }
+
   /* Status light */
   .led {
     display: inline-block;
@@ -405,21 +427,19 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 [data-lab-state="ready"] .lab-canvas {
   opacity: 1;
 }
-.lab-intro {
-  transition:
-    opacity 0.3s ease,
-    translate 0.3s ease;
+.lab-stage {
+  /* Narrow screens: a fixed-height stage in the flow. From lg the grid row
+     sizes it (Lab.astro). */
+  height: clamp(16rem, 56svh, 30rem);
 }
 @media (min-width: 1024px) {
-  [data-lab-state="ready"][data-panel] .lab-intro {
-    opacity: 0;
-    translate: 0 -8px;
-    pointer-events: none;
+  .lab-stage {
+    height: auto;
+    min-height: 24rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lab-canvas,
-  .lab-intro {
+  .lab-canvas {
     transition: none;
   }
 }
@@ -477,34 +497,230 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 }
 
 /* ---------------------------------- */
-/* Flying props (scroll choreography) */
+/* Signal choreography                */
 /* ---------------------------------- */
-/* Above section backgrounds, below section content (containers are z-10). */
-.props-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  overflow: hidden;
-  pointer-events: none;
+/* One motif ties the page together: a teal cable with a charcoal outline and
+   an orange signal travelling through it (src/scroll/). Ports are sockets
+   with a status light: pending (dark), active (orange, the signal is in this
+   section), done (teal). Everything here is CSS state; the markup's default
+   is the completed state so the page reads fully without JS or motion. */
+.cable-outline {
+  stroke: var(--line);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
-.prop {
+.cable-core {
+  stroke: var(--teal);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.signal-dot {
+  fill: var(--orange);
+  stroke: var(--line);
+  stroke-width: 3;
+}
+/* Port light: HTML (span) or SVG (circle) */
+.port-led {
+  fill: #5a5a64;
+  stroke: var(--line);
+  stroke-width: 3;
+  transition: fill 0.25s ease;
+}
+span.port-led {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: #5a5a64;
+  transition: background-color 0.25s ease;
+}
+[data-signal="active"] .port-led,
+[data-signal="active"].port-led {
+  fill: var(--orange);
+  background: var(--orange);
+}
+[data-signal="done"] .port-led,
+[data-signal="done"].port-led {
+  fill: var(--teal);
+  background: var(--teal);
+}
+[data-choreo="static"] .port-led {
+  fill: var(--teal);
+  background: var(--teal);
+}
+
+/* Trunk cable: a strip in the left margin of the page body (≥1280px only). */
+.trunk {
   position: absolute;
   top: 0;
-  left: 0;
-  width: var(--prop-size, 96px);
-  height: var(--prop-size, 96px);
-  opacity: 0;
-  will-change: transform;
-  color: var(--ink);
+  bottom: 0;
+  left: calc(var(--col-left) - 3rem);
+  width: 2.5rem;
+  z-index: 5;
+  pointer-events: none;
+  display: none;
 }
-.prop svg {
+.trunk svg {
+  display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
 }
-[data-props="static"] .prop {
-  opacity: 1;
-  will-change: auto;
+@media (min-width: 1280px) {
+  .trunk {
+    display: block;
+  }
+}
+[data-choreo="static"] .trunk .signal-dot {
+  display: none;
+}
+/* Hero port: the cable's starting socket, same x as the trunk. */
+.hero-port {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--col-left) - 3rem);
+  width: 2.5rem;
+  display: none;
+  z-index: 10;
+  pointer-events: none;
+}
+@media (min-width: 1280px) {
+  .hero-port {
+    display: block;
+  }
+}
+/* Section stub: a short vertical cable above each heading where there is no
+   trunk (below 1280px). */
+.signal-stub {
+  display: none;
+  width: 2.5rem;
+  height: 2.75rem;
+  margin-bottom: 0.5rem;
+  margin-left: -0.75rem;
+}
+@media (max-width: 1279px) {
+  .signal-stub {
+    display: block;
+  }
+}
+
+/* Experiment display frames: a status light and ring that come on as the
+   signal reaches them (Work section). Off until the choreography runs; on
+   under reduced motion, in the lab panels and in static mode. */
+.bezel[data-display] {
+  transition: box-shadow 0.35s ease;
+}
+.bezel[data-display] [data-display-led] {
+  background: #5a5a64;
+  transition: background-color 0.25s ease;
+}
+.bezel[data-display].is-on,
+[data-choreo="static"] .bezel[data-display],
+.lab-panel .bezel[data-display] {
+  box-shadow:
+    4px 4px 0 0 var(--shadow),
+    inset 0 0 0 6px color-mix(in oklab, var(--teal) 45%, #3d3d45);
+}
+.bezel[data-display].is-on [data-display-led],
+[data-choreo="static"] .bezel[data-display] [data-display-led],
+.lab-panel .bezel[data-display] [data-display-led] {
+  background: var(--orange);
+}
+.bezel[data-display].is-on [data-display-led] {
+  animation: led-pop 0.45s ease-out both;
+}
+@keyframes led-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Process steps: the current step is emphasised by its badge, never by
+   fading the others. */
+[data-step] .step-badge {
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+[data-step="done"] .step-badge {
+  background: var(--teal);
+  color: #0f2a27;
+}
+[data-step="current"] .step-badge {
+  transform: scale(1.1);
+  box-shadow:
+    3px 3px 0 0 var(--shadow),
+    0 0 0 4px color-mix(in oklab, var(--orange) 45%, transparent);
+}
+
+/* Notebook cover: a decorative flap over the portrait page; closed only
+   while the choreography is about to open it. */
+.notebook {
+  perspective: 1400px;
+}
+.notebook .cover {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform-origin: left center;
+  background: var(--teal);
+  border-right: 2px solid var(--line);
+  background-image: radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--line) 12%, transparent) 0 2px, transparent 3px);
+  background-size: 18px 18px;
+}
+.notebook[data-cover="closed"] .cover {
+  display: block;
+}
+.notebook .cover .cover-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-plate);
+  background: var(--paper);
+  color: var(--ink);
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 0 var(--shadow);
+}
+
+/* Communication console: dim until the signal arrives. */
+.console-strip {
+  transition:
+    opacity 0.3s ease,
+    translate 0.15s ease;
+}
+.console.is-off .console-strip {
+  opacity: 0.55;
+}
+.console.is-off .console-strip .led {
+  background: #5a5a64;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .port-led,
+  span.port-led,
+  .bezel[data-display],
+  .bezel[data-display] [data-display-led],
+  [data-step] .step-badge,
+  .console-strip {
+    transition: none;
+    animation: none;
+  }
 }
 
 /* ---------------------------------- */
