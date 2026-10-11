@@ -17,13 +17,13 @@ const { idPrefix = "" } = Astro.props;
 const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
 
 const inputClasses =
-  "w-full rounded-button border border-border bg-surface px-4 py-3 text-base placeholder:text-muted focus:border-accent focus:outline-none aria-invalid:border-danger sm:py-2.5 sm:text-sm";
+  "w-full rounded-button border-2 border-border-strong bg-paper px-4 py-3 text-base text-foreground placeholder:text-muted focus:border-orange focus:outline-none focus:ring-0 aria-invalid:border-danger sm:py-2.5 sm:text-sm";
 ---
 
 <form method="post" action="/api/contact" class="space-y-4" data-contact-form>
   <div class="grid gap-4 sm:grid-cols-2">
     <div>
-      <label for={id("name")} class="mb-1.5 block text-sm font-medium">Name</label>
+      <label for={id("name")} class="label-mono mb-1.5 block text-muted">Name</label>
       <input
         id={id("name")}
         name="name"
@@ -39,7 +39,7 @@ const inputClasses =
       <p id={id("name-error")} data-error-for="name" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
     </div>
     <div>
-      <label for={id("email")} class="mb-1.5 block text-sm font-medium">Email</label>
+      <label for={id("email")} class="label-mono mb-1.5 block text-muted">Email</label>
       <input
         id={id("email")}
         name="email"
@@ -55,7 +55,7 @@ const inputClasses =
   </div>
 
   <div>
-    <label for={id("message")} class="mb-1.5 block text-sm font-medium">Message</label>
+    <label for={id("message")} class="label-mono mb-1.5 block text-muted">Message</label>
     <textarea
       id={id("message")}
       name="message"
@@ -76,11 +76,7 @@ const inputClasses =
   </div>
 
   <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
-    <button
-      type="submit"
-      data-submit
-      class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-button bg-accent-strong px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-    >
+    <button type="submit" data-submit class="btn btn-primary shrink-0 disabled:opacity-60">
       <span class="inline-flex" data-spinner hidden>
         <LoaderCircle class="size-4 animate-spin" aria-hidden="true" />
       </span>
@@ -97,7 +93,6 @@ const inputClasses =
   const fields = ["name", "email", "message"] as const;
 
   document.querySelectorAll<HTMLFormElement>("[data-contact-form]").forEach((form) => {
-    // JS takes over validation so messages match the server exactly.
     form.noValidate = true;
 
     const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;

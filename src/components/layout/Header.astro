@@ -5,8 +5,11 @@ import ThemeToggle from "./ThemeToggle.astro";
 import MobileNav from "./MobileNav.astro";
 import ModeSwitch from "@/components/lab/ModeSwitch.astro";
 
+/**
+ * Control strip: a solid bar with a bottom outline, the wordmark on a
+ * nameplate, text navigation and one orange "go" button.
+ */
 interface Props {
-  /** Show the lab/page switch (homepage only). */
   lab?: boolean;
 }
 const { lab = false } = Astro.props;
@@ -14,16 +17,17 @@ const { lab = false } = Astro.props;
 
 <header
   data-header
-  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,border-color] duration-300 data-[scrolled]:border-border data-[scrolled]:bg-background/85 md:data-[scrolled]:backdrop-blur-md"
+  class="fixed inset-x-0 top-0 z-50 border-b-2 border-border-strong bg-background/95 backdrop-blur-sm"
 >
   <a
     href="#main"
-    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-button focus:bg-accent-strong focus:px-4 focus:py-2 focus:text-sm focus:text-white"
+    class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-button focus:bg-orange focus:px-4 focus:py-2 focus:text-sm focus:text-ink"
   >
     Skip to content
   </a>
-  <nav aria-label="Main" class="mx-auto flex h-16 w-full max-w-280 items-center justify-between px-5 sm:px-6">
-    <a href="/#top" class="font-mono text-base font-semibold tracking-tight">
+  <nav aria-label="Main" class="mx-auto flex h-16 w-full max-w-280 items-center justify-between gap-3 px-5 sm:px-6">
+    <a href="/#top" class="plate text-sm" aria-label={`${site.name} — home`}>
+      <span class="led bg-orange" aria-hidden="true"></span>
       {site.name}
     </a>
 
@@ -33,7 +37,7 @@ const { lab = false } = Astro.props;
         navLinks.map((link) => (
           <a
             href={link.href}
-            class="rounded-button px-3 py-2 text-sm text-muted transition-colors hover:text-foreground"
+            class="rounded-button px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-surface-2 hover:text-foreground"
           >
             {link.label}
           </a>
@@ -41,17 +45,12 @@ const { lab = false } = Astro.props;
       }
       <a
         href={site.resume}
-        class="rounded-button px-3 py-2 text-sm text-muted transition-colors hover:text-foreground"
+        class="rounded-button px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-surface-2 hover:text-foreground"
       >
         Résumé
       </a>
       {lab && <ModeSwitch class="ml-2" />}
-      <a
-        href="/#contact"
-        class="ml-2 inline-flex min-h-10 items-center rounded-button bg-accent-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-      >
-        Discuss your project
-      </a>
+      <a href="/#contact" class="btn btn-primary btn-sm ml-2">Discuss your project</a>
       <ThemeToggle class="ml-2 size-10" />
     </div>
 
@@ -62,7 +61,7 @@ const { lab = false } = Astro.props;
         type="button"
         aria-label="Open menu"
         data-mobile-nav-open
-        class="inline-flex size-11 items-center justify-center rounded-button border border-border text-muted transition-colors hover:text-foreground"
+        class="btn btn-sm size-11 px-0"
       >
         <Menu class="size-4" aria-hidden="true" />
       </button>
@@ -70,12 +69,3 @@ const { lab = false } = Astro.props;
   </nav>
   <MobileNav lab={lab} />
 </header>
-
-<script>
-  const header = document.querySelector<HTMLElement>("[data-header]");
-  if (header) {
-    const update = () => header.toggleAttribute("data-scrolled", window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-  }
-</script>

@@ -1,5 +1,5 @@
 ---
-import { Download, Mail } from "@lucide/astro";
+import { Mail } from "@lucide/astro";
 import GithubIcon from "@/components/ui/GithubIcon.astro";
 import Section from "@/components/ui/Section.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
@@ -7,50 +7,56 @@ import Reveal from "@/components/Reveal.astro";
 import ContactForm from "@/components/ContactForm.astro";
 import { site } from "@/data/site";
 import { contactHelp } from "@/data/about";
+
+/**
+ * The communication station: a normal form in an outlined console with a
+ * teal header strip, plus the direct channels beside it.
+ */
 ---
 
-<Section id="contact" class="border-t border-border">
+<Section id="contact" tone="floor" class="border-t-2 border-border-strong">
   <SectionHeading
-    eyebrow="Contact"
+    eyebrow="Communication station"
     title="Tell me about your project."
     description={`A new site, a web app, or something broken on WordPress: send a message and I'll get back to you ${site.responseTime}.`}
   />
-  <div class="grid gap-10 md:grid-cols-[1fr_300px] lg:gap-14">
+  <div class="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] lg:gap-12">
     <Reveal>
-      <ContactForm />
+      <div class="outlined overflow-hidden rounded-card bg-surface">
+        <div class="flex items-center gap-3 border-b-2 border-border-strong bg-teal px-5 py-3 text-[#0f2a27]">
+          <span class="led bg-orange" aria-hidden="true"></span>
+          <span class="label-mono font-semibold">Open channel</span>
+          <span class="ml-auto font-mono text-xs">{site.email}</span>
+        </div>
+        <div class="p-5 sm:p-6">
+          <ContactForm />
+        </div>
+      </div>
     </Reveal>
     <Reveal delay={0.08}>
       <div class="flex flex-col gap-6">
-        <div>
-          <p class="font-mono text-xs uppercase tracking-[0.2em] text-muted">Helpful to include</p>
-          <ul class="mt-3 space-y-1.5 text-sm text-muted">
-            {contactHelp.map((item) => <li>{item}</li>)}
+        <div class="outlined-sm rounded-card bg-paper p-5">
+          <p class="label-mono text-muted">Helpful to include</p>
+          <ul class="mt-3 space-y-2 text-sm">
+            {
+              contactHelp.map((item) => (
+                <li class="flex items-start gap-2">
+                  <span class="led mt-1.5 bg-teal" aria-hidden="true" />
+                  {item}
+                </li>
+              ))
+            }
           </ul>
         </div>
         <div class="flex flex-col gap-3">
-          <p class="font-mono text-xs uppercase tracking-[0.2em] text-muted">Direct</p>
-          <a
-            href={`mailto:${site.email}`}
-            class="inline-flex items-center gap-2 py-1 text-sm text-foreground underline-offset-4 hover:underline"
-          >
-            <Mail class="size-4 text-muted" aria-hidden="true" />
+          <p class="label-mono text-muted">Direct channels</p>
+          <a href={`mailto:${site.email}`} class="btn justify-start">
+            <Mail class="size-4" aria-hidden="true" />
             {site.email}
           </a>
-          <a
-            href={site.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 py-1 text-sm text-muted transition-colors hover:text-foreground"
-          >
+          <a href={site.github} target="_blank" rel="noopener noreferrer" class="btn justify-start">
             <GithubIcon />
             github.com/DexterDevLab
-          </a>
-          <a
-            href={site.resume}
-            class="mt-2 inline-flex min-h-11 w-fit items-center gap-2 rounded-button border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:border-border-strong hover:bg-surface"
-          >
-            <Download class="size-4" aria-hidden="true" />
-            Download résumé
           </a>
         </div>
       </div>

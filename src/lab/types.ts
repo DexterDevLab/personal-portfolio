@@ -42,6 +42,8 @@ export interface LabHandle {
   resetView(): void;
   /** Orbit by an angle in radians (positive = counter-clockwise from above). */
   rotate(radians: number): void;
+  /** Dolly by a factor (< 1 zooms in, > 1 zooms out), within the current limits. */
+  zoom(factor: number): void;
   hover(id: StationId | null): void;
   pause(): void;
   resume(): void;

@@ -1,38 +1,45 @@
 ---
-import { LayoutTemplate, Wrench, AppWindow, Server } from "@lucide/astro";
 import Section from "@/components/ui/Section.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/Reveal.astro";
+import ServiceArt from "@/components/decor/ServiceArt.astro";
 import { engagementLine, services, type ServiceIcon } from "@/data/services";
 
-const icons: Record<ServiceIcon, typeof Wrench> = {
-  layout: LayoutTemplate,
-  wrench: Wrench,
-  app: AppWindow,
-  server: Server,
+/**
+ * Four stations on a workbench row: illustration above, the plain service
+ * name and description below. Literal names stay; the art is decoration.
+ */
+const art: Record<ServiceIcon, "layout" | "wrench" | "app" | "server"> = {
+  layout: "layout",
+  wrench: "wrench",
+  app: "app",
+  server: "server",
 };
 ---
 
-<Section id="services" class="border-t border-border">
+<Section id="services">
   <SectionHeading
-    eyebrow="Services"
+    eyebrow="Services · four stations"
     title="Build it, fix it, keep it running."
     description="Four things I do for clients, from a first build to the maintenance that comes after."
   />
-  <div class="grid gap-4 sm:grid-cols-2">
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
     {
-      services.map((service, i) => {
-        const Icon = icons[service.icon];
-        return (
-          <Reveal delay={(i % 2) * 0.06}>
-            <div class="h-full rounded-card border border-border bg-surface p-6 transition-colors hover:border-border-strong">
-              <Icon class="mb-4 size-5 text-accent" aria-hidden="true" />
-              <h3 class="text-base font-medium">{service.title}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-muted">{service.description}</p>
+      services.map((service, i) => (
+        <Reveal delay={(i % 4) * 0.06}>
+          <article
+            id={service.icon === "wrench" ? "troubleshooting" : undefined}
+            class="outlined flex h-full flex-col rounded-card bg-surface p-5 transition-transform duration-200 hover:-translate-y-0.5"
+          >
+            <div class="rounded-[12px] border-2 border-border-strong bg-background-deep p-3">
+              <ServiceArt kind={art[service.icon]} />
             </div>
-          </Reveal>
-        );
-      })
+            <p class="label-mono mt-4 text-muted">Station 0{i + 1}</p>
+            <h3 class="mt-1 text-lg font-bold">{service.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">{service.description}</p>
+          </article>
+        </Reveal>
+      ))
     }
   </div>
   <Reveal delay={0.2}>

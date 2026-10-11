@@ -1,34 +1,89 @@
 ---
 import { Image } from "astro:assets";
+import { Download } from "@lucide/astro";
 import Section from "@/components/ui/Section.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/Reveal.astro";
 import Tag from "@/components/ui/Tag.astro";
+import Button from "@/components/ui/Button.astro";
 import portrait from "@/assets/portrait.jpg";
 import { site } from "@/data/site";
 import { aboutParagraphs, stack } from "@/data/about";
+
+/**
+ * The lab notebook, open: portrait taped to the left page, the biography
+ * on the right, ring binding down the middle. Normal type, normal size.
+ */
 ---
 
-<Section id="about" class="border-t border-border">
-  <SectionHeading eyebrow="About" title="A developer who sticks with the problem." />
-  <div class="grid items-start gap-10 md:grid-cols-[240px_1fr]">
-    <Reveal>
-      <Image
-        src={portrait}
-        alt={`Portrait of ${site.person}`}
-        width={480}
-        densities={[1, 2]}
-        loading="lazy"
-        class="aspect-4/5 w-full max-w-60 rounded-card border border-border object-cover object-top"
-      />
-    </Reveal>
-    <Reveal delay={0.08}>
-      <div class="max-w-2xl space-y-4 text-base leading-relaxed text-muted">
-        {aboutParagraphs.map((p) => <p>{p}</p>)}
+<Section id="about">
+  <SectionHeading eyebrow="Lab notebook" title="A developer who sticks with the problem." />
+  <Reveal>
+    <div class="notebook outlined grid overflow-hidden rounded-card md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div class="paper relative border-b-2 border-border-strong p-6 sm:p-8 md:border-r-2 md:border-b-0">
+        <div class="relative mx-auto w-full max-w-60 rotate-[-2deg]">
+          <span class="tape -top-3 left-6" aria-hidden="true"></span>
+          <span class="tape -top-3 right-6" aria-hidden="true"></span>
+          <Image
+            src={portrait}
+            alt={`Portrait of ${site.person}`}
+            width={480}
+            densities={[1, 2]}
+            loading="lazy"
+            class="aspect-4/5 w-full rounded-[6px] border-2 border-border-strong object-cover object-top"
+          />
+        </div>
+        <p class="label-mono mt-6 text-center text-muted">{site.person}</p>
+        <p class="mt-1 text-center text-sm text-muted">{site.role} · Philippines</p>
+        <div class="mt-5 flex justify-center">
+          <Button href={site.resume} variant="secondary" size="sm">
+            <Download class="size-4" aria-hidden="true" />
+            Download résumé
+          </Button>
+        </div>
       </div>
-      <div class="mt-6 flex flex-wrap gap-2">
-        {stack.map((item) => <Tag>{item}</Tag>)}
+      <div class="paper relative p-6 sm:p-8 md:pl-10">
+        <div class="rings" aria-hidden="true"></div>
+        <div class="space-y-4 text-base leading-[2rem] text-foreground/90">
+          {aboutParagraphs.map((p) => <p>{p}</p>)}
+        </div>
+        <p class="label-mono mt-6 text-muted">Tools I reach for</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {stack.map((item) => <Tag>{item}</Tag>)}
+        </div>
       </div>
-    </Reveal>
-  </div>
+    </div>
+  </Reveal>
 </Section>
+
+<style>
+  .notebook {
+    background: var(--paper);
+  }
+  .tape {
+    position: absolute;
+    width: 3.5rem;
+    height: 1.1rem;
+    background: color-mix(in oklab, var(--teal) 55%, transparent);
+    border: 2px solid var(--line);
+    transform: rotate(-6deg);
+    z-index: 1;
+  }
+  .tape:last-of-type {
+    transform: rotate(5deg);
+  }
+  /* Ring binding along the spine on wide screens */
+  @media (min-width: 768px) {
+    .rings {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -0.6rem;
+      width: 1.2rem;
+      background-image: radial-gradient(circle, var(--line) 0 4px, transparent 5px);
+      background-size: 1.2rem 2.4rem;
+      background-position: 0 1.2rem;
+      background-repeat: repeat-y;
+    }
+  }
+</style>

@@ -62,9 +62,8 @@ const ogImage = new URL("/og.png", Astro.site);
                 ok = !!document.createElement("canvas").getContext("webgl2");
               } catch (e) {}
               if (params.get("nowebgl") === "1") ok = false;
-              var narrow = matchMedia("(max-width: 767px)").matches;
               var view =
-                q === "page" || q === "lab" ? q : stored === "page" || stored === "lab" ? stored : ok && !narrow ? "lab" : "page";
+                q === "page" || q === "lab" ? q : stored === "page" || stored === "lab" ? stored : ok ? "lab" : "page";
               if (!ok) view = "page";
               var h = document.documentElement;
               h.dataset.view = view;

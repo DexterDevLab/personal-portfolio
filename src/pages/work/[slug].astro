@@ -23,39 +23,38 @@ const liveHost = data.liveUrl ? new URL(data.liveUrl).host : undefined;
 
 <Base title={`${data.title} — case study | ${site.name}`} description={data.summary}>
   <article>
-    <Container class="pt-28 pb-10 lg:pt-36">
-      <a
-        href="/#work"
-        class="inline-flex min-h-11 items-center gap-1.5 text-sm text-muted transition-colors hover:text-foreground"
-      >
-        <ArrowLeft class="size-4" aria-hidden="true" />
-        All work
-      </a>
-      <div class="mt-6 grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-end">
-        <div>
-          <Eyebrow class="mb-3">Case study</Eyebrow>
-          <h1 class="text-4xl font-semibold leading-[1.1] sm:text-5xl">{data.title}</h1>
-          <p class="mt-5 max-w-2xl text-lg leading-relaxed text-muted">{data.summary}</p>
+    <div class="border-b-2 border-border-strong bg-background-deep grid-floor">
+      <Container class="pt-28 pb-10 lg:pt-36">
+        <a href="/#work" class="btn btn-ghost btn-sm -ml-3">
+          <ArrowLeft class="size-4" aria-hidden="true" />
+          All work
+        </a>
+        <div class="mt-6 grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-end">
+          <div>
+            <Eyebrow class="mb-3" tone="orange">Case study · main control system</Eyebrow>
+            <h1 class="text-4xl font-bold leading-[1.05] sm:text-5xl">{data.title}</h1>
+            <p class="mt-5 max-w-2xl text-lg leading-relaxed text-muted">{data.summary}</p>
+          </div>
+          <dl class="outlined-sm grid grid-cols-2 gap-x-6 gap-y-4 rounded-card bg-surface p-5 text-sm lg:grid-cols-1">
+            <div>
+              <dt class="label-mono text-muted">Status</dt>
+              <dd class="mt-1 flex items-center gap-2"><span class="led bg-teal" aria-hidden="true"></span>{data.statusLabel ?? data.status}</dd>
+            </div>
+            <div>
+              <dt class="label-mono text-muted">My role</dt>
+              <dd class="mt-1">{data.role}</dd>
+            </div>
+            <div class="col-span-2 lg:col-span-1">
+              <dt class="label-mono text-muted">Stack</dt>
+              <dd class="mt-2 flex flex-wrap gap-2">{data.stack.map((tag) => <Tag>{tag}</Tag>)}</dd>
+            </div>
+          </dl>
         </div>
-        <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm lg:grid-cols-1">
-          <div>
-            <dt class="font-mono text-xs uppercase tracking-[0.2em] text-muted">Status</dt>
-            <dd class="mt-1">{data.statusLabel ?? data.status}</dd>
-          </div>
-          <div>
-            <dt class="font-mono text-xs uppercase tracking-[0.2em] text-muted">My role</dt>
-            <dd class="mt-1">{data.role}</dd>
-          </div>
-          <div class="col-span-2 lg:col-span-1">
-            <dt class="font-mono text-xs uppercase tracking-[0.2em] text-muted">Stack</dt>
-            <dd class="mt-2 flex flex-wrap gap-2">{data.stack.map((tag) => <Tag>{tag}</Tag>)}</dd>
-          </div>
-        </dl>
-      </div>
-    </Container>
+      </Container>
+    </div>
 
-    <Container>
-      <Screenshot label={liveHost}>
+    <Container class="-mt-6 lg:-mt-8">
+      <Screenshot label={liveHost} tag="Overview screen">
         <Image
           src={data.screenshot}
           alt={data.screenshotAlt}
@@ -69,12 +68,7 @@ const liveHost = data.liveUrl ? new URL(data.liveUrl).host : undefined;
         data.liveUrl && (
           <p class="mt-3 text-sm text-muted">
             Overview screen of the production app.{" "}
-            <a
-              href={data.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-1 text-accent underline-offset-4 hover:underline"
-            >
+            <a href={data.liveUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 font-medium text-accent underline-offset-4 hover:underline">
               {liveHost}
               <ArrowUpRight class="size-3.5" aria-hidden="true" />
             </a>{" "}
@@ -85,14 +79,17 @@ const liveHost = data.liveUrl ? new URL(data.liveUrl).host : undefined;
     </Container>
 
     <Container class="py-14 md:py-20">
-      <div class="prose">
-        <Content />
+      <div class="outlined paper rounded-card px-6 py-8 sm:px-10 sm:py-10">
+        <div class="prose">
+          <Content />
+        </div>
       </div>
     </Container>
 
     <Container class="pb-20">
-      <div class="rounded-card border border-border bg-surface p-6 sm:p-8">
-        <h2 class="text-2xl font-semibold">Need something built, fixed, or maintained?</h2>
+      <div class="outlined rounded-card bg-surface p-6 sm:p-8">
+        <Eyebrow class="mb-3">Communication station</Eyebrow>
+        <h2 class="text-2xl font-bold">Need something built, fixed, or maintained?</h2>
         <p class="mt-2 max-w-2xl text-muted">
           Whether it's an internal tool like this one, a WordPress site, or a problem nobody else wants to debug,
           tell me what you're dealing with.

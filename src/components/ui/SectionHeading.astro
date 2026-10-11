@@ -6,13 +6,14 @@ interface Props {
   title: string;
   description?: string;
   class?: string;
+  tone?: "teal" | "orange" | "blue";
 }
-const { eyebrow, title, description, class: className } = Astro.props;
+const { eyebrow, title, description, class: className, tone } = Astro.props;
 ---
 
-<div class:list={["mb-10 max-w-2xl md:mb-14", className]}>
-  {eyebrow && <Eyebrow class="mb-3">{eyebrow}</Eyebrow>}
-  <h2 class="text-3xl font-semibold leading-tight md:text-4xl">{title}</h2>
+<div class:list={["relative z-10 mb-10 max-w-2xl md:mb-12", className]}>
+  {eyebrow && <Eyebrow class="mb-3" tone={tone}>{eyebrow}</Eyebrow>}
+  <h2 class="text-3xl font-bold leading-[1.1] md:text-[2.6rem]">{title}</h2>
   {
     description && (
       <p class="mt-4 text-base leading-relaxed text-muted md:text-lg">

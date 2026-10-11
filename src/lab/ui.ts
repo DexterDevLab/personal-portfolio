@@ -56,18 +56,16 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     history.replaceState(null, "", url.pathname + url.search + (opts.hash ?? location.hash));
 
     if (next === "lab") {
-      // The lab fills the viewport; leftover page scroll would push it under the header.
       window.scrollTo(0, 0);
       lab?.resume();
       void ensureBooted();
       const target = stationFromHash(location.hash);
       if (target) requestStation(target, null);
     } else {
-      const activeHash = openId ? STATION_BY_ID[openId].hash : location.hash;
       closePanel({ restoreFocus: false });
       lab?.back();
       lab?.pause();
-      scrollToAnchor(activeHash);
+      window.scrollTo(0, 0);
     }
   }
 
@@ -250,12 +248,23 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     }
   });
 
-  root.querySelectorAll<HTMLAnchorElement>("[data-mode-link]").forEach((a) => {
+  // "Jump to this section": close the panel and scroll the page to the
+  // matching section below the lab.
+  root.querySelectorAll<HTMLAnchorElement>("[data-section-link]").forEach((a) => {
     a.addEventListener("click", (event) => {
       event.preventDefault();
-      const hash = new URL(a.href).hash;
-      setView("page", { hash });
+      const anchor = a.dataset.sectionLink ?? "";
+      closePanel({ restoreFocus: false });
+      lab?.back();
+      const el = document.getElementById(anchor);
+      el?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
+      (el?.querySelector<HTMLElement>("h2") ?? el)?.focus?.({ preventScroll: true });
     });
+  });
+
+  root.querySelectorAll<HTMLButtonElement>("[data-lab-zoom]").forEach((b) => {
+    const factor = b.dataset.labZoom === "in" ? 0.8 : 1.25;
+    b.addEventListener("click", () => lab?.zoom(factor));
   });
 
   document.querySelectorAll<HTMLButtonElement>("[data-mode-switch]").forEach((button) => {

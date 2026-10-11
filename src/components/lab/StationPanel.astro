@@ -19,32 +19,26 @@ const meta = STATION_BY_ID[id];
   id={`panel-${id}`}
   data-station-panel={id}
   aria-labelledby={`panel-${id}-title`}
-  class="lab-panel fixed inset-x-0 bottom-0 top-auto m-0 max-h-[62dvh] w-full max-w-none overflow-y-auto border-t border-border bg-background p-5 text-foreground shadow-2xl shadow-black/30 md:inset-y-0 md:top-16 md:right-0 md:left-auto md:max-h-none md:w-[min(460px,100vw)] md:border-t-0 md:border-l md:p-7"
+  class="lab-panel fixed inset-x-0 top-auto bottom-0 m-0 max-h-[62dvh] w-full max-w-none overflow-y-auto border-t-2 border-border-strong bg-background p-5 text-foreground shadow-[0_-4px_0_0_var(--shadow)] md:inset-y-0 md:top-16 md:right-0 md:left-auto md:max-h-none md:w-[min(460px,100vw)] md:border-t-0 md:border-l-2 md:p-7 md:shadow-[-4px_0_0_0_var(--shadow)]"
 >
   <div class="flex items-center justify-between gap-3">
-    <button
-      type="button"
-      data-lab-back
-      class="inline-flex min-h-11 items-center gap-1.5 rounded-button px-2 text-sm text-muted transition-colors hover:text-foreground"
-    >
+    <button type="button" data-lab-back class="btn btn-ghost btn-sm -ml-2">
       <ArrowLeft class="size-4" aria-hidden="true" />
       Back to lab
     </button>
-    <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-muted" aria-hidden="true">
-      Station 0{meta.index}
-    </span>
+    <span class="label-mono text-muted" aria-hidden="true">Station 0{meta.index}</span>
   </div>
-  <Eyebrow class="mt-5 mb-2">{meta.eyebrow}</Eyebrow>
-  <h2 id={`panel-${id}-title`} tabindex="-1" class="text-2xl font-semibold leading-tight outline-none md:text-3xl">
+  <Eyebrow class="mt-5 mb-2" tone="orange">{meta.eyebrow}</Eyebrow>
+  <h2 id={`panel-${id}-title`} tabindex="-1" class="text-2xl font-bold leading-tight outline-none md:text-3xl">
     {meta.title}
   </h2>
   <div class="mt-5">
     <slot />
   </div>
-  <p class="mt-8 border-t border-border pt-4 text-xs text-muted">
+  <p class="mt-8 border-t-2 border-border pt-4 text-xs text-muted">
     Prefer reading?{" "}
-    <a href={`/?view=page${meta.hash}`} data-mode-link="page" class="text-accent underline-offset-4 hover:underline">
-      View this as a page
+    <a href={meta.hash} data-section-link={meta.pageAnchor} class="font-medium text-accent underline-offset-4 hover:underline">
+      Jump to this section on the page
     </a>
   </p>
 </dialog>

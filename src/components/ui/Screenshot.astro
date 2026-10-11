@@ -1,36 +1,31 @@
 ---
 /**
- * Consistent frame for project screenshots: a thin "window" chrome with a
- * neutral bezel so screenshots of very different sites read as one set.
- * The image itself is passed as the default slot.
+ * Screenshot mounted in a display frame: dark bezel with a title bar, the
+ * same "monitor" language as the screens in the room.
  */
 interface Props {
   class?: string;
-  /** Show the three window dots in the top bar. */
   chrome?: boolean;
-  /** Optional label rendered in the title bar (e.g. a domain). */
   label?: string;
+  /** Experiment number or status shown on the right of the title bar. */
+  tag?: string;
 }
-const { class: className, chrome = true, label } = Astro.props;
+const { class: className, chrome = true, label, tag } = Astro.props;
 ---
 
-<div
-  class:list={[
-    "overflow-hidden rounded-card border border-border bg-frame shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]",
-    className,
-  ]}
->
+<div class:list={["bezel overflow-hidden", className]}>
   {
     chrome && (
-      <div class="flex h-8 items-center gap-1.5 border-b border-border px-3" aria-hidden="true">
-        <span class="size-2 rounded-full bg-border-strong" />
-        <span class="size-2 rounded-full bg-border-strong" />
-        <span class="size-2 rounded-full bg-border-strong" />
-        {label && (
-          <span class="ml-3 truncate font-mono text-[11px] leading-none text-muted">{label}</span>
-        )}
+      <div class="flex h-9 items-center gap-1.5 border-b-2 border-[#3d3d45] px-3" aria-hidden="true">
+        <span class="size-2.5 rounded-full bg-orange" />
+        <span class="size-2.5 rounded-full bg-teal" />
+        <span class="size-2.5 rounded-full bg-accent" />
+        {label && <span class="ml-3 truncate font-mono text-[11px] leading-none text-[#b9b3a7]">{label}</span>}
+        {tag && <span class="ml-auto font-mono text-[10px] tracking-[0.2em] text-[#b9b3a7] uppercase">{tag}</span>}
       </div>
     )
   }
-  <slot />
+  <div class="m-1.5 overflow-hidden rounded-[10px] bg-[#101014]">
+    <slot />
+  </div>
 </div>

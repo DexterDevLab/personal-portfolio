@@ -11,10 +11,7 @@ const { class: className } = Astro.props;
   type="button"
   data-theme-toggle
   aria-label="Switch theme"
-  class:list={[
-    "inline-flex size-11 items-center justify-center rounded-button border border-border text-muted transition-colors hover:border-border-strong hover:text-foreground",
-    className,
-  ]}
+  class:list={["btn btn-sm size-11 px-0", className]}
 >
   <Sun class="size-4 [.light_&]:hidden" aria-hidden="true" />
   <Moon class="size-4 [.dark_&]:hidden" aria-hidden="true" />
@@ -49,7 +46,6 @@ const { class: className } = Astro.props;
     });
   });
 
-  // Follow OS changes only while the visitor hasn't picked a theme.
   media.addEventListener("change", (event) => {
     try {
       if (localStorage.getItem("theme")) return;

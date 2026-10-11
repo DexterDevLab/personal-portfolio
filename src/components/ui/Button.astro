@@ -1,11 +1,16 @@
 ---
-type Variant = "primary" | "secondary" | "ghost";
+/**
+ * Physical lab button: outlined, with a hard offset shadow that presses
+ * down on click (see .btn in global.css).
+ */
+type Variant = "primary" | "secondary" | "teal" | "ghost";
 
 interface Props {
   variant?: Variant;
   href?: string;
   external?: boolean;
   type?: "button" | "submit";
+  size?: "md" | "sm";
   class?: string;
   [key: string]: unknown;
 }
@@ -15,22 +20,19 @@ const {
   href,
   external = false,
   type = "button",
+  size = "md",
   class: className,
   ...rest
 } = Astro.props;
 
 const variants: Record<Variant, string> = {
-  primary: "bg-accent-strong text-white hover:opacity-90 border border-transparent",
-  secondary:
-    "border border-border bg-transparent text-foreground hover:border-border-strong hover:bg-surface",
-  ghost: "text-muted hover:text-foreground",
+  primary: "btn-primary",
+  secondary: "",
+  teal: "btn-teal",
+  ghost: "btn-ghost",
 };
 
-const classes = [
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-button px-5 py-2.5 text-sm font-medium transition-[background-color,border-color,color,opacity,transform] duration-200 active:scale-[0.98]",
-  variants[variant],
-  className,
-];
+const classes = ["btn", variants[variant], size === "sm" && "btn-sm", className];
 ---
 
 {

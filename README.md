@@ -2,7 +2,7 @@
 
 Personal portfolio of **Dexter Iglesia** (DexterDevLab), a freelance web developer based in the Philippines: websites and web apps, WordPress & WooCommerce troubleshooting, hosting, deployment, and maintenance.
 
-The homepage is an explorable cartoon inventor's laboratory (Three.js) whose six stations open the portfolio content, on top of a complete readable page. Visitors can switch between "Explore the lab" and "View as a page" at any time; narrow screens, no-WebGL browsers, and no-JS visitors get the page.
+The whole site is styled as one cartoon inventor's laboratory: the homepage opens with the rotatable 3D room (Three.js) whose six stations open the portfolio content, and the same content continues below as a normal scrolling page with lab props travelling in the margins. Visitors can turn the 3D lab off at any time; no-WebGL browsers and no-JS visitors get the static hero.
 
 ## Stack
 
@@ -43,7 +43,10 @@ npm run brand                # regenerate favicon / og.png from scripts/generate
 | Headline, intro, about paragraphs, featured copy, troubleshooting steps, contact hints (shared by page and lab panels) | `src/data/about.ts` |
 | Station names / panel titles / hashes | `src/lab/stations.ts`; panel bodies in `src/components/lab/Lab.astro` |
 | Lab palette, room size, camera, DPR caps | `src/lab/config.ts`; props per station in `src/lab/scene/stations/` |
-| Lab vs page default (breakpoint, WebGL check) | inline script in `src/layouts/Base.astro` |
+| 3D lab on/off default (WebGL check) | inline script in `src/layouts/Base.astro` |
+| Design tokens, button/plate/bezel/paper components | `src/styles/global.css` |
+| Flying props and scroll choreography intensity | `src/scroll/config.ts` (routes, sizes, breakpoint, scrub); props art in `src/components/decor/PropsLayer.astro` |
+| Service illustrations | `src/components/decor/ServiceArt.astro` |
 | Colours, fonts, motion, prose styles | `src/styles/global.css` |
 | Metadata, favicon links, theme script | `src/layouts/Base.astro` |
 | Contact delivery (Brevo) | `src/lib/contact.ts`; messages in `src/lib/contact-messages.ts`; validation in `src/lib/contact-schema.ts` |

@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Base from "@/layouts/Base.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import Lab from "@/components/lab/Lab.astro";
+import PropsLayer from "@/components/decor/PropsLayer.astro";
 import Hero from "@/components/sections/Hero.astro";
 import Featured from "@/components/sections/Featured.astro";
 import Work from "@/components/sections/Work.astro";
@@ -22,12 +23,15 @@ const clientWork = work.filter((entry) => !entry.data.featured);
     <JsonLd projects={work} />
   </Fragment>
 
-  <!-- Interactive lab (desktop + WebGL by default; see Base.astro view script) -->
+  <!-- Hero: the interactive room on WebGL devices (3D lab on), a static hero otherwise -->
   <Lab featured={featured} projects={clientWork} />
-
-  <!-- Readable page: the complete portfolio, also what no-JS and search engines get -->
   <div data-page-only>
     <Hero featured={featured} />
+  </div>
+
+  <!-- The portfolio, with the flying props travelling in the margins behind it -->
+  <div class="relative" data-page-body>
+    <PropsLayer />
     <Featured project={featured} />
     <Work projects={clientWork} />
     <Services />
@@ -36,3 +40,8 @@ const clientWork = work.filter((entry) => !entry.data.featured);
     <Contact />
   </div>
 </Base>
+
+<script>
+  import { initChoreography } from "@/scroll/choreography";
+  initChoreography();
+</script>

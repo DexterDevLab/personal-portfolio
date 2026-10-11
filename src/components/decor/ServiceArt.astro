@@ -1,0 +1,92 @@
+---
+/**
+ * Original line-art illustrations for the four services, in the room's
+ * language: charcoal outlines, teal and orange fills, cream surfaces.
+ */
+interface Props {
+  kind: "layout" | "wrench" | "app" | "server";
+  class?: string;
+}
+const { kind, class: className } = Astro.props;
+const stroke = "var(--line)";
+---
+
+<svg
+  viewBox="0 0 160 120"
+  class:list={["h-auto w-full", className]}
+  aria-hidden="true"
+  fill="none"
+  stroke={stroke}
+  stroke-width="3"
+  stroke-linejoin="round"
+  stroke-linecap="round"
+>
+  {
+    kind === "layout" && (
+      <>
+        {/* build station: bench with a monitor and a page being assembled */}
+        <rect x="18" y="86" width="124" height="10" rx="3" fill="#c8a97a" />
+        <path d="M28 96v16M132 96v16" />
+        <rect x="46" y="22" width="68" height="46" rx="6" fill="#2b2b30" />
+        <rect x="52" y="28" width="56" height="34" rx="3" fill="#fbf8f1" stroke="none" />
+        <rect x="56" y="33" width="22" height="5" rx="2" fill="#2bb3a3" stroke="none" />
+        <rect x="56" y="42" width="48" height="3" rx="1.5" fill="#cfc7b8" stroke="none" />
+        <rect x="56" y="49" width="40" height="3" rx="1.5" fill="#cfc7b8" stroke="none" />
+        <rect x="82" y="33" width="22" height="5" rx="2" fill="#ff8a3d" stroke="none" />
+        <path d="M80 68v10M66 78h28" />
+        <rect x="118" y="70" width="18" height="16" rx="3" fill="#2bb3a3" />
+        <rect x="22" y="74" width="16" height="12" rx="2" fill="#ff8a3d" />
+      </>
+    )
+  }
+  {
+    kind === "wrench" && (
+      <>
+        {/* repair tools: wrench and screwdriver crossed over a small device */}
+        <rect x="44" y="70" width="72" height="34" rx="8" fill="#fbf8f1" />
+        <rect x="56" y="80" width="30" height="14" rx="2" fill="#2b2b30" />
+        <circle cx="100" cy="86" r="5" fill="#2bb3a3" />
+        <path d="M36 30l48 48" stroke-width="10" stroke="#2b2b30" />
+        <path d="M36 30l48 48" stroke-width="5" stroke="#9aa3ad" />
+        <path d="M24 18a12 12 0 0 1 20 10l-8 8-10-10a12 12 0 0 1-2-8Z" fill="#9aa3ad" />
+        <path d="M124 26l-44 44" stroke-width="10" stroke="#2b2b30" />
+        <path d="M124 26l-44 44" stroke-width="5" stroke="#ff8a3d" />
+        <path d="M124 26l12-12" stroke-width="7" stroke="#2b2b30" />
+        <path d="M124 26l12-12" stroke-width="3" stroke="#9aa3ad" />
+      </>
+    )
+  }
+  {
+    kind === "app" && (
+      <>
+        {/* connected modules: three boxes wired to a central hub */}
+        <path d="M44 48h30M86 48h30M80 54v22" stroke="#4f7cff" stroke-dasharray="5 5" />
+        <rect x="14" y="30" width="30" height="36" rx="6" fill="#fbf8f1" />
+        <rect x="116" y="30" width="30" height="36" rx="6" fill="#fbf8f1" />
+        <rect x="62" y="30" width="36" height="36" rx="8" fill="#4f7cff" />
+        <rect x="70" y="40" width="20" height="4" rx="2" fill="#fbf8f1" stroke="none" />
+        <rect x="70" y="48" width="14" height="4" rx="2" fill="#fbf8f1" stroke="none" />
+        <rect x="60" y="76" width="40" height="26" rx="6" fill="#2bb3a3" />
+        <circle cx="29" cy="48" r="5" fill="#ff8a3d" />
+        <circle cx="131" cy="48" r="5" fill="#ff8a3d" />
+      </>
+    )
+  }
+  {
+    kind === "server" && (
+      <>
+        {/* server cabinet with status lights */}
+        <rect x="46" y="12" width="68" height="96" rx="8" fill="#2b2b30" />
+        {[0, 1, 2, 3].map((i) => (
+          <>
+            <rect x="54" y={20 + i * 22} width="52" height="16" rx="3" fill="#9aa3ad" />
+            <rect x="58" y={30 + i * 22} width="22" height="3" rx="1.5" fill="#2b2b30" stroke="none" />
+            <circle cx="98" cy={28 + i * 22} r="3" fill={i === 1 ? "#ff8a3d" : "#2bb3a3"} stroke="none" />
+          </>
+        ))}
+        <path d="M24 108h112" />
+        <path d="M114 40c12 0 18 8 18 20s-6 20-18 20" stroke="#4f7cff" stroke-dasharray="5 5" />
+      </>
+    )
+  }
+</svg>

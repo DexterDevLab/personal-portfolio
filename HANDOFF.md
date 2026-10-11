@@ -2,7 +2,34 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Zoom-out from a station (latest)
+## Whole-site lab identity + scroll choreography (latest)
+
+### Visual system (derived from the room)
+- **Tokens** (`src/styles/global.css`, `:root`): warm off-white paper `#f3eee4` / deep `#e9e2d4`, charcoal ink `#2b2b30`, teal `#2bb3a3`, orange `#ff8a3d`, blue `#4f7cff` for "screens on", cream `#fbf8f1` surfaces. Dark theme is the lab at night (charcoal `#1b1b1f` with off-white type); both themes still toggle and follow the OS.
+- **Components** (`global.css` + `src/components/ui/*`): `.outlined` / `.outlined-sm` (2 px outline + hard offset shadow = solid cartoon object), `.btn` family (physical buttons that lift on hover and press on click; `btn-primary` orange, `btn-teal`, `btn-ghost`, `btn-sm`), `.plate` (charcoal nameplate like the wall wordmark), `.label-mono` (technical kicker with a `.led` status light), `.bezel` (dark instrument frame for screenshots), `.paper` (ruled notebook page), `.grid-floor` (tile grid backdrop), `.led`.
+- **Section compositions**: header = control strip (nameplate, text nav, orange "Discuss your project", 3D lab on/off, theme). Hero = the rotatable room with the intro column and station HUD over it (`Scroll to read` cue). Panda Central = main control system: full bezel display with numbered markers on the real dashboard + legend naming only what is on the screenshot (managed sites, queue health, recent activity). Work = experiment rack: two wide frames on the top shelf, three below, wooden shelf lines, `EXP-0n` labels, contribution note, live link. Services = four stations with original SVG illustrations (`src/components/decor/ServiceArt.astro`), literal service names kept. Process = four numbered nodes on a cable with a travelling signal. About = open lab notebook (taped portrait, ruled page, ring binding). Contact = communication station (teal "open channel" strip, outlined console, direct channels as buttons). Footer = charcoal strip. Case study = paper panel in the same chrome.
+
+### Hero integration (what changed structurally)
+- The room is now the hero of **one scrolling page**; the sections always follow. "View as a page" became **3D lab on/off** (static hero when off / no WebGL / failure). Default: lab on for every WebGL2 device, including phones (column layout: buttons / room / stations).
+- Plain wheel over the canvas **scrolls the page**; zoom needs ⌘/Ctrl + wheel, pinch, or the new +/− buttons (`src/lab/index.ts` capture-phase wheel listener; `touch-action: pan-y` so vertical swipes scroll, horizontal drags rotate). Station panels still open as overlays; "Jump to this section on the page" closes the panel and scrolls to the matching section.
+
+### Scroll choreography
+- `src/scroll/config.ts` — **the file to adjust intensity**: `CHOREOGRAPHY.enabled`, `minWidth` (flying props need real margins; below it they are static, below 1024 px hidden), `scrub`, `marginInset`, and `PROPS` routes (`from` section → settles beside `to`, side, size, rotation, drift).
+- `src/scroll/choreography.ts` — lazily imports GSAP + ScrollTrigger only when wide and motion is allowed; one `gsap.context` reverted on teardown; `ResizeObserver` + `load` refresh; media-query listeners switch between flying / static / off. Props are inline SVG in `src/components/decor/PropsLayer.astro`, in a `pointer-events: none` layer at z-index 5 (above section backgrounds, below the z-10 content containers), so they never cross text, links or fields.
+- Sequence (desktop ≥ 1280 px): **gear** rolls down the left margin from Panda Central and parks by the experiment rack → **wrench** leaves the right margin by Panda Central and settles beside the troubleshooting station → **circuit board** turns slowly down the left toward the web-apps station → **connector** follows the right margin to the process cable → **notebook sheet** drifts down the right and settles beside the notebook. The process **signal** travels the cable as the section scrolls (`getPointAtLength`), static at step 1 without motion.
+- Reduced motion: props placed statically (or hidden on narrow screens), no travel/parallax; reveals disabled; lab travel instant.
+
+### Checks completed
+- `astro check` 0 errors; `astro build` passes (lab 619 KB, gsap 70 KB + ScrollTrigger 43 KB as separate lazy chunks).
+- Chrome 1440 px, light and dark: hero, Panda Central display, experiment rack, services, process (signal moves with scroll), notebook, contact, footer; prop opacity/positions at several scroll depths (`data-props="flying"`); plain wheel over the room leaves the camera at 13.24 while ⌘-wheel zooms to 8.34; station selection still works; no horizontal overflow (scrollWidth ≤ viewport).
+- 390 px: lab-on column layout, `?view=page` static hero, `?motion=reduce`, props off, no overflow; case-study page renders the paper panel.
+
+### Limitations
+- Same hidden-window caveat as before: scrub smoothing and reveals were advanced synchronously; feel/timing needs one look in a visible window. Real touch (pan-y scroll vs horizontal rotate) not exercised on a device.
+- Props only fly at ≥ 1280 px; 1024–1279 px shows them static beside their sections; below that they are hidden.
+- No Lighthouse/PSI numbers (needs a deployed URL).
+
+## Zoom-out from a station
 
 - A station view can now be zoomed all the way out: its zoom range extends to the overview maximum (17), zoom-out eases the target toward the overview home, and past `STATION_EXIT_DISTANCE` (8.5, `src/lab/index.ts`) the station releases in place — panel closes, station buttons collapse, overview orbit limits and view offset apply, robot resumes — with no camera travel. Verified: console view → wheel out → still "station" at 7.7, "overview" with the panel closed at 11.5, target (0, 1.05, −0.6) at 17.
 

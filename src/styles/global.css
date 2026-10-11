@@ -5,9 +5,6 @@
 /* ---------------------------------- */
 /* Fonts — self-hosted, latin subset  */
 /* ---------------------------------- */
-/* display: optional — if the font misses first paint, keep the size-adjusted
-   fallback instead of swapping. A late swap repaints the hero text and pushes
-   LCP to the swap moment on slow connections. */
 @font-face {
   font-family: "Geist";
   font-style: normal;
@@ -28,7 +25,6 @@
     U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
     U+2212, U+2215, U+FEFF, U+FFFD;
 }
-/* Metric-matched fallbacks so a missed font load doesn't shift layout. */
 @font-face {
   font-family: "Geist Fallback";
   src: local("Arial");
@@ -52,25 +48,32 @@
 }
 
 /* ---------------------------------- */
-/* Design tokens — dark-first         */
+/* Design tokens — the lab's palette  */
 /* ---------------------------------- */
-/* light-dark() follows the OS when no theme class is set (no-JS visitors);
-   the inline script in Base.astro adds .dark/.light before first paint. */
+/* Derived from the 3D room: warm off-white walls, charcoal outlines, teal and
+   orange accents, blue for "screens on". light-dark() follows the OS when no
+   theme class is set; the inline script in Base.astro adds .dark/.light. */
 :root {
   color-scheme: light dark;
-  --bg: light-dark(#ffffff, #0a0a0b);
-  --surface: light-dark(#f6f7f9, #141416);
-  --surface-2: light-dark(#edeef1, #1d1d21);
-  --border: light-dark(#e4e6eb, #26262b);
-  --border-strong: light-dark(#cfd3da, #3a3a41);
-  --text: light-dark(#0a0a0b, #ededef);
-  --muted: light-dark(#5b5f66, #8a8a94);
-  --accent: light-dark(#3b63e6, #4f7cff);
-  --accent-strong: #3b63e6; /* button bg — white text passes AA on this */
-  --accent-weak: light-dark(rgba(59, 99, 230, 0.1), rgba(79, 124, 255, 0.14));
+  --bg: light-dark(#f3eee4, #1b1b1f);
+  --bg-deep: light-dark(#e9e2d4, #141417);
+  --surface: light-dark(#fbf8f1, #26262b);
+  --surface-2: light-dark(#e9e3d6, #2f2f35);
+  --paper: light-dark(#fffdf7, #2b2b31);
+  --ink: light-dark(#2b2b30, #f3eee4);
+  --ink-soft: light-dark(#5f5c58, #b9b3a7);
+  --line: light-dark(#2b2b30, #f3eee4);
+  --line-soft: light-dark(#cfc7b8, #3d3d45);
+  --teal: #2bb3a3;
+  --teal-deep: light-dark(#1f8c80, #2bb3a3);
+  --orange: #ff8a3d;
+  --orange-deep: #e5731f;
+  --blue: light-dark(#3b63e6, #4f7cff);
+  --blue-soft: light-dark(rgba(59, 99, 230, 0.12), rgba(79, 124, 255, 0.18));
   --success: light-dark(#15803d, #34d399);
   --danger: light-dark(#dc2626, #f87171);
-  --frame: light-dark(#e9ebf0, #0f0f11);
+  --shadow: light-dark(#2b2b30, #0b0b0d);
+  --frame: light-dark(#2b2b30, #0f0f11);
 }
 .dark {
   color-scheme: dark;
@@ -81,24 +84,32 @@
 
 @theme inline {
   --color-background: var(--bg);
+  --color-background-deep: var(--bg-deep);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-foreground: var(--text);
-  --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-accent-strong: var(--accent-strong);
-  --color-accent-weak: var(--accent-weak);
+  --color-paper: var(--paper);
+  --color-border: var(--line-soft);
+  --color-border-strong: var(--line);
+  --color-foreground: var(--ink);
+  --color-muted: var(--ink-soft);
+  --color-accent: var(--blue);
+  --color-accent-strong: var(--blue);
+  --color-accent-weak: var(--blue-soft);
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-orange: var(--orange);
+  --color-orange-deep: var(--orange-deep);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-frame: var(--frame);
+  --color-ink: var(--ink);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  --radius-card: 16px;
-  --radius-button: 10px;
+  --radius-card: 18px;
+  --radius-button: 12px;
+  --radius-plate: 8px;
 }
 
 /* ---------------------------------- */
@@ -106,10 +117,8 @@
 /* ---------------------------------- */
 html {
   scroll-behavior: smooth;
-  /* Fixed header is 4rem tall; keep anchor targets clear of it. */
   scroll-padding-top: 5rem;
 }
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -118,23 +127,22 @@ html {
 
 body {
   background-color: var(--bg);
-  color: var(--text);
+  color: var(--ink);
   font-family: var(--font-geist-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background-color: var(--accent);
-  color: #ffffff;
+  background-color: var(--orange);
+  color: #2b2b30;
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 3px solid var(--orange);
   outline-offset: 2px;
 }
 
-/* Balanced headline wrapping */
 h1,
 h2,
 h3 {
@@ -142,11 +150,154 @@ h3 {
   letter-spacing: -0.02em;
 }
 
+/* Subtle floor-tile grid, like the room's floor, for section backdrops */
+.grid-floor {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--line) 9%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--line) 9%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ---------------------------------- */
+/* Lab components                     */
+/* ---------------------------------- */
+/* Everything with an outline + a hard offset shadow reads as a solid
+   cartoon object, like the props in the room. */
+.outlined {
+  border: 2px solid var(--line);
+  box-shadow: 4px 4px 0 0 var(--shadow);
+}
+.outlined-sm {
+  border: 2px solid var(--line);
+  box-shadow: 3px 3px 0 0 var(--shadow);
+}
+
+/* Physical button: lifts on hover, presses down on click */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: var(--radius-button);
+  border: 2px solid var(--line);
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 4px 0 0 var(--shadow);
+  translate: 0 0;
+  transition:
+    translate 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+.btn:hover {
+  translate: 0 -1px;
+  box-shadow: 0 5px 0 0 var(--shadow);
+}
+.btn:active {
+  translate: 0 3px;
+  box-shadow: 0 1px 0 0 var(--shadow);
+}
+.btn-primary {
+  background: var(--orange);
+  color: #2b2b30;
+}
+.btn-primary:hover {
+  background: #ff9955;
+}
+.btn-teal {
+  background: var(--teal);
+  color: #0f2a27;
+}
+.btn-ghost {
+  background: transparent;
+  box-shadow: none;
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background: var(--surface-2);
+  translate: 0 0;
+  box-shadow: none;
+}
+.btn-sm {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  box-shadow: 0 3px 0 0 var(--shadow);
+}
+.btn-sm:hover {
+  box-shadow: 0 4px 0 0 var(--shadow);
+}
+.btn-sm:active {
+  box-shadow: 0 1px 0 0 var(--shadow);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn:hover,
+  .btn:active {
+    transition: none;
+  }
+}
+
+/* Nameplate: charcoal plate with engraved mono text (the wordmark on the wall) */
+.plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-plate);
+  background: #2b2b30;
+  color: var(--blue);
+  font-family: var(--font-geist-mono);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 0 0 2px #3d3d45;
+}
+.dark .plate {
+  background: #0f0f11;
+}
+
+/* Mono technical label (section kickers, experiment numbers) */
+.label-mono {
+  font-family: var(--font-geist-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Paper panel: notebook pages, the case-study body */
+.paper {
+  background-color: var(--paper);
+  background-image: linear-gradient(to bottom, transparent 31px, color-mix(in oklab, var(--blue) 18%, transparent) 32px);
+  background-size: 100% 32px;
+}
+
+/* Screen bezel: dark instrument frame for screenshots */
+.bezel {
+  background: var(--frame);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow:
+    4px 4px 0 0 var(--shadow),
+    inset 0 0 0 6px #3d3d45;
+}
+
+/* Status light */
+.led {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+}
+
 /* ---------------------------------- */
 /* Entrance animations                */
 /* ---------------------------------- */
-/* Transform-only on purpose: fading from opacity 0 makes Chrome treat the
-   hero text as unpainted until the fade ends, pushing LCP out by ~1s. */
 @keyframes rise-in {
   from {
     transform: translateY(16px);
@@ -155,27 +306,22 @@ h3 {
     transform: none;
   }
 }
-
 .animate-rise {
   animation: rise-in 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
   animation-delay: var(--rise-delay, 0s);
 }
-
-/* Scroll reveal (below the fold): hidden until Reveal.astro's
-   IntersectionObserver adds .is-visible. */
 .reveal {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(14px);
   transition:
-    opacity 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98),
-    transform 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+    opacity 0.45s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    transform 0.45s cubic-bezier(0.21, 0.47, 0.32, 0.98);
   transition-delay: var(--reveal-delay, 0s);
 }
 .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
-
 @media (prefers-reduced-motion: reduce) {
   .animate-rise {
     animation: none;
@@ -184,73 +330,6 @@ h3 {
     opacity: 1;
     transform: none;
     transition: none;
-  }
-}
-
-/* ---------------------------------- */
-/* Hero project frame — light depth   */
-/* ---------------------------------- */
-/* A small perspective tilt that settles flat on hover. Only on devices with
-   a hover pointer and no reduced-motion preference; everywhere else the
-   frame is simply flat. */
-.hero-frame {
-  transform: none;
-  transition: transform 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98);
-}
-@media (hover: hover) and (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
-  .hero-stage {
-    perspective: 1600px;
-  }
-  .hero-frame {
-    transform: rotateY(-7deg) rotateX(2deg);
-  }
-  .hero-stage:hover .hero-frame {
-    transform: rotateY(0) rotateX(0);
-  }
-}
-
-/* ---------------------------------- */
-/* Aurora glow (hero)                 */
-/* ---------------------------------- */
-/* Small screens get the glow as radial gradients instead of blur():
-   rasterizing the giant blurred blobs held the phone's first paint. */
-.aurora-gradient {
-  background:
-    radial-gradient(56rem 30rem at 50% -12%, var(--accent-weak), transparent 62%),
-    radial-gradient(36rem 20rem at 66% 16%, var(--accent-weak), transparent 60%);
-}
-@keyframes aurora-drift {
-  0%,
-  100% {
-    transform: translateX(-50%) translateY(0) scale(1);
-    opacity: 0.9;
-  }
-  33% {
-    transform: translateX(-42%) translateY(4%) scale(1.08);
-    opacity: 1;
-  }
-  66% {
-    transform: translateX(-58%) translateY(-3%) scale(0.95);
-    opacity: 0.7;
-  }
-}
-@keyframes aurora-drift-alt {
-  0%,
-  100% {
-    transform: translateX(-30%) translateY(0) scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translateX(-52%) translateY(8%) scale(1.15);
-    opacity: 0.85;
-  }
-}
-@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-  .animate-aurora {
-    animation: aurora-drift 14s ease-in-out infinite;
-  }
-  .animate-aurora-alt {
-    animation: aurora-drift-alt 19s ease-in-out infinite;
   }
 }
 
@@ -268,7 +347,7 @@ dialog[data-mobile-nav][open] {
   }
 }
 dialog[data-mobile-nav]::backdrop {
-  background: rgb(0 0 0 / 0.6);
+  background: rgb(43 43 48 / 0.6);
 }
 @media (prefers-reduced-motion: reduce) {
   dialog[data-mobile-nav] {
@@ -277,24 +356,16 @@ dialog[data-mobile-nav]::backdrop {
 }
 
 /* ---------------------------------- */
-/* Lab / page view modes              */
+/* Lab (3D hero) / simple view        */
 /* ---------------------------------- */
 /* data-view is set before paint by the inline script in Base.astro; with
-   no JS there is no attribute and the readable page shows. */
+   no JS there is no attribute and the simple (static) hero shows. */
 html[data-view="lab"] [data-page-only] {
   display: none;
 }
 html[data-view="page"] [data-lab-only],
 html:not([data-view]) [data-lab-only] {
   display: none;
-}
-html[data-view="lab"] {
-  overflow: hidden;
-}
-/* Over the scene the header always needs its backdrop. */
-html[data-view="lab"] [data-header] {
-  border-color: var(--border);
-  background-color: color-mix(in oklab, var(--bg) 85%, transparent);
 }
 html:not([data-lab-supported]) [data-mode-switch] {
   display: none;
@@ -309,16 +380,15 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   display: none;
 }
 
-/* Canvas fades in once the runtime reports ready. */
 .lab-canvas {
   opacity: 0;
   transition: opacity 0.6s ease;
-  touch-action: manipulation;
+  /* vertical swipes scroll the page; horizontal drags rotate the room */
+  touch-action: pan-y !important;
 }
 [data-lab-state="ready"] .lab-canvas {
   opacity: 1;
 }
-/* The intro column steps aside while a station panel is open on wide screens. */
 .lab-intro {
   transition:
     opacity 0.3s ease,
@@ -338,7 +408,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   }
 }
 .lab-progress {
-  accent-color: var(--accent);
+  accent-color: var(--teal);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -347,14 +417,9 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   border-radius: 999px;
 }
 .lab-progress::-webkit-progress-value {
-  background: var(--accent);
+  background: var(--teal);
 }
-/* Narrow screens: the intro, stage and station row stack. Once the scene is
-   up the intro drops its one-liner so the room gets the height; while a
-   bottom-sheet panel is open the station row is covered anyway. */
 @media (max-width: 767px) {
-  /* The page view carries the headline; in the lab the room gets the space
-     and the intro is just the two actions. */
   [data-lab] .lab-intro [data-lab-intro-text] {
     display: none;
   }
@@ -363,7 +428,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   }
 }
 .lab-panel {
-  z-index: 20;
+  z-index: 60;
   translate: 0 12px;
   opacity: 0;
   transition:
@@ -386,11 +451,42 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 }
 
 /* ---------------------------------- */
+/* Flying props (scroll choreography) */
+/* ---------------------------------- */
+/* Above section backgrounds, below section content (containers are z-10). */
+.props-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+.prop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--prop-size, 96px);
+  height: var(--prop-size, 96px);
+  opacity: 0;
+  will-change: transform;
+  color: var(--ink);
+}
+.prop svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+[data-props="static"] .prop {
+  opacity: 1;
+  will-change: auto;
+}
+
+/* ---------------------------------- */
 /* Case-study prose                   */
 /* ---------------------------------- */
 .prose {
   max-width: 42rem;
-  color: var(--text);
+  color: var(--ink);
   font-size: 1.0625rem;
   line-height: 1.7;
 }
@@ -398,20 +494,31 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   margin-top: 1.25em;
 }
 .prose h2 {
-  margin-top: 2.75em;
+  margin-top: 2.5em;
   font-size: 1.375rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
 }
 .prose h2:first-child {
   margin-top: 0;
 }
+.prose h2::before {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  margin-right: 0.5em;
+  border-radius: 999px;
+  background: var(--teal);
+  border: 2px solid var(--line);
+  vertical-align: 0.05em;
+}
 .prose p,
 .prose li {
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 .prose strong {
-  color: var(--text);
+  color: var(--ink);
   font-weight: 600;
 }
 .prose ul {
@@ -422,7 +529,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   margin-top: 0.5em;
 }
 .prose a {
-  color: var(--accent);
+  color: var(--blue);
   text-underline-offset: 4px;
 }
 .prose a:hover {

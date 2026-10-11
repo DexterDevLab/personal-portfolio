@@ -1,6 +1,6 @@
 ---
 import { Image, getImage } from "astro:assets";
-import { ArrowRight, ArrowUpRight, Download, Mail, RotateCcw, RotateCw, Undo2 } from "@lucide/astro";
+import { ArrowDown, ArrowRight, ArrowUpRight, Download, Mail, Minus, Plus, RotateCcw, RotateCw, Undo2 } from "@lucide/astro";
 import type { CollectionEntry } from "astro:content";
 import Button from "@/components/ui/Button.astro";
 import Tag from "@/components/ui/Tag.astro";
@@ -17,12 +17,11 @@ import { processSteps } from "@/data/process";
 import { aboutParagraphs, contactHelp, intro, stack, troubleshootingSteps } from "@/data/about";
 
 /**
- * The interactive laboratory. Layout:
+ * The interactive laboratory as the page hero. Layout:
  *  - narrow screens: a column — compact intro / the 3D stage / station buttons;
- *  - md and up: the stage fills the section and the intro + controls float
- *    over it. The canvas is sized to the stage element, never the window.
- * Everything is server-rendered; src/lab/ui.ts wires it and lazily loads the
- * Three.js runtime (src/lab/index.ts).
+ *  - md and up: the stage fills the hero and the intro + controls float over it.
+ * The canvas is sized to the stage element. The page continues below, so
+ * the hint says so; station panels still open as overlays.
  */
 interface Props {
   featured: CollectionEntry<"work">;
@@ -30,7 +29,6 @@ interface Props {
 }
 const { featured, projects } = Astro.props;
 
-// Optimised texture sources for the scene (same-origin, no CORS setup needed).
 const screen = await getImage({ src: featured.data.screenshot, width: 1024, format: "webp", quality: 80 });
 const face = await getImage({ src: portrait, width: 512, format: "webp", quality: 80 });
 const thumbs = await Promise.all(
@@ -40,9 +38,6 @@ const thumbs = await Promise.all(
 const troubleshooting = services.find((s) => s.icon === "wrench");
 const hosting = services.find((s) => s.icon === "server");
 const otherServices = services.filter((s) => s !== hosting);
-
-const viewButton =
-  "inline-flex size-11 items-center justify-center rounded-button border border-border bg-background/85 text-muted backdrop-blur-sm transition-colors hover:border-border-strong hover:text-foreground";
 ---
 
 <section
@@ -53,21 +48,26 @@ const viewButton =
   data-screen-src={screen.src}
   data-portrait-src={face.src}
   data-thumb-srcs={JSON.stringify(thumbs.map((t) => t.src))}
-  class="relative grid h-dvh w-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-background pt-16 md:block md:pt-0"
+  class="relative grid min-h-[88svh] w-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden border-b-2 border-border-strong bg-background-deep grid-floor pt-16 md:block md:min-h-[min(92svh,900px)] md:pt-0"
   aria-label="Interactive laboratory"
 >
+  <span id="top" class="absolute top-0"></span>
+
   <!-- Intro: in flow on narrow screens, a floating column on wide ones -->
   <div
     data-lab-intro
     class="lab-intro z-10 px-5 pt-3 pb-2 sm:px-6 md:absolute md:top-24 md:left-0 md:max-w-[22rem] md:pt-0 md:pb-0 lg:left-[max(1.5rem,calc((100vw-70rem)/2))] lg:px-0"
   >
     <div data-lab-intro-text>
-      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-accent">{site.name} — {site.role}</p>
-      <h1 class="mt-2 text-xl font-semibold leading-[1.15] tracking-tight sm:text-2xl md:text-[1.7rem]">{intro.headline}</h1>
+      <p class="label-mono inline-flex items-center gap-2 text-muted">
+        <span class="led bg-orange" aria-hidden="true"></span>
+        {site.name} — {site.role}
+      </p>
+      <h1 class="mt-3 text-xl font-bold leading-[1.12] tracking-tight sm:text-2xl md:text-[1.8rem]">{intro.headline}</h1>
       <p data-lab-intro-copy class="mt-2 text-sm leading-relaxed text-muted">{intro.short}</p>
     </div>
-    <div class="mt-3 flex flex-wrap items-center gap-2 sm:gap-3 md:mt-3">
-      <Button href="#contact" data-station-link="comms" class="min-h-10 px-4 py-2">
+    <div class="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
+      <Button href="#contact" data-station-link="comms" size="sm">
         Discuss your project
         <ArrowRight class="size-4" aria-hidden="true" />
       </Button>
@@ -85,34 +85,38 @@ const viewButton =
     <canvas data-lab-canvas aria-hidden="true" tabindex="-1" class="lab-canvas absolute inset-0 h-full w-full"></canvas>
   </div>
   <p class="sr-only">
-    This page is an illustrated inventor's laboratory you can rotate. Each station in the room opens part of the
-    portfolio. Use the station buttons to open the same content, the rotate buttons to turn the room, or switch to the
-    page view.
+    This page opens with an illustrated inventor's laboratory you can rotate. Each station in the room opens part of
+    the portfolio, and the same content continues below as a normal page. Use the station buttons, the rotate buttons,
+    or simply scroll.
   </p>
 
-  <!-- Station buttons + view controls: bottom row on narrow screens, floating bottom-left on wide ones -->
+  <!-- Station buttons + view controls -->
   <div
     data-lab-hud
-    class="lab-hud z-10 px-5 pt-2 pb-3 sm:px-6 md:absolute md:bottom-5 md:left-0 md:max-w-[min(100%,46rem)] md:pt-0 md:pb-0 lg:left-[max(1.5rem,calc((100vw-70rem)/2))] lg:px-0"
+    class="lab-hud z-10 px-5 pt-2 pb-4 sm:px-6 md:absolute md:bottom-5 md:left-0 md:max-w-[min(100%,48rem)] md:pt-0 md:pb-0 lg:left-[max(1.5rem,calc((100vw-70rem)/2))] lg:px-0"
   >
-    <div class="mb-2 flex items-center justify-between gap-3">
-      <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-muted">Stations</p>
-      <p data-lab-hint class="hidden text-xs text-muted sm:block">Drag to rotate · Select a station</p>
+    <div class="mb-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+      <p class="label-mono text-muted">Stations</p>
+      <p data-lab-hint class="hidden text-xs text-muted sm:block">
+        Drag to rotate · <kbd class="font-mono">⌘</kbd>/<kbd class="font-mono">Ctrl</kbd> + scroll to zoom · Scroll down to read
+      </p>
     </div>
     <div class="flex flex-wrap items-start gap-2">
       <StationList class="lab-station-list" />
       <div class="flex gap-1.5" role="group" aria-label="View controls">
-        <button type="button" data-lab-rotate="left" aria-label="Rotate the room left" class={viewButton}>
+        <button type="button" data-lab-rotate="left" aria-label="Rotate the room left" class="btn btn-sm size-11 px-0">
           <RotateCcw class="size-4" aria-hidden="true" />
         </button>
-        <button type="button" data-lab-rotate="right" aria-label="Rotate the room right" class={viewButton}>
+        <button type="button" data-lab-rotate="right" aria-label="Rotate the room right" class="btn btn-sm size-11 px-0">
           <RotateCw class="size-4" aria-hidden="true" />
         </button>
-        <button
-          type="button"
-          data-lab-reset
-          class="inline-flex min-h-11 items-center gap-1.5 rounded-button border border-border bg-background/85 px-3 text-sm text-muted backdrop-blur-sm transition-colors hover:border-border-strong hover:text-foreground"
-        >
+        <button type="button" data-lab-zoom="in" aria-label="Zoom in" class="btn btn-sm size-11 px-0">
+          <Plus class="size-4" aria-hidden="true" />
+        </button>
+        <button type="button" data-lab-zoom="out" aria-label="Zoom out" class="btn btn-sm size-11 px-0">
+          <Minus class="size-4" aria-hidden="true" />
+        </button>
+        <button type="button" data-lab-reset class="btn btn-sm">
           <Undo2 class="size-4" aria-hidden="true" />
           Reset view
         </button>
@@ -121,31 +125,42 @@ const viewButton =
     <p data-lab-status class="sr-only" aria-live="polite"></p>
   </div>
 
+  <!-- Scroll cue, wide screens -->
+  <a
+    href="#panda-central"
+    class="absolute right-6 bottom-6 z-10 hidden items-center gap-2 text-xs text-muted hover:text-foreground md:flex lg:right-[max(1.5rem,calc((100vw-70rem)/2))]"
+  >
+    Scroll to read
+    <span class="btn btn-sm size-9 px-0" aria-hidden="true"><ArrowDown class="size-4" /></span>
+  </a>
+
   <!-- Station panels (readable HTML, same sources as the page sections) -->
   <StationPanel id="console">
     <p class="text-sm text-muted">{featured.data.statusLabel} · {featured.data.role}</p>
     <p class="mt-3 leading-relaxed text-muted">{featured.data.summary}</p>
-    <div class="mt-4 overflow-hidden rounded-card border border-border">
-      <Image
-        src={featured.data.screenshot}
-        alt={featured.data.screenshotAlt}
-        widths={[400, 800]}
-        sizes="(max-width: 768px) calc(100vw - 2.5rem), 400px"
-        loading="lazy"
-        class="aspect-16/10 w-full object-cover object-top"
-      />
+    <div class="bezel mt-4 overflow-hidden">
+      <div class="m-1.5 overflow-hidden rounded-[10px]">
+        <Image
+          src={featured.data.screenshot}
+          alt={featured.data.screenshotAlt}
+          widths={[400, 800]}
+          sizes="(max-width: 768px) calc(100vw - 2.5rem), 400px"
+          loading="lazy"
+          class="aspect-16/10 w-full object-cover object-top"
+        />
+      </div>
     </div>
     <div class="mt-4 flex flex-wrap gap-2">
       {featured.data.stack.map((tag) => <Tag>{tag}</Tag>)}
     </div>
     <div class="mt-5 flex flex-wrap gap-3">
-      <Button href={`/work/${featured.id}`}>
+      <Button href={`/work/${featured.id}`} size="sm">
         Read the case study
         <ArrowRight class="size-4" aria-hidden="true" />
       </Button>
       {
         featured.data.liveUrl && (
-          <Button href={featured.data.liveUrl} external variant="secondary">
+          <Button href={featured.data.liveUrl} external variant="secondary" size="sm">
             Open {featured.data.title}
             <ArrowUpRight class="size-4 text-muted" aria-hidden="true" />
           </Button>
@@ -161,31 +176,31 @@ const viewButton =
     </p>
     <div class="mt-6 grid gap-8">
       {
-        projects.map((project) => (
+        projects.map((project, i) => (
           <div class="relative">
-            <ProjectCard project={project} />
+            <ProjectCard project={project} index={i + 1} />
           </div>
         ))
       }
     </div>
     <p class="mt-6 text-sm text-muted">
       More work available on request —{" "}
-      <a href={`mailto:${site.email}`} class="text-accent underline-offset-4 hover:underline">just ask</a>.
+      <a href={`mailto:${site.email}`} class="font-medium text-accent underline-offset-4 hover:underline">just ask</a>.
     </p>
   </StationPanel>
 
   <StationPanel id="repair">
     {troubleshooting && <p class="leading-relaxed text-muted">{troubleshooting.description}</p>}
-    <p class="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted">How a fix goes</p>
+    <p class="label-mono mt-6 text-muted">How a fix goes</p>
     <ol class="mt-3 space-y-4">
       {
         troubleshootingSteps.map((step, i) => (
           <li class="flex gap-3">
-            <span class="font-mono text-sm text-accent" aria-hidden="true">
-              0{i + 1}
+            <span class="outlined-sm flex size-7 shrink-0 items-center justify-center rounded-full bg-orange font-mono text-xs font-bold text-[#2b2b30]" aria-hidden="true">
+              {i + 1}
             </span>
             <div>
-              <h3 class="text-sm font-medium">{step.title}</h3>
+              <h3 class="text-sm font-bold">{step.title}</h3>
               <p class="mt-1 text-sm leading-relaxed text-muted">{step.description}</p>
             </div>
           </li>
@@ -194,7 +209,7 @@ const viewButton =
     </ol>
     <p class="mt-6 text-sm text-muted">
       Something broken right now?{" "}
-      <button type="button" data-station-link="comms" class="text-accent underline-offset-4 hover:underline">
+      <button type="button" data-station-link="comms" class="font-medium text-accent underline-offset-4 hover:underline">
         Tell me what it's doing
       </button>
       .
@@ -206,7 +221,7 @@ const viewButton =
       {
         [hosting, ...otherServices].filter(Boolean).map((service) => (
           <div>
-            <h3 class="text-base font-medium">{service!.title}</h3>
+            <h3 class="text-base font-bold">{service!.title}</h3>
             <p class="mt-1 text-sm leading-relaxed text-muted">{service!.description}</p>
           </div>
         ))
@@ -223,22 +238,22 @@ const viewButton =
         width={240}
         densities={[1, 2]}
         loading="lazy"
-        class="aspect-4/5 w-24 shrink-0 rounded-card border border-border object-cover object-top sm:w-28"
+        class="aspect-4/5 w-24 shrink-0 rounded-[6px] border-2 border-border-strong object-cover object-top sm:w-28"
       />
       <div class="space-y-3 text-sm leading-relaxed text-muted">
         {aboutParagraphs.map((p) => <p>{p}</p>)}
       </div>
     </div>
-    <p class="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted">How I work</p>
+    <p class="label-mono mt-6 text-muted">How I work</p>
     <ol class="mt-3 space-y-3">
       {
         processSteps.map((step, i) => (
           <li class="flex gap-3">
-            <span class="font-mono text-sm text-accent" aria-hidden="true">
+            <span class="font-mono text-sm font-bold text-orange-deep" aria-hidden="true">
               0{i + 1}
             </span>
             <div>
-              <h3 class="text-sm font-medium">{step.title}</h3>
+              <h3 class="text-sm font-bold">{step.title}</h3>
               <p class="mt-1 text-sm leading-relaxed text-muted">{step.description}</p>
             </div>
           </li>
@@ -248,13 +263,10 @@ const viewButton =
     <div class="mt-6 flex flex-wrap gap-2">
       {stack.map((item) => <Tag>{item}</Tag>)}
     </div>
-    <a
-      href={site.resume}
-      class="mt-6 inline-flex min-h-11 w-fit items-center gap-2 rounded-button border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:border-border-strong hover:bg-surface"
-    >
+    <Button href={site.resume} variant="secondary" size="sm" class="mt-6">
       <Download class="size-4" aria-hidden="true" />
       Download résumé
-    </a>
+    </Button>
   </StationPanel>
 
   <StationPanel id="comms">
@@ -264,13 +276,13 @@ const viewButton =
     <div class="mt-5">
       <ContactForm idPrefix="lab" />
     </div>
-    <p class="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted">Helpful to include</p>
+    <p class="label-mono mt-6 text-muted">Helpful to include</p>
     <ul class="mt-2 space-y-1 text-sm text-muted">
       {contactHelp.map((item) => <li>{item}</li>)}
     </ul>
-    <p class="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted">Direct</p>
+    <p class="label-mono mt-6 text-muted">Direct</p>
     <div class="mt-2 flex flex-col gap-2">
-      <a href={`mailto:${site.email}`} class="inline-flex items-center gap-2 py-1 text-sm text-foreground underline-offset-4 hover:underline">
+      <a href={`mailto:${site.email}`} class="inline-flex items-center gap-2 py-1 text-sm font-medium text-foreground underline-offset-4 hover:underline">
         <Mail class="size-4 text-muted" aria-hidden="true" />
         {site.email}
       </a>

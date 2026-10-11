@@ -1,0 +1,62 @@
+---
+/**
+ * Decorative layer behind the page sections. The props are small original
+ * lab objects (wrench, gear, circuit board, notebook sheet) drawn as inline
+ * SVG; src/scroll/choreography.ts moves them along the margins as the
+ * visitor scrolls. The layer never takes pointer events and sits behind
+ * the content (z-index 0; section containers are z-10).
+ */
+import { PROPS } from "@/scroll/config";
+---
+
+<div class="props-layer" data-props-layer aria-hidden="true">
+  {
+    PROPS.map((p) => (
+      <div class="prop" data-prop={p.id} style={`--prop-size:${p.size}px`}>
+        {p.id === "wrench" && (
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M22 78 60 40" stroke-width="14" />
+            <path d="M22 78 60 40" stroke="#9aa3ad" stroke-width="7" />
+            <path d="M58 20a16 16 0 0 1 24 14l-10 10-14-14 0-10Z" fill="#9aa3ad" />
+            <path d="M14 86a8 8 0 0 0 12 0" fill="#ff8a3d" />
+          </svg>
+        )}
+        {p.id === "gear" && (
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round">
+            <path
+              d="M50 10l6 8 10-2 3 9 9 3-2 10 8 6-8 6 2 10-9 3-3 9-10-2-6 8-6-8-10 2-3-9-9-3 2-10-8-6 8-6-2-10 9-3 3-9 10 2z"
+              fill="#2bb3a3"
+            />
+            <circle cx="50" cy="50" r="14" fill="var(--paper)" />
+            <circle cx="50" cy="50" r="5" fill="#ff8a3d" />
+          </svg>
+        )}
+        {p.id === "board" && (
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round">
+            <rect x="12" y="20" width="76" height="60" rx="8" fill="#2bb3a3" />
+            <rect x="24" y="32" width="24" height="18" rx="3" fill="#2b2b30" />
+            <path d="M58 34h16M58 44h16M58 54h10M24 60h40" stroke="#fbf8f1" stroke-width="4" />
+            <circle cx="78" cy="64" r="4" fill="#ff8a3d" />
+            <path d="M30 20v-8M46 20v-8M62 20v-8M30 88v-8M46 88v-8M62 88v-8" />
+          </svg>
+        )}
+        {p.id === "sheet" && (
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round">
+            <path d="M24 10h38l16 16v64H24z" fill="var(--paper)" />
+            <path d="M62 10v16h16" />
+            <path d="M34 42h32M34 54h32M34 66h20" stroke="#4f7cff" />
+            <path d="M34 30h14" stroke="#ff8a3d" stroke-width="6" />
+          </svg>
+        )}
+        {p.id === "plug" && (
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M10 60c20 0 20-20 40-20" stroke="#4f7cff" stroke-dasharray="6 6" />
+            <rect x="48" y="28" width="30" height="24" rx="5" fill="#2b2b30" />
+            <path d="M78 34h12M78 46h12" stroke="#9aa3ad" stroke-width="6" />
+            <circle cx="58" cy="40" r="3" fill="#2bb3a3" stroke="none" />
+          </svg>
+        )}
+      </div>
+    ))
+  }
+</div>

@@ -310,11 +310,17 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   let dragging = false;
   canvas.style.cursor = "grab";
 
-  // Runs before OrbitControls' own wheel handler (capture phase): zoom in
-  // toward the pointer, zoom out straight back and remember where we started.
+  // The room is the hero of a scrolling page, so a plain wheel scrolls the
+  // page; zooming needs ⌘/Ctrl (or pinch, or the +/- buttons). This runs
+  // before OrbitControls' own wheel handler (capture phase) and stops it
+  // for plain wheels. For zooms: in toward the pointer, out straight back.
   canvas.addEventListener(
     "wheel",
     (e) => {
+      if (!(e.ctrlKey || e.metaKey)) {
+        e.stopImmediatePropagation();
+        return;
+      }
       const zoomingIn = e.deltaY < 0;
       controls.zoomToCursor = zoomingIn;
       if (!zoomingIn && controls.enabled) {
@@ -324,6 +330,9 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     },
     { signal, capture: true, passive: true },
   );
+  // Vertical swipes scroll the page; horizontal drags rotate (OrbitControls
+  // sets touch-action: none on connect, override it).
+  canvas.style.touchAction = "pan-y";
 
   canvas.addEventListener(
     "pointerdown",
@@ -508,6 +517,26 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     }, 0.8);
   }
 
+  /** Button zoom: dolly toward/away from the target within the current limits. */
+  function zoom(factor: number) {
+    if (state.phase === "transitioning" || state.phase === "loading" || state.phase === "error") return;
+    const current = controls.getDistance();
+    const wanted = MathUtils.clamp(current * factor, controls.minDistance, controls.maxDistance);
+    if (factor > 1) zoomOut = { distance: current };
+    const offset = camera.position.clone().sub(controls.target);
+    const proxy = { d: current };
+    gsap.killTweensOf(proxy);
+    gsap.to(proxy, {
+      d: wanted,
+      duration: state.reducedMotion ? 0 : 0.35,
+      ease: "power2.out",
+      onUpdate: () => {
+        camera.position.copy(controls.target).add(offset.clone().setLength(proxy.d));
+        requestRender();
+      },
+    });
+  }
+
   /** Keyboard/button orbit: rotate the camera around the current target. */
   function rotate(radians: number) {
     if (state.phase === "transitioning" || state.phase === "loading" || state.phase === "error") return;
@@ -644,6 +673,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     back,
     resetView,
     rotate,
+    zoom,
     hover: (id) => {
       if (state.phase === "overview" || state.phase === "station") setHover(id);
     },
