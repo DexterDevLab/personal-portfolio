@@ -8,7 +8,7 @@ export const intro = {
   headline: "Websites and web apps, built and maintained.",
   paragraph: `I'm ${site.shortPerson}, a freelance web developer based in the Philippines. I build websites and custom web apps, troubleshoot WordPress and WooCommerce issues, and handle hosting, deployment, and ongoing maintenance. When your project needs design, I collaborate with a designer.`,
   /** One-liner for the lab overlay, where the room is the centrepiece. */
-  short: `${site.shortPerson}, freelance web developer in the Philippines. WordPress & WooCommerce, custom web apps, hosting and maintenance.`,
+  short: `I'm ${site.shortPerson}, a freelance web developer in the Philippines. I build websites and web apps, solve WordPress and WooCommerce problems, and handle hosting and maintenance.`,
 };
 
 export const featuredCopy = {

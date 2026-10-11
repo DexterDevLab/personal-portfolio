@@ -65,7 +65,6 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
       closePanel({ restoreFocus: false });
       lab?.back();
       lab?.pause();
-      window.scrollTo(0, 0);
     }
   }
 
@@ -108,8 +107,8 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     stationButtons.forEach((b) => b.setAttribute("aria-expanded", "false"));
     if (!silent) {
       if (status) status.textContent = "Back at the lab overview";
-      if (location.hash) history.replaceState(null, "", location.pathname + location.search);
     }
+    if (location.hash.startsWith("#lab/")) history.replaceState(null, "", location.pathname + location.search);
     if (restoreFocus) lastTrigger?.focus({ preventScroll: true });
   }
 
@@ -282,31 +281,48 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     }
   });
 
-  // Hash deep links: in lab view, open the matching station; in page view the
-  // browser scrolls, except for lab-only hashes that map to a page section.
+  // Hash routing. Station deep links live under `#lab/<id>`; every other
+  // hash is a page section the browser scrolls to on its own. Navigating to
+  // a section while a station panel is open closes the panel first.
   window.addEventListener("hashchange", () => {
     const id = stationFromHash(location.hash);
-    if (view() === "lab") {
-      if (id) requestStation(id, null);
-      else if (location.hash === "" || location.hash === "#top") goBack();
-    } else if (id && !document.getElementById(location.hash.slice(1))) {
-      scrollToAnchor(location.hash);
+    if (id) {
+      if (view() === "lab") requestStation(id, null);
+      else scrollToAnchor(location.hash);
+      return;
+    }
+    if (openId) {
+      closePanel({ restoreFocus: false, silent: true });
+      lab?.back();
     }
   });
+
+  // Secondary view controls collapse behind a disclosure on narrow screens.
+  const viewControls = root.querySelector<HTMLDetailsElement>("[data-view-controls]");
+  if (viewControls) {
+    const wide = matchMedia("(min-width: 768px)");
+    const sync = () => {
+      if (wide.matches) viewControls.open = true;
+    };
+    sync();
+    wide.addEventListener("change", sync);
+  }
 
   // ---------- initial state ----------
 
   if (view() === "lab") {
-    window.scrollTo(0, 0);
     const id = stationFromHash(location.hash);
-    if (id) openPanel(id, null);
+    if (id) {
+      window.scrollTo(0, 0);
+      openPanel(id, null);
+    }
     const start = () => void ensureBooted();
     if (document.readyState === "complete") start();
     else window.addEventListener("load", start, { once: true });
   } else {
     if (loading) loading.hidden = true;
     const id = stationFromHash(location.hash);
-    if (id && !document.getElementById(location.hash.slice(1))) scrollToAnchor(location.hash);
+    if (id) scrollToAnchor(location.hash);
   }
 }
 

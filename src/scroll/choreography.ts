@@ -54,11 +54,22 @@ function targetY(el: Element, body: HTMLElement) {
   return { top: r.top - b.top, center: r.top - b.top + r.height / 2 };
 }
 
-function sideX(route: PropRoute) {
+/** Gap kept between a prop and the content column, px. */
+const COLUMN_GAP = 16;
+
+/**
+ * Size a prop to the margin it has to live in (never overlapping the
+ * content column) and return its x. Returns null when the margin is too
+ * narrow for a readable prop.
+ */
+function placeInMargin(route: PropRoute, el: HTMLElement): number | null {
   const { left, right, width } = columnEdges();
-  const half = route.size / 2;
-  if (route.side === "left") return Math.max(half + 8, left - CHOREOGRAPHY.marginInset - half);
-  return Math.min(width - half - 8, right + CHOREOGRAPHY.marginInset - half);
+  const margin = Math.min(left, width - right) - COLUMN_GAP - 8;
+  const size = Math.min(route.size, margin);
+  if (size < 52) return null;
+  el.style.setProperty("--prop-size", `${Math.round(size)}px`);
+  if (route.side === "left") return left - COLUMN_GAP - size;
+  return right + COLUMN_GAP;
 }
 
 /**
@@ -73,9 +84,15 @@ function placeStatic(layer: HTMLElement, body: HTMLElement, _wide: boolean): Cle
       const el = layer.querySelector<HTMLElement>(`[data-prop="${route.id}"]`);
       const to = document.querySelector(route.to);
       if (!el || !to) continue;
-      const y = targetY(to, body).center - route.size / 2;
-      el.style.transform = `translate(${sideX(route)}px, ${y}px) rotate(${route.rotate[1]}deg)`;
-      el.style.opacity = show ? "1" : "0";
+      const x = show ? placeInMargin(route, el) : null;
+      if (x === null) {
+        el.style.opacity = "0";
+        continue;
+      }
+      const size = parseFloat(el.style.getPropertyValue("--prop-size")) || route.size;
+      const y = targetY(to, body).center - size / 2;
+      el.style.transform = `translate(${x}px, ${y}px) rotate(${route.rotate[1]}deg)`;
+      el.style.opacity = "1";
     }
   };
   place();
@@ -101,10 +118,11 @@ async function startFlying(layer: HTMLElement, body: HTMLElement): Promise<Clean
 
       // Recomputed on every ScrollTrigger refresh (resize, fonts, images)
       const geometry = () => {
-        const x = sideX(route);
-        const y0 = targetY(from, body).top - route.size;
-        const y1 = targetY(to, body).center - route.size / 2;
-        return { x, y0, y1 };
+        const x = placeInMargin(route, el);
+        const size = parseFloat(el.style.getPropertyValue("--prop-size")) || route.size;
+        const y0 = targetY(from, body).top - size;
+        const y1 = targetY(to, body).center - size / 2;
+        return { x: x ?? -9999, y0, y1, hidden: x === null };
       };
       let g = geometry();
       gsap.set(el, { x: g.x, y: g.y0, rotation: route.rotate[0], opacity: 0 });
@@ -122,7 +140,7 @@ async function startFlying(layer: HTMLElement, body: HTMLElement): Promise<Clean
           },
         },
       });
-      tl.to(el, { opacity: 1, duration: 0.08, ease: "none" }, 0)
+      tl.to(el, { opacity: () => (g.hidden ? 0 : 1), duration: 0.08, ease: "none" }, 0)
         .to(el, { y: () => g.y1, rotation: route.rotate[1], duration: 1, ease: "none" }, 0)
         .to(el, { x: () => g.x + (route.drift ?? 0), duration: 1, ease: "sine.inOut" }, 0);
     }

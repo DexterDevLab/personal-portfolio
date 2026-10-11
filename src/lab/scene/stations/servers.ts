@@ -1,6 +1,6 @@
 import { Group, Mesh, Vector3 } from "three";
 import { PALETTE } from "../../config";
-import { PartBuilder, box, circle, contactShadow, cyl, hitBox, rbox } from "../../geometry";
+import { PartBuilder, box, circle, contactShadow, cyl, hitBox, rbox, sphere } from "../../geometry";
 import { poseFor } from "../../camera";
 import type { Animator, BuildContext, StationDefinition } from "../types";
 
@@ -35,6 +35,12 @@ export function buildServers(ctx: BuildContext): StationDefinition {
   parts
     .add(rbox(0.1, 0.06, 1.3, 0.02), PALETTE.metalDark, { position: [-0.65, 2.3, -0.2], rotation: [0, 0.9, 0] })
     .add(cyl(0.02, 0.02, 1.2, 6), PALETTE.blue, { position: [-0.65, 2.34, -0.2], rotation: [Math.PI / 2, 0, -0.9] });
+  // Antenna with a signal ball on top, and a big round gauge on the door
+  parts
+    .add(cyl(0.015, 0.015, 0.7, 8), PALETTE.metalDark, { position: [-0.3, 2.9, -0.1] })
+    .add(sphere(0.07, 12, 10), PALETTE.orange, { position: [-0.3, 3.28, -0.1] })
+    .add(cyl(0.16, 0.16, 0.05, 20), PALETTE.cream, { position: [0, 0.2, 0.42], rotation: [Math.PI / 2, 0, 0] })
+    .add(rbox(0.02, 0.12, 0.01, 0.005), PALETTE.red, { position: [0.03, 0.24, 0.45], rotation: [0, 0, -0.4] });
   parts.build(group, ctx.shared.outline, new Set([PALETTE.charcoal]));
 
   // LEDs: two per slot

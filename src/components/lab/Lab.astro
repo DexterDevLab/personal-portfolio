@@ -1,6 +1,6 @@
 ---
 import { Image, getImage } from "astro:assets";
-import { ArrowDown, ArrowRight, ArrowUpRight, Download, Mail, Minus, Plus, RotateCcw, RotateCw, Undo2 } from "@lucide/astro";
+import { ArrowDown, ArrowRight, ArrowUpRight, ChevronDown, Download, Mail, Minus, Plus, RotateCcw, RotateCw, Settings2, Undo2 } from "@lucide/astro";
 import type { CollectionEntry } from "astro:content";
 import Button from "@/components/ui/Button.astro";
 import Tag from "@/components/ui/Tag.astro";
@@ -48,7 +48,7 @@ const otherServices = services.filter((s) => s !== hosting);
   data-screen-src={screen.src}
   data-portrait-src={face.src}
   data-thumb-srcs={JSON.stringify(thumbs.map((t) => t.src))}
-  class="relative grid min-h-[88svh] w-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden border-b-2 border-border-strong bg-background-deep grid-floor pt-16 md:block md:min-h-[min(92svh,900px)] md:pt-0"
+  class="relative grid min-h-[88svh] w-full grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden border-b-2 border-border-strong bg-background grid-floor pt-16 lg:block lg:min-h-[min(92svh,900px)] lg:pt-0"
   aria-label="Interactive laboratory"
 >
   <span id="top" class="absolute top-0"></span>
@@ -56,17 +56,19 @@ const otherServices = services.filter((s) => s !== hosting);
   <!-- Intro: in flow on narrow screens, a floating column on wide ones -->
   <div
     data-lab-intro
-    class="lab-intro z-10 px-5 pt-3 pb-2 sm:px-6 md:absolute md:top-24 md:left-0 md:max-w-[22rem] md:pt-0 md:pb-0 lg:left-[max(1.5rem,calc((100vw-70rem)/2))] lg:px-0"
+    class="lab-intro z-10 px-5 pt-4 pb-2 sm:px-6 lg:absolute lg:top-24 lg:left-[max(1.5rem,calc((100vw-70rem)/2))] lg:max-w-[27rem] lg:px-0 lg:pt-0 lg:pb-0"
   >
     <div data-lab-intro-text>
-      <p class="label-mono inline-flex items-center gap-2 text-muted">
+      <p class="label-mono inline-flex items-center gap-2 text-teal-deep">
         <span class="led bg-orange" aria-hidden="true"></span>
         {site.name} — {site.role}
       </p>
-      <h1 class="mt-3 text-xl font-bold leading-[1.12] tracking-tight sm:text-2xl md:text-[1.8rem]">{intro.headline}</h1>
-      <p data-lab-intro-copy class="mt-2 text-sm leading-relaxed text-muted">{intro.short}</p>
+      <h1 class="display mt-3 text-[1.9rem] sm:text-4xl lg:text-[3.2rem]">
+        Websites and web apps,<br class="hidden lg:block" /> built and maintained.
+      </h1>
+      <p data-lab-intro-copy class="mt-3 max-w-md text-sm leading-relaxed text-foreground/85 sm:text-base">{intro.short}</p>
     </div>
-    <div class="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
+    <div class="mt-4 flex flex-wrap items-center gap-2 sm:gap-3">
       <Button href="#contact" data-station-link="comms" size="sm">
         Discuss your project
         <ArrowRight class="size-4" aria-hidden="true" />
@@ -81,7 +83,7 @@ const otherServices = services.filter((s) => s !== hosting);
   </div>
 
   <!-- The 3D stage: the canvas is sized to this element -->
-  <div data-lab-stage class="relative min-h-0 md:absolute md:inset-0">
+  <div data-lab-stage class="relative min-h-[46svh] sm:min-h-[52svh] lg:absolute lg:inset-0 lg:min-h-0">
     <canvas data-lab-canvas aria-hidden="true" tabindex="-1" class="lab-canvas absolute inset-0 h-full w-full"></canvas>
   </div>
   <p class="sr-only">
@@ -93,34 +95,41 @@ const otherServices = services.filter((s) => s !== hosting);
   <!-- Station buttons + view controls -->
   <div
     data-lab-hud
-    class="lab-hud z-10 px-5 pt-2 pb-4 sm:px-6 md:absolute md:bottom-5 md:left-0 md:max-w-[min(100%,48rem)] md:pt-0 md:pb-0 lg:left-[max(1.5rem,calc((100vw-70rem)/2))] lg:px-0"
+    class="lab-hud z-10 px-5 pt-2 pb-4 sm:px-6 lg:absolute lg:bottom-5 lg:left-[max(1.5rem,calc((100vw-70rem)/2))] lg:max-w-[min(100%,48rem)] lg:px-0 lg:pt-0 lg:pb-0"
   >
     <div class="mb-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-      <p class="label-mono text-muted">Stations</p>
+      <p class="label-mono text-teal-deep">Stations</p>
       <p data-lab-hint class="hidden text-xs text-muted sm:block">
         Drag to rotate · <kbd class="font-mono">⌘</kbd>/<kbd class="font-mono">Ctrl</kbd> + scroll to zoom · Scroll down to read
       </p>
     </div>
     <div class="flex flex-wrap items-start gap-2">
       <StationList class="lab-station-list" />
-      <div class="flex gap-1.5" role="group" aria-label="View controls">
-        <button type="button" data-lab-rotate="left" aria-label="Rotate the room left" class="btn btn-sm size-11 px-0">
-          <RotateCcw class="size-4" aria-hidden="true" />
-        </button>
-        <button type="button" data-lab-rotate="right" aria-label="Rotate the room right" class="btn btn-sm size-11 px-0">
-          <RotateCw class="size-4" aria-hidden="true" />
-        </button>
-        <button type="button" data-lab-zoom="in" aria-label="Zoom in" class="btn btn-sm size-11 px-0">
-          <Plus class="size-4" aria-hidden="true" />
-        </button>
-        <button type="button" data-lab-zoom="out" aria-label="Zoom out" class="btn btn-sm size-11 px-0">
-          <Minus class="size-4" aria-hidden="true" />
-        </button>
-        <button type="button" data-lab-reset class="btn btn-sm">
-          <Undo2 class="size-4" aria-hidden="true" />
-          Reset view
-        </button>
-      </div>
+      <details data-view-controls class="group/vc">
+        <summary class="btn btn-sm cursor-pointer select-none">
+          <Settings2 class="size-4" aria-hidden="true" />
+          View controls
+          <ChevronDown class="size-3.5 transition-transform group-open/vc:rotate-180" aria-hidden="true" />
+        </summary>
+        <div class="mt-2 flex flex-wrap gap-1.5 lg:mt-0" role="group" aria-label="View controls">
+          <button type="button" data-lab-rotate="left" aria-label="Rotate the room left" class="btn btn-sm size-11 px-0">
+            <RotateCcw class="size-4" aria-hidden="true" />
+          </button>
+          <button type="button" data-lab-rotate="right" aria-label="Rotate the room right" class="btn btn-sm size-11 px-0">
+            <RotateCw class="size-4" aria-hidden="true" />
+          </button>
+          <button type="button" data-lab-zoom="in" aria-label="Zoom in" class="btn btn-sm size-11 px-0">
+            <Plus class="size-4" aria-hidden="true" />
+          </button>
+          <button type="button" data-lab-zoom="out" aria-label="Zoom out" class="btn btn-sm size-11 px-0">
+            <Minus class="size-4" aria-hidden="true" />
+          </button>
+          <button type="button" data-lab-reset class="btn btn-sm">
+            <Undo2 class="size-4" aria-hidden="true" />
+            Reset view
+          </button>
+        </div>
+      </details>
     </div>
     <p data-lab-status class="sr-only" aria-live="polite"></p>
   </div>
@@ -128,7 +137,7 @@ const otherServices = services.filter((s) => s !== hosting);
   <!-- Scroll cue, wide screens -->
   <a
     href="#panda-central"
-    class="absolute right-6 bottom-6 z-10 hidden items-center gap-2 text-xs text-muted hover:text-foreground md:flex lg:right-[max(1.5rem,calc((100vw-70rem)/2))]"
+    class="absolute right-6 bottom-6 z-10 hidden items-center gap-2 text-xs text-muted hover:text-foreground lg:flex lg:right-[max(1.5rem,calc((100vw-70rem)/2))]"
   >
     Scroll to read
     <span class="btn btn-sm size-9 px-0" aria-hidden="true"><ArrowDown class="size-4" /></span>

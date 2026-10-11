@@ -3,7 +3,7 @@
  * the top of `from` and settles beside `to`. Tweak sizes, rotation and the
  * overall intensity here; set `enabled: false` to turn the flying props off.
  */
-export type PropId = "wrench" | "gear" | "board" | "sheet" | "plug";
+export type PropId = "wrench" | "screwdriver" | "gear" | "board" | "sheet" | "plug" | "bot";
 
 export interface PropRoute {
   id: PropId;
@@ -15,7 +15,7 @@ export interface PropRoute {
   size: number;
   /** Rotation at the start and at rest, degrees. */
   rotate: [number, number];
-  /** Horizontal drift while travelling, px (positive = toward the content). */
+  /** Horizontal drift while travelling, px (positive = away from the content). */
   drift?: number;
 }
 
@@ -25,19 +25,19 @@ export const CHOREOGRAPHY = {
   minWidth: 1280,
   /** Scrub smoothing in seconds (0 = locked to the scrollbar). */
   scrub: 0.7,
-  /** Distance from the content column to the prop centre, px. */
-  marginInset: 48,
 };
 
 export const PROPS: PropRoute[] = [
-  // The wrench leaves the lab and heads for the repair station
-  { id: "wrench", from: "#panda-central", to: "#troubleshooting", side: "right", size: 112, rotate: [-30, 18], drift: -24 },
+  // The screwdriver leaves the lab and heads for the repair station
+  { id: "screwdriver", from: "#panda-central", to: "#troubleshooting", side: "right", size: 112, rotate: [-30, 14], drift: 10 },
   // A gear rolls down the left margin and parks by the experiment rack
-  { id: "gear", from: "#panda-central", to: "#work", side: "left", size: 84, rotate: [0, 200] },
+  { id: "gear", from: "#panda-central", to: "#work", side: "left", size: 88, rotate: [0, 180] },
   // A circuit board turns slowly toward the web-apps station
-  { id: "board", from: "#work", to: "#services", side: "left", size: 96, rotate: [12, -8] },
+  { id: "board", from: "#work", to: "#services", side: "left", size: 100, rotate: [10, -6] },
   // A connector follows the cable toward hosting / the process line
-  { id: "plug", from: "#services", to: "#process", side: "right", size: 90, rotate: [-10, 6], drift: -20 },
+  { id: "plug", from: "#services", to: "#process", side: "right", size: 92, rotate: [-8, 4], drift: 8 },
   // A notebook sheet drifts down and settles beside the notebook
-  { id: "sheet", from: "#process", to: "#about", side: "right", size: 88, rotate: [8, -4] },
+  { id: "sheet", from: "#process", to: "#about", side: "right", size: 92, rotate: [8, -3] },
+  // The assistant's head waits by the communication station
+  { id: "bot", from: "#about", to: "#contact", side: "left", size: 96, rotate: [-6, 3] },
 ];

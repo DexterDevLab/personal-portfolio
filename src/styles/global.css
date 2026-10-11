@@ -55,25 +55,27 @@
    theme class is set; the inline script in Base.astro adds .dark/.light. */
 :root {
   color-scheme: light dark;
-  --bg: light-dark(#f3eee4, #1b1b1f);
-  --bg-deep: light-dark(#e9e2d4, #141417);
-  --surface: light-dark(#fbf8f1, #26262b);
-  --surface-2: light-dark(#e9e3d6, #2f2f35);
-  --paper: light-dark(#fffdf7, #2b2b31);
-  --ink: light-dark(#2b2b30, #f3eee4);
-  --ink-soft: light-dark(#5f5c58, #b9b3a7);
-  --line: light-dark(#2b2b30, #f3eee4);
-  --line-soft: light-dark(#cfc7b8, #3d3d45);
-  --teal: #2bb3a3;
-  --teal-deep: light-dark(#1f8c80, #2bb3a3);
-  --orange: #ff8a3d;
-  --orange-deep: #e5731f;
-  --blue: light-dark(#3b63e6, #4f7cff);
-  --blue-soft: light-dark(rgba(59, 99, 230, 0.12), rgba(79, 124, 255, 0.18));
-  --success: light-dark(#15803d, #34d399);
-  --danger: light-dark(#dc2626, #f87171);
-  --shadow: light-dark(#2b2b30, #0b0b0d);
-  --frame: light-dark(#2b2b30, #0f0f11);
+  --bg: light-dark(#f5eedc, #1c1c21);
+  --bg-deep: light-dark(#ece3cc, #151518);
+  --surface: light-dark(#fbf7ec, #26262c);
+  --surface-2: light-dark(#e6ddc6, #30303a);
+  --paper: light-dark(#fffcf3, #2a2a31);
+  --ink: light-dark(#25252b, #f5eedc);
+  --ink-soft: light-dark(#55525a, #b8b2a6);
+  --line: light-dark(#25252b, #f5eedc);
+  --line-soft: light-dark(#cdc4ae, #3f3f4a);
+  --teal: light-dark(#258f83, #2fb3a4);
+  --teal-deep: light-dark(#1b7268, #258f83);
+  --teal-soft: light-dark(#cfe9e4, #1f3b38);
+  --orange: #f58a35;
+  --orange-deep: #d9721f;
+  --red: #db5149;
+  --blue: light-dark(#3b63e6, #6b8dff);
+  --blue-soft: light-dark(rgba(59, 99, 230, 0.12), rgba(107, 141, 255, 0.18));
+  --success: light-dark(#1f7a4a, #3ad48a);
+  --danger: light-dark(#c4332c, #ff7b74);
+  --shadow: light-dark(#25252b, #0b0b0d);
+  --frame: light-dark(#25252b, #0f0f11);
 }
 .dark {
   color-scheme: dark;
@@ -97,6 +99,8 @@
   --color-accent-weak: var(--blue-soft);
   --color-teal: var(--teal);
   --color-teal-deep: var(--teal-deep);
+  --color-teal-soft: var(--teal-soft);
+  --color-red: var(--red);
   --color-orange: var(--orange);
   --color-orange-deep: var(--orange-deep);
   --color-success: var(--success);
@@ -135,7 +139,7 @@ body {
 
 ::selection {
   background-color: var(--orange);
-  color: #2b2b30;
+  color: #25252b;
 }
 
 :focus-visible {
@@ -153,146 +157,161 @@ h3 {
 /* Subtle floor-tile grid, like the room's floor, for section backdrops */
 .grid-floor {
   background-image:
-    linear-gradient(to right, color-mix(in oklab, var(--line) 9%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklab, var(--line) 9%, transparent) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(to right, color-mix(in oklab, var(--line) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--line) 5%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
 }
 
 /* ---------------------------------- */
 /* Lab components                     */
 /* ---------------------------------- */
-/* Everything with an outline + a hard offset shadow reads as a solid
-   cartoon object, like the props in the room. */
-.outlined {
-  border: 2px solid var(--line);
-  box-shadow: 4px 4px 0 0 var(--shadow);
-}
-.outlined-sm {
-  border: 2px solid var(--line);
-  box-shadow: 3px 3px 0 0 var(--shadow);
-}
-
-/* Physical button: lifts on hover, presses down on click */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 2.75rem;
-  padding: 0.6rem 1.15rem;
-  border-radius: var(--radius-button);
-  border: 2px solid var(--line);
-  font-weight: 600;
-  font-size: 0.9rem;
-  line-height: 1.2;
-  color: var(--ink);
-  background: var(--surface);
-  box-shadow: 0 4px 0 0 var(--shadow);
-  translate: 0 0;
-  transition:
-    translate 120ms ease,
-    box-shadow 120ms ease,
-    background-color 120ms ease;
-}
-.btn:hover {
-  translate: 0 -1px;
-  box-shadow: 0 5px 0 0 var(--shadow);
-}
-.btn:active {
-  translate: 0 3px;
-  box-shadow: 0 1px 0 0 var(--shadow);
-}
-.btn-primary {
-  background: var(--orange);
-  color: #2b2b30;
-}
-.btn-primary:hover {
-  background: #ff9955;
-}
-.btn-teal {
-  background: var(--teal);
-  color: #0f2a27;
-}
-.btn-ghost {
-  background: transparent;
-  box-shadow: none;
-  border-color: transparent;
-}
-.btn-ghost:hover {
-  background: var(--surface-2);
-  translate: 0 0;
-  box-shadow: none;
-}
-.btn-sm {
-  min-height: 2.5rem;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.85rem;
-  box-shadow: 0 3px 0 0 var(--shadow);
-}
-.btn-sm:hover {
-  box-shadow: 0 4px 0 0 var(--shadow);
-}
-.btn-sm:active {
-  box-shadow: 0 1px 0 0 var(--shadow);
-}
-@media (prefers-reduced-motion: reduce) {
-  .btn,
-  .btn:hover,
-  .btn:active {
-    transition: none;
+/* In @layer components so utilities such as `hidden` can still override. */
+@layer components {
+  /* ---------------------------------- */
+  /* Everything with an outline + a hard offset shadow reads as a solid
+     cartoon object, like the props in the room. */
+  .outlined {
+    border: 2px solid var(--line);
+    box-shadow: 4px 4px 0 0 var(--shadow);
   }
-}
+  .outlined-sm {
+    border: 2px solid var(--line);
+    box-shadow: 3px 3px 0 0 var(--shadow);
+  }
 
-/* Nameplate: charcoal plate with engraved mono text (the wordmark on the wall) */
-.plate {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.7rem;
-  border-radius: var(--radius-plate);
-  background: #2b2b30;
-  color: var(--blue);
-  font-family: var(--font-geist-mono);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  box-shadow: inset 0 0 0 2px #3d3d45;
-}
-.dark .plate {
-  background: #0f0f11;
-}
+  /* Physical button: lifts on hover, presses down on click */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.6rem 1.15rem;
+    border-radius: var(--radius-button);
+    border: 2px solid var(--line);
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    color: var(--ink);
+    background: var(--surface);
+    box-shadow: 0 4px 0 0 var(--shadow);
+    translate: 0 0;
+    transition:
+      translate 120ms ease,
+      box-shadow 120ms ease,
+      background-color 120ms ease;
+  }
+  .btn:hover {
+    translate: 0 -1px;
+    box-shadow: 0 5px 0 0 var(--shadow);
+  }
+  .btn:active {
+    translate: 0 3px;
+    box-shadow: 0 1px 0 0 var(--shadow);
+  }
+  .btn-primary {
+    background: var(--orange);
+    color: #2b2b30;
+  }
+  .btn-primary:hover {
+    background: #ff9955;
+  }
+  .btn-teal {
+    background: var(--teal);
+    color: #0f2a27;
+  }
+  .btn-ghost {
+    background: transparent;
+    box-shadow: none;
+    border-color: transparent;
+  }
+  .btn-ghost:hover {
+    background: var(--surface-2);
+    translate: 0 0;
+    box-shadow: none;
+  }
+  .btn-sm {
+    min-height: 2.5rem;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+    box-shadow: 0 3px 0 0 var(--shadow);
+  }
+  .btn-sm:hover {
+    box-shadow: 0 4px 0 0 var(--shadow);
+  }
+  .btn-sm:active {
+    box-shadow: 0 1px 0 0 var(--shadow);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn,
+    .btn:hover,
+    .btn:active {
+      transition: none;
+    }
+  }
 
-/* Mono technical label (section kickers, experiment numbers) */
-.label-mono {
-  font-family: var(--font-geist-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
+  /* Nameplate: charcoal plate with engraved mono text (the wordmark on the wall) */
+  .plate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-plate);
+    background: #25252b;
+    color: #f5eedc; /* 13.5:1 on charcoal */
+    font-family: var(--font-geist-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    box-shadow:
+      inset 0 0 0 2px #3f3f4a,
+      0 3px 0 0 #0b0b0d;
+  }
+  .dark .plate {
+    background: #0f0f11;
+  }
 
-/* Paper panel: notebook pages, the case-study body */
-.paper {
-  background-color: var(--paper);
-  background-image: linear-gradient(to bottom, transparent 31px, color-mix(in oklab, var(--blue) 18%, transparent) 32px);
-  background-size: 100% 32px;
-}
+  /* Mono technical label (section kickers, experiment numbers) */
+  .label-mono {
+    font-family: var(--font-geist-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
 
-/* Screen bezel: dark instrument frame for screenshots */
-.bezel {
-  background: var(--frame);
-  border: 2px solid var(--line);
-  border-radius: var(--radius-card);
-  box-shadow:
-    4px 4px 0 0 var(--shadow),
-    inset 0 0 0 6px #3d3d45;
-}
+  /* Display headings: heavy, tight, slightly condensed by tracking */
+  .display {
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
 
-/* Status light */
-.led {
-  display: inline-block;
-  width: 0.6rem;
-  height: 0.6rem;
-  border-radius: 999px;
-  border: 2px solid var(--line);
+  /* Paper panel: notebook pages, the case-study body */
+  .paper {
+    background-color: var(--paper);
+    background-image: linear-gradient(to bottom, transparent 31px, color-mix(in oklab, var(--blue) 18%, transparent) 32px);
+    background-size: 100% 32px;
+  }
+
+  /* Screen bezel: dark instrument frame for screenshots */
+  .bezel {
+    background: var(--frame);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-card);
+    box-shadow:
+      4px 4px 0 0 var(--shadow),
+      inset 0 0 0 6px #3d3d45;
+  }
+
+  /* Status light */
+  .led {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+  }
 }
 
 /* ---------------------------------- */
@@ -310,16 +329,14 @@ h3 {
   animation: rise-in 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
   animation-delay: var(--rise-delay, 0s);
 }
+/* Entrance is transform-only: content is always fully opaque, so it stays
+   readable even if the observer never fires. */
 .reveal {
-  opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 0.45s cubic-bezier(0.21, 0.47, 0.32, 0.98),
-    transform 0.45s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+  transform: translateY(12px);
+  transition: transform 0.4s cubic-bezier(0.21, 0.47, 0.32, 0.98);
   transition-delay: var(--reveal-delay, 0s);
 }
 .reveal.is-visible {
-  opacity: 1;
   transform: none;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -327,7 +344,6 @@ h3 {
     animation: none;
   }
   .reveal {
-    opacity: 1;
     transform: none;
     transition: none;
   }
@@ -394,7 +410,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
     opacity 0.3s ease,
     translate 0.3s ease;
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   [data-lab-state="ready"][data-panel] .lab-intro {
     opacity: 0;
     translate: 0 -8px;
@@ -419,13 +435,23 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 .lab-progress::-webkit-progress-value {
   background: var(--teal);
 }
-@media (max-width: 767px) {
-  [data-lab] .lab-intro [data-lab-intro-text] {
-    display: none;
-  }
+@media (max-width: 1023px) {
   [data-lab-state="ready"][data-panel] .lab-hud {
     visibility: hidden;
   }
+}
+/* View-controls disclosure: a real <details> on narrow screens, always open
+   (summary hidden) from md up — src/lab/ui.ts keeps it open there. */
+@media (min-width: 768px) {
+  [data-view-controls] > summary {
+    display: none;
+  }
+}
+[data-view-controls] > summary {
+  list-style: none;
+}
+[data-view-controls] > summary::-webkit-details-marker {
+  display: none;
 }
 .lab-panel {
   z-index: 60;

@@ -2,7 +2,31 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Whole-site lab identity + scroll choreography (latest)
+## Refinement pass: mobile intro, navigation, contrast, palette, typography (latest)
+
+### Root causes found
+1. **Mobile intro missing** — a `@media (max-width: 767px)` rule hid `[data-lab-intro-text]` (added when the headline was clipped under the header). Removed; the intro column now shows the headline and a short introduction on every width, and the hero stage has a minimum height so the room is never squeezed out.
+2. **Header links opened lab panels** — station deep links reused the section anchors (`#services`, `#work`, …), and the `hashchange` handler treated any such hash as a station request. Stations now live under `#lab/<id>` (`src/lab/stations.ts`); section hashes just scroll, and navigating to a section while a panel is open closes it first (`src/lab/ui.ts`). Case-study links and history are unaffected; `scroll-padding-top: 5rem` keeps headings clear of the sticky header.
+3. **Wordmark contrast** — `.plate` was blue (`#4f7cff`) on charcoal (≈3.9:1). Now warm white `#f5eedc` on `#25252b` (measured **13.2:1**) with an orange LED accent.
+4. **Faint process text** — `.reveal` started at `opacity: 0` until an IntersectionObserver fired. Entrances are now transform-only (content is always fully opaque); the process section animates the cable signal instead.
+
+### Visual decisions
+- **Palette** (`src/styles/global.css` `:root`, `src/lab/config.ts` PALETTE): cream `#F5EEDC` surfaces, charcoal `#25252B` structure/outlines/screens, teal `#258F83` equipment and kickers, orange `#F58A35` actions/selection/signal, red `#DB5149` only for the fault lamp and gauge needles. Beige/grey tones reduced; the floor grid is lighter (5 % lines, 64 px) and used only on the hero.
+- **Typography**: Geist stays for body; headings use a `.display` treatment (Geist 800, −0.035em tracking, line-height 1). Desktop hero headline is 51 px (was 29 px) with an intentional break; section titles 32–45 px; mono labels are 0.74 rem / 0.12 em (less tiny and airy); project role/metadata is 14 px.
+- **Room props**: console gained two round gauges with needles and bigger lever balls; the comms terminal a larger dial with an orange needle; the server cabinet an antenna with an orange ball and a door gauge. Everything else kept.
+- **Flying props** redrawn in the room's language (5-unit charcoal outlines, flat teal/orange/cream fills, hard offset shadow): screwdriver → troubleshooting, gear → experiment rack, circuit board → web apps, connector → process cable, notebook sheet → About, the **robot's head** → contact. Props are sized to the available margin and always sit ≥ 16 px outside the content column; margins under 52 px hide them.
+- **Hero layout** stacks (intro / room / stations) below 1024 px; the header hides the 3D switch below `lg` so nothing wraps on tablets. Secondary view controls sit behind a **View controls** disclosure on narrow screens (always open from 768 px).
+
+### Checks completed
+- `astro check` 0 errors, `astro build` passes.
+- Desktop: header *Services* → `#services`, no panel opened; station button → `#lab/servers` panel; header *About* then closes it. Wordmark contrast 13.2:1 measured. Hero h1 51.2 px. Props outside the column at the test width.
+- 390 and 360 px: headline (30 px) and intro rendered with non-zero bounds, view-controls disclosure closed, no horizontal overflow. 820 px: stacked hero, 46 px headline. 1280 px reduced-motion: static props.
+
+### Limitations
+- Scrub feel, reveal timing and real touch still need a look in a visible window / on a device (automation window is hidden and much wider than 1440, so desktop screenshots are at ~2750 px CSS).
+- No Lighthouse/PSI numbers without a deployed URL.
+
+## Whole-site lab identity + scroll choreography
 
 ### Visual system (derived from the room)
 - **Tokens** (`src/styles/global.css`, `:root`): warm off-white paper `#f3eee4` / deep `#e9e2d4`, charcoal ink `#2b2b30`, teal `#2bb3a3`, orange `#ff8a3d`, blue `#4f7cff` for "screens on", cream `#fbf8f1` surfaces. Dark theme is the lab at night (charcoal `#1b1b1f` with off-white type); both themes still toggle and follow the OS.

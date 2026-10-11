@@ -24,8 +24,9 @@ export function buildComms(ctx: BuildContext): StationDefinition {
     .add(cyl(0.12, 0.14, 0.7, 12), PALETTE.charcoalLight, { position: [0, 0.47, 0] })
     .add(rbox(0.9, 0.5, 0.6, 0.08), PALETTE.teal, { position: [0, 1.05, 0] })
     .add(rbox(0.5, 0.2, 0.05, 0.02), PALETTE.cream, { position: [0, 1.1, 0.3] })
-    .add(cyl(0.11, 0.11, 0.05, 16), PALETTE.cream, { position: [0.28, 1.12, 0.3], rotation: [Math.PI / 2, 0, 0] })
-    .add(cyl(0.03, 0.03, 0.06, 8), PALETTE.charcoal, { position: [0.28, 1.19, 0.31], rotation: [Math.PI / 2, 0, 0] })
+    .add(cyl(0.15, 0.15, 0.06, 18), PALETTE.cream, { position: [0.3, 1.1, 0.31], rotation: [Math.PI / 2, 0, 0] })
+    .add(cyl(0.17, 0.17, 0.04, 18), PALETTE.charcoal, { position: [0.3, 1.1, 0.29], rotation: [Math.PI / 2, 0, 0] })
+    .add(rbox(0.03, 0.12, 0.02, 0.01), PALETTE.orange, { position: [0.33, 1.15, 0.345], rotation: [0, 0, -0.5] })
     // Handset on top
     .add(torus(0.18, 0.045), PALETTE.charcoal, { position: [-0.1, 1.42, -0.05], rotation: [0, 0, 0] })
     .add(sphere(0.07, 10, 8), PALETTE.charcoal, { position: [-0.28, 1.42, -0.05] })

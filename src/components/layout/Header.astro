@@ -49,8 +49,8 @@ const { lab = false } = Astro.props;
       >
         Résumé
       </a>
-      {lab && <ModeSwitch class="ml-2" />}
-      <a href="/#contact" class="btn btn-primary btn-sm ml-2">Discuss your project</a>
+      {lab && <ModeSwitch class="ml-2 hidden lg:inline-flex" />}
+      <a href="/#contact" class="btn btn-primary btn-sm ml-2 whitespace-nowrap">Discuss your project</a>
       <ThemeToggle class="ml-2 size-10" />
     </div>
 

@@ -15,7 +15,7 @@ export interface StationMeta {
   eyebrow: string;
   /** Panel title. */
   title: string;
-  /** URL hash that deep-links to this station (and to the page section). */
+  /** URL hash that deep-links to this station (distinct from the page section anchors). */
   hash: `#${string}`;
   /** Section id to scroll to in page view. */
   pageAnchor: string;
@@ -29,7 +29,7 @@ export const STATIONS: StationMeta[] = [
     subtitle: "Panda Central, the featured project",
     eyebrow: "Main control console",
     title: "Panda Central",
-    hash: "#panda-central",
+    hash: "#lab/console",
     pageAnchor: "panda-central",
   },
   {
@@ -39,7 +39,7 @@ export const STATIONS: StationMeta[] = [
     subtitle: "Selected client work",
     eyebrow: "Experiment stations",
     title: "Client sites I've developed",
-    hash: "#work",
+    hash: "#lab/experiments",
     pageAnchor: "work",
   },
   {
@@ -49,7 +49,7 @@ export const STATIONS: StationMeta[] = [
     subtitle: "WordPress & WooCommerce troubleshooting",
     eyebrow: "Repair bench",
     title: "Troubleshooting, fixed at the cause",
-    hash: "#troubleshooting",
+    hash: "#lab/repair",
     pageAnchor: "services",
   },
   {
@@ -59,7 +59,7 @@ export const STATIONS: StationMeta[] = [
     subtitle: "Hosting, deployment, maintenance, and other services",
     eyebrow: "Server cabinet",
     title: "Services",
-    hash: "#services",
+    hash: "#lab/servers",
     pageAnchor: "services",
   },
   {
@@ -69,7 +69,7 @@ export const STATIONS: StationMeta[] = [
     subtitle: "About me and how I work",
     eyebrow: "Lab notebook",
     title: "About Dexter",
-    hash: "#about",
+    hash: "#lab/notebook",
     pageAnchor: "about",
   },
   {
@@ -79,7 +79,7 @@ export const STATIONS: StationMeta[] = [
     subtitle: "Contact: discuss your project",
     eyebrow: "Communication terminal",
     title: "Discuss your project",
-    hash: "#contact",
+    hash: "#lab/comms",
     pageAnchor: "contact",
   },
 ];

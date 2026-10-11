@@ -2,18 +2,18 @@
  * Scene settings: palette, room size, camera, timing. Tweak here first.
  */
 export const PALETTE = {
-  wall: 0xf3eee4,
-  wallShade: 0xe6dfd2,
-  floor: 0xd9d2c4,
-  floorLine: 0xc9c1b1,
-  charcoal: 0x2b2b30,
+  wall: 0xf5eedc,
+  wallShade: 0xe8dfc9,
+  floor: 0xdcd3bd,
+  floorLine: 0xcbc1a9,
+  charcoal: 0x25252b,
   charcoalLight: 0x3d3d45,
   blue: 0x4f7cff,
   blueDeep: 0x3b63e6,
-  teal: 0x2bb3a3,
-  tealDeep: 0x1f8c80,
-  orange: 0xff8a3d,
-  red: 0xe5484d,
+  teal: 0x258f83,
+  tealDeep: 0x1b7268,
+  orange: 0xf58a35,
+  red: 0xdb5149,
   green: 0x3ccf7a,
   cream: 0xfff8ec,
   wood: 0xc8a97a,
@@ -23,7 +23,7 @@ export const PALETTE = {
   paper: 0xfdfaf2,
   glass: 0xbfe9ff,
   robot: 0xf6f1e7,
-  outline: 0x24242a,
+  outline: 0x1e1e23,
 } as const;
 
 export const ROOM = {
