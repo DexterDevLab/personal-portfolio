@@ -2,7 +2,13 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Robot, zoom and lamp (latest)
+## Robot patrol + thought bubbles (latest)
+
+- The walk loop now has nine waypoints and runs along the experiment shelves (x ≈ −2.6, z −1.6 → −0.1) before crossing to the front; the floor lamp moved to (−1.05, 0, −1.5) so it is clear of the route. Edit the loop in `src/lab/index.ts` (`robot.setPath`).
+- **Thought bubble**: a camera-facing sprite drawn on a canvas (cream bubble, dark outline, two tail circles, Geist Mono text, wraps to two lines). The robot "thinks" one of `robot.idleLines` (edit in `src/lab/scene/robot.ts`) about 70 % of the times it pauses at a waypoint, and names the station it points at ("Repair bench!") on selection. `robot.say(text, seconds)` from anywhere. Never shown under reduced motion.
+- Verified with `__lab.debug.advance()` (robot position trail along the shelves, bubble visible and legible in the overview, bubble on station selection).
+
+## Robot, zoom and lamp
 
 - **Robot** — what was wrong: the dome head sat 0.14 units inside the torso (no neck), the arm pivots were inside a 0.5-wide body so the arms were hidden, the "visor" read as a stripe through the head, and it stood on a hover ring and never moved. Rebuilt (`src/lab/scene/robot.ts`): legs + feet, pelvis, rounded torso with chest panel and belt, neck, boxy head with visor, two eyes, ear discs and antenna, arms on shoulder joints outside the body. It now **walks** a loop of six waypoints through the free floor (`robot.setPath([...])` in `src/lab/index.ts`), with a leg/arm gait and body bob, turns toward its direction of travel, pauses 2–5 s at each stop to look around, keeps tracking what you hover, stops and points while a station is focused, resumes on Back, and stands still under reduced motion.
 - **Zoom** — `zoomToCursor` on OrbitControls (zoom lands on what you point at), zoom speed 0.9, overview distance 2.4–17 (was 5–22, which kept you far away and let the room shrink to a thumbnail), station 1.6–9, near plane 0.25.
