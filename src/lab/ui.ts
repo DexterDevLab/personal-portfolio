@@ -56,6 +56,8 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     history.replaceState(null, "", url.pathname + url.search + (opts.hash ?? location.hash));
 
     if (next === "lab") {
+      // The lab fills the viewport; leftover page scroll would push it under the header.
+      window.scrollTo(0, 0);
       lab?.resume();
       void ensureBooted();
       const target = stationFromHash(location.hash);
@@ -286,6 +288,7 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
   // ---------- initial state ----------
 
   if (view() === "lab") {
+    window.scrollTo(0, 0);
     const id = stationFromHash(location.hash);
     if (id) openPanel(id, null);
     const start = () => void ensureBooted();

@@ -353,7 +353,9 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
    up the intro drops its one-liner so the room gets the height; while a
    bottom-sheet panel is open the station row is covered anyway. */
 @media (max-width: 767px) {
-  [data-lab-state="ready"] [data-lab-intro-copy] {
+  /* The page view carries the headline; in the lab the room gets the space
+     and the intro is just the two actions. */
+  [data-lab] .lab-intro [data-lab-intro-text] {
     display: none;
   }
   [data-lab-state="ready"][data-panel] .lab-hud {
