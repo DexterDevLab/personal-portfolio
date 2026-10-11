@@ -3,6 +3,13 @@ import { Menu } from "@lucide/astro";
 import { navLinks, site } from "@/data/site";
 import ThemeToggle from "./ThemeToggle.astro";
 import MobileNav from "./MobileNav.astro";
+import ModeSwitch from "@/components/lab/ModeSwitch.astro";
+
+interface Props {
+  /** Show the lab/page switch (homepage only). */
+  lab?: boolean;
+}
+const { lab = false } = Astro.props;
 ---
 
 <header
@@ -38,6 +45,7 @@ import MobileNav from "./MobileNav.astro";
       >
         Résumé
       </a>
+      {lab && <ModeSwitch class="ml-2" />}
       <a
         href="/#contact"
         class="ml-2 inline-flex min-h-10 items-center rounded-button bg-accent-strong px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
@@ -60,7 +68,7 @@ import MobileNav from "./MobileNav.astro";
       </button>
     </div>
   </nav>
-  <MobileNav />
+  <MobileNav lab={lab} />
 </header>
 
 <script>

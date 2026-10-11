@@ -277,6 +277,118 @@ dialog[data-mobile-nav]::backdrop {
 }
 
 /* ---------------------------------- */
+/* Lab / page view modes              */
+/* ---------------------------------- */
+/* data-view is set before paint by the inline script in Base.astro; with
+   no JS there is no attribute and the readable page shows. */
+html[data-view="lab"] [data-page-only] {
+  display: none;
+}
+html[data-view="page"] [data-lab-only],
+html:not([data-view]) [data-lab-only] {
+  display: none;
+}
+html[data-view="lab"] {
+  overflow: hidden;
+}
+/* Over the scene the header always needs its backdrop. */
+html[data-view="lab"] [data-header] {
+  border-color: var(--border);
+  background-color: color-mix(in oklab, var(--bg) 85%, transparent);
+}
+html:not([data-lab-supported]) [data-mode-switch] {
+  display: none;
+}
+[data-mode-switch] [data-when="lab"] {
+  display: none;
+}
+html[data-view="lab"] [data-mode-switch] [data-when="lab"] {
+  display: inline;
+}
+html[data-view="lab"] [data-mode-switch] [data-when="page"] {
+  display: none;
+}
+
+/* Canvas fades in once the runtime reports ready. */
+.lab-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  touch-action: manipulation;
+}
+[data-lab-state="ready"] .lab-canvas {
+  opacity: 1;
+}
+/* Intro card slides out of the way once the scene is up; it stays on narrow
+   screens where the scene itself is secondary. */
+.lab-intro-card {
+  transition:
+    opacity 0.4s ease,
+    translate 0.4s ease;
+}
+@media (min-width: 1024px) {
+  [data-lab-state="ready"][data-panel] .lab-intro-card {
+    opacity: 0;
+    translate: 0 -8px;
+    pointer-events: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-canvas,
+  .lab-intro-card {
+    transition: none;
+  }
+}
+.lab-progress {
+  accent-color: var(--accent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lab-progress::-webkit-progress-bar {
+  background: var(--surface-2);
+  border-radius: 999px;
+}
+.lab-progress::-webkit-progress-value {
+  background: var(--accent);
+}
+/* Narrow screens: once the scene is up the intro shrinks to its headline so
+   the room is visible; while a panel (bottom sheet) is open it hides. */
+@media (max-width: 767px) {
+  [data-lab-state="ready"] [data-lab-intro-copy] {
+    display: none;
+  }
+  [data-lab-state="ready"] .lab-intro-card h1 {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+  [data-lab-state="ready"][data-panel] .lab-intro-card,
+  [data-lab-state="ready"][data-panel] .lab-station-list {
+    display: none;
+  }
+}
+.lab-panel {
+  z-index: 20;
+  translate: 0 12px;
+  opacity: 0;
+  transition:
+    translate 0.25s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    opacity 0.25s ease,
+    display 0.25s allow-discrete;
+}
+.lab-panel[open] {
+  translate: 0 0;
+  opacity: 1;
+  @starting-style {
+    translate: 0 12px;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-panel {
+    transition: none;
+  }
+}
+
+/* ---------------------------------- */
 /* Case-study prose                   */
 /* ---------------------------------- */
 .prose {

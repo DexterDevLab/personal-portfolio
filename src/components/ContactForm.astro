@@ -6,7 +6,16 @@ import { LoaderCircle } from "@lucide/astro";
  * native constraints and POSTs to /api/contact, which redirects to a status
  * page. With JS the script below validates with the shared zod schema, posts
  * JSON, and renders the result inline.
+ *
+ * `idPrefix` lets the form appear more than once on a page (page section and
+ * lab panel) without duplicate ids.
  */
+interface Props {
+  idPrefix?: string;
+}
+const { idPrefix = "" } = Astro.props;
+const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
+
 const inputClasses =
   "w-full rounded-button border border-border bg-surface px-4 py-3 text-base placeholder:text-muted focus:border-accent focus:outline-none aria-invalid:border-danger sm:py-2.5 sm:text-sm";
 ---
@@ -14,9 +23,9 @@ const inputClasses =
 <form method="post" action="/api/contact" class="space-y-4" data-contact-form>
   <div class="grid gap-4 sm:grid-cols-2">
     <div>
-      <label for="name" class="mb-1.5 block text-sm font-medium">Name</label>
+      <label for={id("name")} class="mb-1.5 block text-sm font-medium">Name</label>
       <input
-        id="name"
+        id={id("name")}
         name="name"
         type="text"
         autocomplete="name"
@@ -24,46 +33,46 @@ const inputClasses =
         required
         minlength="2"
         maxlength="100"
-        aria-describedby="name-error"
+        aria-describedby={id("name-error")}
         class={inputClasses}
       />
-      <p id="name-error" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+      <p id={id("name-error")} data-error-for="name" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
     </div>
     <div>
-      <label for="email" class="mb-1.5 block text-sm font-medium">Email</label>
+      <label for={id("email")} class="mb-1.5 block text-sm font-medium">Email</label>
       <input
-        id="email"
+        id={id("email")}
         name="email"
         type="email"
         autocomplete="email"
         placeholder="you@example.com"
         required
-        aria-describedby="email-error"
+        aria-describedby={id("email-error")}
         class={inputClasses}
       />
-      <p id="email-error" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+      <p id={id("email-error")} data-error-for="email" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
     </div>
   </div>
 
   <div>
-    <label for="message" class="mb-1.5 block text-sm font-medium">Message</label>
+    <label for={id("message")} class="mb-1.5 block text-sm font-medium">Message</label>
     <textarea
-      id="message"
+      id={id("message")}
       name="message"
       rows="5"
       placeholder="Tell me a little about your project…"
       required
       minlength="10"
       maxlength="5000"
-      aria-describedby="message-error"
+      aria-describedby={id("message-error")}
       class:list={[inputClasses, "resize-y"]}></textarea>
-    <p id="message-error" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+    <p id={id("message-error")} data-error-for="message" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
   </div>
 
   <!-- Honeypot — visually hidden, real users never fill this -->
   <div aria-hidden="true" class="absolute top-auto -left-[9999px]">
-    <label for="company">Company</label>
-    <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+    <label for={id("company")}>Company</label>
+    <input id={id("company")} name="company" type="text" tabindex="-1" autocomplete="off" />
   </div>
 
   <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
@@ -85,9 +94,9 @@ const inputClasses =
   import { contactSchema } from "@/lib/contact-schema";
   import { CONTACT_MESSAGES } from "@/lib/contact-messages";
 
-  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+  const fields = ["name", "email", "message"] as const;
 
-  if (form) {
+  document.querySelectorAll<HTMLFormElement>("[data-contact-form]").forEach((form) => {
     // JS takes over validation so messages match the server exactly.
     form.noValidate = true;
 
@@ -95,7 +104,6 @@ const inputClasses =
     const label = form.querySelector<HTMLElement>("[data-submit-label]")!;
     const spinner = form.querySelector<HTMLElement>("[data-spinner]")!;
     const status = form.querySelector<HTMLElement>("[data-status]")!;
-    const fields = ["name", "email", "message"] as const;
 
     const setStatus = (tone: "success" | "error" | "", text: string) => {
       status.textContent = text;
@@ -105,7 +113,7 @@ const inputClasses =
 
     const setFieldError = (field: string, message?: string) => {
       const input = form.elements.namedItem(field) as HTMLInputElement | null;
-      const error = form.querySelector<HTMLElement>(`#${field}-error`);
+      const error = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
       if (!input || !error) return;
       input.setAttribute("aria-invalid", message ? "true" : "false");
       error.textContent = message ?? "";
@@ -130,7 +138,7 @@ const inputClasses =
         let firstInvalid: string | undefined;
         for (const issue of parsed.error.issues) {
           const field = String(issue.path[0]);
-          const error = form.querySelector<HTMLElement>(`#${field}-error`);
+          const error = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
           if (error && error.hidden) {
             setFieldError(field, issue.message);
             firstInvalid ??= field;
@@ -163,5 +171,5 @@ const inputClasses =
         setBusy(false);
       }
     });
-  }
+  });
 </script>

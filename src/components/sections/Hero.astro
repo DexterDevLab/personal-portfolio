@@ -6,7 +6,9 @@ import Button from "@/components/ui/Button.astro";
 import Container from "@/components/ui/Container.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Screenshot from "@/components/ui/Screenshot.astro";
+import ModeSwitch from "@/components/lab/ModeSwitch.astro";
 import { site } from "@/data/site";
+import { intro } from "@/data/about";
 
 interface Props {
   featured: CollectionEntry<"work">;
@@ -37,15 +39,11 @@ const liveHost = featured.data.liveUrl ? new URL(featured.data.liveUrl).host : u
       </div>
       <div class="animate-rise" style="--rise-delay: 0.08s">
         <h1 class="max-w-xl text-4xl leading-[1.08] font-semibold tracking-tight sm:text-5xl lg:text-[3.4rem]">
-          Websites and web apps, built and maintained.
+          {intro.headline}
         </h1>
       </div>
       <div class="animate-rise" style="--rise-delay: 0.16s">
-        <p class="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-          I'm {site.shortPerson}, a freelance web developer based in the Philippines. I build websites and
-          custom web apps, troubleshoot WordPress and WooCommerce issues, and handle hosting, deployment, and
-          ongoing maintenance. When your project needs design, I collaborate with a designer.
-        </p>
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">{intro.paragraph}</p>
       </div>
       <div class="animate-rise" style="--rise-delay: 0.24s">
         <div class="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -54,6 +52,7 @@ const liveHost = featured.data.liveUrl ? new URL(featured.data.liveUrl).host : u
             <ArrowRight class="size-4" aria-hidden="true" />
           </Button>
           <Button href="/#work" variant="secondary">Explore my work</Button>
+          <ModeSwitch class="min-h-11 px-5 py-2.5" />
         </div>
         {
           site.availability.show && (

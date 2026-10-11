@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Base from "@/layouts/Base.astro";
 import JsonLd from "@/components/JsonLd.astro";
+import Lab from "@/components/lab/Lab.astro";
 import Hero from "@/components/sections/Hero.astro";
 import Featured from "@/components/sections/Featured.astro";
 import Work from "@/components/sections/Work.astro";
@@ -16,15 +17,22 @@ if (!featured) throw new Error("Mark exactly one entry in src/content/work as `f
 const clientWork = work.filter((entry) => !entry.data.featured);
 ---
 
-<Base>
+<Base lab>
   <Fragment slot="head">
     <JsonLd projects={work} />
   </Fragment>
-  <Hero featured={featured} />
-  <Featured project={featured} />
-  <Work projects={clientWork} />
-  <Services />
-  <Process />
-  <About />
-  <Contact />
+
+  <!-- Interactive lab (desktop + WebGL by default; see Base.astro view script) -->
+  <Lab featured={featured} projects={clientWork} />
+
+  <!-- Readable page: the complete portfolio, also what no-JS and search engines get -->
+  <div data-page-only>
+    <Hero featured={featured} />
+    <Featured project={featured} />
+    <Work projects={clientWork} />
+    <Services />
+    <Process />
+    <About />
+    <Contact />
+  </div>
 </Base>

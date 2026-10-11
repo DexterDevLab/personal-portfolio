@@ -1,0 +1,24 @@
+---
+/**
+ * Switches between the 3D lab and the readable page. Hidden by CSS unless
+ * the inline view script marked the document as lab-capable. Click handling
+ * lives in src/lab/ui.ts so the lab root can react.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  data-mode-switch
+  class:list={[
+    "inline-flex min-h-10 items-center gap-2 rounded-button border border-border px-3 py-2 text-sm text-muted transition-colors hover:border-border-strong hover:text-foreground",
+    className,
+  ]}
+>
+  <span class="size-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+  <span data-when="page">Explore the lab</span>
+  <span data-when="lab">View as a page</span>
+</button>

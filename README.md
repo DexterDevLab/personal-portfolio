@@ -2,9 +2,12 @@
 
 Personal portfolio of **Dexter Iglesia** (DexterDevLab), a freelance web developer based in the Philippines: websites and web apps, WordPress & WooCommerce troubleshooting, hosting, deployment, and maintenance.
 
+The homepage is an explorable cartoon inventor's laboratory (Three.js) whose six stations open the portfolio content, on top of a complete readable page. Visitors can switch between "Explore the lab" and "View as a page" at any time; narrow screens, no-WebGL browsers, and no-JS visitors get the page.
+
 ## Stack
 
 - **Astro 7** — static output; one on-demand route (`/api/contact`) and the no-JS contact error page run as Vercel functions via `@astrojs/vercel`
+- **Three.js + GSAP** — the laboratory (`src/lab/`), loaded lazily as its own chunk; procedural geometry, toon shading, click-to-explore camera
 - **Tailwind CSS 4** with CSS-variable design tokens (`light-dark()` for both themes) in `src/styles/global.css`
 - **Content collections** for projects (`src/content/work/*.md`), plain TS for site constants and services
 - **Zod → Brevo** contact form (progressive enhancement: works without JavaScript)
@@ -37,7 +40,10 @@ npm run brand                # regenerate favicon / og.png from scripts/generate
 | Projects (cards, featured project, case study) | `src/content/work/*.md` — one file per project; frontmatter is validated by `src/content.config.ts` |
 | Panda Central case study text | `src/content/work/panda-central.md` (markdown body) |
 | Screenshots / portrait | `src/assets/projects/*.jpg`, `src/assets/portrait.jpg` |
-| Hero, About, Contact copy | `src/components/sections/*.astro` |
+| Headline, intro, about paragraphs, featured copy, troubleshooting steps, contact hints (shared by page and lab panels) | `src/data/about.ts` |
+| Station names / panel titles / hashes | `src/lab/stations.ts`; panel bodies in `src/components/lab/Lab.astro` |
+| Lab palette, room size, camera, DPR caps | `src/lab/config.ts`; props per station in `src/lab/scene/stations/` |
+| Lab vs page default (breakpoint, WebGL check) | inline script in `src/layouts/Base.astro` |
 | Colours, fonts, motion, prose styles | `src/styles/global.css` |
 | Metadata, favicon links, theme script | `src/layouts/Base.astro` |
 | Contact delivery (Brevo) | `src/lib/contact.ts`; messages in `src/lib/contact-messages.ts`; validation in `src/lib/contact-schema.ts` |

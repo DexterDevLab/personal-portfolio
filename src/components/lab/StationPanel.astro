@@ -1,0 +1,49 @@
+---
+import { ArrowLeft } from "@lucide/astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import { STATION_BY_ID, type StationId } from "@/lab/stations";
+
+/**
+ * One readable HTML panel per station. Opened non-modally by src/lab/ui.ts
+ * (dialog.show()) so the station list stays operable; focus moves to the
+ * heading and returns to the trigger on close.
+ */
+interface Props {
+  id: StationId;
+}
+const { id } = Astro.props;
+const meta = STATION_BY_ID[id];
+---
+
+<dialog
+  data-station-panel={id}
+  aria-labelledby={`panel-${id}-title`}
+  class="lab-panel fixed inset-x-0 bottom-0 top-auto m-0 max-h-[62dvh] w-full max-w-none overflow-y-auto border-t border-border bg-background p-5 text-foreground shadow-2xl shadow-black/30 md:inset-y-0 md:top-16 md:right-0 md:left-auto md:max-h-none md:w-[min(460px,100vw)] md:border-t-0 md:border-l md:p-7"
+>
+  <div class="flex items-center justify-between gap-3">
+    <button
+      type="button"
+      data-lab-back
+      class="inline-flex min-h-11 items-center gap-1.5 rounded-button px-2 text-sm text-muted transition-colors hover:text-foreground"
+    >
+      <ArrowLeft class="size-4" aria-hidden="true" />
+      Back to lab
+    </button>
+    <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-muted" aria-hidden="true">
+      Station 0{meta.index}
+    </span>
+  </div>
+  <Eyebrow class="mt-5 mb-2">{meta.eyebrow}</Eyebrow>
+  <h2 id={`panel-${id}-title`} tabindex="-1" class="text-2xl font-semibold leading-tight outline-none md:text-3xl">
+    {meta.title}
+  </h2>
+  <div class="mt-5">
+    <slot />
+  </div>
+  <p class="mt-8 border-t border-border pt-4 text-xs text-muted">
+    Prefer reading?{" "}
+    <a href={`/?view=page${meta.hash}`} data-mode-link="page" class="text-accent underline-offset-4 hover:underline">
+      View this as a page
+    </a>
+  </p>
+</dialog>

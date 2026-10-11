@@ -1,6 +1,12 @@
 ---
 import { X } from "@lucide/astro";
 import { navLinks, site } from "@/data/site";
+import ModeSwitch from "@/components/lab/ModeSwitch.astro";
+
+interface Props {
+  lab?: boolean;
+}
+const { lab = false } = Astro.props;
 ---
 
 <!-- Native <dialog>: focus trap, Esc to close, inert page behind, ::backdrop. -->
@@ -37,9 +43,10 @@ import { navLinks, site } from "@/data/site";
     >
       Résumé
     </a>
+    {lab && <ModeSwitch class="mt-4 justify-center" />}
     <a
       href="/#contact"
-      class="mt-4 inline-flex min-h-11 items-center justify-center rounded-button bg-accent-strong px-4 py-3 text-sm font-medium text-white"
+      class="mt-2 inline-flex min-h-11 items-center justify-center rounded-button bg-accent-strong px-4 py-3 text-sm font-medium text-white"
     >
       Discuss your project
     </a>

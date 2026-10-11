@@ -28,7 +28,8 @@ AI-assisted development is part of the workflow and is stated plainly, but it is
 
 ## Operating Context
 
-- Homepage at **dexteriglesia.com** with anchor sections (`#work`, `#services`, `#about`, `#contact`) plus one case-study route, `/work/panda-central`.
+- Homepage at **dexteriglesia.com** has two views of the same content: an explorable cartoon **inventor's laboratory** (Three.js, six stations: control console = Panda Central, experiments = client work, repair bench = troubleshooting, server cabinet = services, notebook = about, comms terminal = contact) and a readable **page view** with anchor sections (`#work`, `#services`, `#about`, `#contact`). Lab is the default on wide WebGL-capable screens; page is the default on phones, without WebGL, and without JS. Plus one case-study route, `/work/panda-central`.
+- The lab is an original design (Dexter's-Laboratory *mood*, no copied characters, props, or branding) and an enhancement, never the only way to reach content.
 - Contact runs through a **Brevo**-powered form delivering to **info@dexteriglesia.com**. Works without JavaScript (server redirect to a status page). This flow must keep working.
 - A downloadable **résumé** is served at `/resume.pdf`.
 - Deployed on Vercel, auto-deploying on push to `main`.
@@ -38,7 +39,8 @@ AI-assisted development is part of the workflow and is stated plainly, but it is
 - **Services presented:** Website development (with designer collaboration) · WordPress & WooCommerce troubleshooting · Custom web applications · Hosting, deployment & maintenance.
 - **Work section:** 1 featured project (Panda Central, with case study) + 5 client WordPress sites credited as "Development · Design by a designer colleague".
 - **Tech constraint:** Astro 7, static output, no UI framework; see `AGENTS.md`.
-- **Motion is intentionally capped** (aurora glow, scroll reveals, a light hero-frame tilt on hover only); respect `prefers-reduced-motion`.
+- **Motion is intentionally capped.** Page view: aurora glow, scroll reveals, a light hero-frame tilt on hover. Lab: restrained ambient life (robot, arm, console links, LEDs, flask, beacon), camera travel on selection, the repair sequence; no camera sway, flashes, particles, audio, or scroll hijacking. Everything respects `prefers-reduced-motion`.
+- **Lab performance budget:** DPR ≤ 2 (1.5 narrow), no shadow maps or postprocessing, draw calls well under 150, render on demand, pause when hidden.
 - **Performance is a hard constraint.** The hero image is the LCP element and loads eagerly; nothing above the fold waits for JavaScript; no backdrop-blur or opacity entrances above the fold.
 
 ## Brand Commitments
