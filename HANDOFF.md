@@ -2,7 +2,12 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Robot patrol + thought bubbles (latest)
+## Zoom-out returns home (latest)
+
+- Zoom-in uses zoom-to-cursor (target follows the pointer); zoom-out now dollies straight back and eases the orbit target toward the framing's home target (overview target, or the station's) in proportion to the distance gained — at full zoom-out you are back at the original framing. Pinch-zoom on touch goes through OrbitControls' touch path and does not get this easing (Reset view still works).
+- Verified: zoom in to 2.6 units with the target pulled to (1.49, 1.95, −1.88), zoom out → distance 17, target exactly (0, 1.05, −0.6); mixed in/out sequences also return home.
+
+## Robot patrol + thought bubbles
 
 - The walk loop now has nine waypoints and runs along the experiment shelves (x ≈ −2.6, z −1.6 → −0.1) before crossing to the front; the floor lamp moved to (−1.05, 0, −1.5) so it is clear of the route. Edit the loop in `src/lab/index.ts` (`robot.setPath`).
 - **Thought bubble**: a camera-facing sprite drawn on a canvas (cream bubble, dark outline, two tail circles, Geist Mono text, wraps to two lines). The robot "thinks" one of `robot.idleLines` (edit in `src/lab/scene/robot.ts`) about 70 % of the times it pauses at a waypoint, and names the station it points at ("Repair bench!") on selection. `robot.say(text, seconds)` from anywhere. Never shown under reduced motion.
