@@ -3,7 +3,8 @@
  * "walks" as the page scrolls past — legs and arms swing with scroll speed,
  * the body bobs — and settles when scrolling stops. It steps out below the
  * hero, cruises at ~55 % of the viewport, and stops above the footer. At
- * each section it says a short line in its bubble. Wide screens only (the
+ * each section it says a short line in its bubble, kept up for as long as
+ * that section is beside it. Wide screens only (the
  * CSS hides it below 1280px) and never with reduced motion (the "static"
  * mode never calls this).
  */
@@ -19,7 +20,6 @@ const LINES: Record<string, string> = {
 };
 
 const CRUISE = 0.55; // viewport fraction the robot walks at
-const BUBBLE_SECONDS = 3.2;
 
 export function setupRobot(ctx: SectionContext): () => void {
   const robot = document.querySelector<HTMLElement>("[data-page-robot]");
@@ -128,19 +128,22 @@ export function setupRobot(ctx: SectionContext): () => void {
     }, 110);
   }, 3800);
 
-  // ----- bubbles at each section -----
-  let hide = 0;
-  const say = (text: string) => {
+  // ----- bubbles: one line per section, shown for as long as the section is
+  // the one beside the robot (it stays up until the section scrolls past) -----
+  let current: string | null = null;
+  const say = (id: string, text: string) => {
+    current = id;
     bubbleText.textContent = text;
     bubble.classList.add("is-on");
     lookTarget = 1; // glance at the section title while speaking
     wake();
-    window.clearTimeout(hide);
-    hide = window.setTimeout(() => {
-      bubble.classList.remove("is-on");
-      lookTarget = 0;
-      wake();
-    }, BUBBLE_SECONDS * 1000);
+  };
+  const hush = (id: string) => {
+    if (current !== id) return; // another section already took over
+    current = null;
+    bubble.classList.remove("is-on");
+    lookTarget = 0;
+    wake();
   };
   for (const [id, line] of Object.entries(LINES)) {
     const section = document.getElementById(id);
@@ -149,8 +152,10 @@ export function setupRobot(ctx: SectionContext): () => void {
       trigger: section,
       start: "top 60%",
       end: "bottom 60%",
-      onEnter: () => say(line),
-      onEnterBack: () => say(line),
+      onEnter: () => say(id, line),
+      onEnterBack: () => say(id, line),
+      onLeave: () => hush(id),
+      onLeaveBack: () => hush(id),
     });
   }
 
@@ -160,7 +165,6 @@ export function setupRobot(ctx: SectionContext): () => void {
     window.removeEventListener("resize", wake);
     if (raf) cancelAnimationFrame(raf);
     window.clearInterval(blinker);
-    window.clearTimeout(hide);
     bubble.classList.remove("is-on");
     delete robot.dataset.active;
     robot.style.opacity = "0";
