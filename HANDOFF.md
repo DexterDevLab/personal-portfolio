@@ -4,7 +4,7 @@ Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesig
 
 ## More room for the lab + panel scrolling (latest)
 - **Station panels could not scroll** (side panel from `md`): a `<dialog>` has `height: fit-content` in the UA stylesheet, which beat the `top/bottom` anchoring, so the panel was as tall as its content (2966 px for Experiments) and `overflow-y: auto` never kicked in. `h-auto` on the dialog fixes it (693 px tall at 1440 × 757, scrolls inside).
-- **Full-width hero and header**: the intro column, control bar and header now use a window-edge gutter (`--edge: clamp(1.5rem, 4vw, 5rem)`) instead of the 70rem column edge, so on wide screens the room takes the space (at 2000 px: stage 1505 × 915, intro and logo both at x 80; at 1440: stage 967 × 625). Sections below keep the centred 70rem column.
+- **Full-width hero**: the intro column and control bar use a window-edge gutter (`--edge: clamp(1.5rem, 4vw, 5rem)`) instead of the 70rem column edge, so on wide screens the room takes the space (at 2000 px: stage 1505 × 915, intro at x 80; at 1440: stage 967 × 625). The header and the sections below keep the centred 70rem column (user's call).
 - **Bigger room on desktop**: the stage bleeds to the right edge; the control bar is one row spanning the full width (the visible "Stations" kicker is gone, the `<nav>` keeps its label; the hint chip and the "Scroll to read" cue moved into the intro column under the CTA); the overview camera is 11 % closer (`CAMERA.overview` position 6.6 / 5.45 / 8.1). At 1440 × 757 the stage went from 861 × 573 to 881 × 625 and the hero still fits the viewport exactly; the bar wraps to two rows below ≈ 1330 px wide, where the hero simply grows.
 
 ## Logo plaque + side-wall decor
