@@ -86,14 +86,15 @@ const ink = "#25252b";
     transform-box: fill-box;
     transform-origin: center;
   }
-  /* Thought bubble, like the one in the room: above the head, spanning the
-     margin from the window edge to just before the content column, so it
-     never covers text. */
+  /* Thought bubble, like the one in the room: a compact pill above the head,
+     right-aligned to the robot so it grows leftward into the margin and
+     never crosses the content column (it is capped at the margin width). */
   .page-robot__bubble {
     position: absolute;
-    left: calc(0.5rem - (var(--col-left) - 5.75rem));
-    width: calc(var(--col-left) - 1.25rem);
-    bottom: calc(100% + 0.75rem);
+    right: -0.25rem;
+    width: max-content;
+    max-width: calc(var(--col-left) - 1.5rem);
+    bottom: calc(100% + 0.6rem);
     padding: 0.4rem 0.55rem;
     border: 2px solid #25252b;
     border-radius: 12px;
@@ -121,13 +122,13 @@ const ink = "#25252b";
     background: #fffcf3;
   }
   .page-robot__dot--a {
-    right: calc(var(--col-left) - 5.75rem + 1.6rem);
+    right: 1.6rem;
     bottom: -0.7rem;
     width: 0.55rem;
     height: 0.55rem;
   }
   .page-robot__dot--b {
-    right: calc(var(--col-left) - 5.75rem + 1.2rem);
+    right: 1.2rem;
     bottom: -1.2rem;
     width: 0.35rem;
     height: 0.35rem;

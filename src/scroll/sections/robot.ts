@@ -43,6 +43,9 @@ export function setupRobot(ctx: SectionContext): () => void {
   let lastMove = performance.now();
   let raf = 0;
   let shown = false;
+  let look = 0; // 0 = straight ahead, 1 = turned toward the section title
+  let lookTarget = 0;
+  let blink = 1; // eye scaleY
 
   const place = () => {
     const vh = window.innerHeight;
@@ -68,8 +71,10 @@ export function setupRobot(ctx: SectionContext): () => void {
     arms[0]!.style.transform = `rotate(${-s * 22}deg)`;
     arms[1]!.style.transform = `rotate(${s * 22}deg)`;
     torso.style.transform = `translateY(${-bob}px)`;
-    head.style.transform = `translateY(${-bob * 1.4}px) rotate(${s * 2}deg)`;
+    head.style.transform = `translateY(${-bob * 1.4}px) translateX(${look * 3}px) rotate(${s * 2 + look * 9}deg)`;
+    eyes.forEach((e) => (e.style.transform = `translateX(${look * 2.5}px) scaleY(${blink})`));
   };
+  const settled = () => swing === 0 && Math.abs(look - lookTarget) < 0.005 && blink === 1;
 
   const tick = (now: number) => {
     raf = 0;
@@ -90,9 +95,11 @@ export function setupRobot(ctx: SectionContext): () => void {
         phase = rest;
       }
     }
+    look += (lookTarget - look) * 0.12;
+    if (Math.abs(look - lookTarget) < 0.005) look = lookTarget;
     place();
     pose();
-    if (swing > 0 || dy !== 0) raf = requestAnimationFrame(tick);
+    if (!settled() || dy !== 0) raf = requestAnimationFrame(tick);
   };
   const wake = () => {
     if (!raf) raf = requestAnimationFrame(tick);
@@ -104,9 +111,13 @@ export function setupRobot(ctx: SectionContext): () => void {
   pose();
 
   // Blink now and then
-  const blink = window.setInterval(() => {
-    eyes.forEach((e) => (e.style.transform = "scaleY(0.15)"));
-    window.setTimeout(() => eyes.forEach((e) => (e.style.transform = "")), 110);
+  const blinker = window.setInterval(() => {
+    blink = 0.15;
+    wake();
+    window.setTimeout(() => {
+      blink = 1;
+      wake();
+    }, 110);
   }, 3800);
 
   // ----- bubbles at each section -----
@@ -114,8 +125,14 @@ export function setupRobot(ctx: SectionContext): () => void {
   const say = (text: string) => {
     bubbleText.textContent = text;
     bubble.classList.add("is-on");
+    lookTarget = 1; // glance at the section title while speaking
+    wake();
     window.clearTimeout(hide);
-    hide = window.setTimeout(() => bubble.classList.remove("is-on"), BUBBLE_SECONDS * 1000);
+    hide = window.setTimeout(() => {
+      bubble.classList.remove("is-on");
+      lookTarget = 0;
+      wake();
+    }, BUBBLE_SECONDS * 1000);
   };
   for (const [id, line] of Object.entries(LINES)) {
     const section = document.getElementById(id);
@@ -133,7 +150,7 @@ export function setupRobot(ctx: SectionContext): () => void {
     window.removeEventListener("scroll", wake);
     window.removeEventListener("resize", wake);
     if (raf) cancelAnimationFrame(raf);
-    window.clearInterval(blink);
+    window.clearInterval(blinker);
     window.clearTimeout(hide);
     bubble.classList.remove("is-on");
     delete robot.dataset.active;
