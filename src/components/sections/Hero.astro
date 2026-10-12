@@ -21,7 +21,7 @@ const { featured } = Astro.props;
 const liveHost = featured.data.liveUrl ? new URL(featured.data.liveUrl).host : undefined;
 ---
 
-<div id="top" class="relative overflow-hidden bg-background-deep grid-floor">
+<div id="top" class="relative overflow-hidden border-b-2 border-border-strong bg-background-deep grid-floor">
   <Container class="grid items-center gap-10 pt-28 pb-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:pt-36 lg:pb-20">
     <div>
       <div class="animate-rise">

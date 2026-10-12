@@ -11,7 +11,6 @@ import Process from "@/components/sections/Process.astro";
 import About from "@/components/sections/About.astro";
 import Contact from "@/components/sections/Contact.astro";
 import PageRobot from "@/components/decor/PageRobot.astro";
-import Skirting from "@/components/decor/Skirting.astro";
 
 const work = (await getCollection("work")).sort((a, b) => a.data.order - b.data.order);
 const featured = work.find((entry) => entry.data.featured);
@@ -32,19 +31,12 @@ const clientWork = work.filter((entry) => !entry.data.featured);
 
   <!-- The portfolio: one station per section, each with its own short scene -->
   <div class="relative" data-page-body>
-    <Skirting />
     <Featured project={featured} />
-    <Skirting />
     <Work projects={clientWork} />
-    <Skirting />
     <Services />
-    <Skirting />
     <Process />
-    <Skirting />
     <About />
-    <Skirting />
     <Contact />
-    <Skirting />
   </div>
   <!-- The assistant, walking down the margin beside the page (wide screens, motion allowed) -->
   <PageRobot />

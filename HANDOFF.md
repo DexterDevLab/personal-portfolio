@@ -2,10 +2,7 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Skirting-board dividers (latest)
-The 2 px rules between sections are replaced by `src/components/decor/Skirting.astro`: a 20 px charcoal baseboard with a lighter top edge, a hard shadow below and a screw head every 220 px, like the skirting at the base of the room's walls. Placed in `index.astro` between every section (and before the footer); the sections' own `border-*` classes and the footer's top border are gone. Colours are per theme (`.dark` overrides inside the component). No layout impact beyond the 20 px band.
-
-## Notebook redesign
+## Notebook redesign (latest)
 `src/components/sections/About.astro` is now a proper lab-notebook spread: left page with "Entry 00 · Who", the polaroid (light frame, tape, a handwritten caption in a cursive system face), an index card of plain facts (base, 10+ years, started with WordPress, works with a designer colleague — all from existing copy), the résumé button and a page number; right page with an orange sticky note ("Ask me about WordPress fixes") in the flow above the biography, the three paragraphs as numbered entries with teal margin rules and mono labels, and the tools as rotated sticker chips. Index tabs (Bio / Tools / CV) sit on the right edge from `md`, a paper clip hangs over the top-left corner. Decorative pieces are `aria-hidden`; the photo keeps its alt and a visually-hidden name/role line. The cover-open scene is unchanged. Checked in both themes at 1440 (sticky note never overlaps the entries) and at 390 px.
 
 ## Page robot
