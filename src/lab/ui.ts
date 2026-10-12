@@ -144,6 +144,7 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
           screenSrc: root.dataset.screenSrc ?? "",
           portraitSrc: root.dataset.portraitSrc ?? "",
           thumbSrcs: thumbs,
+          logoSrc: root.dataset.logoSrc,
           reducedMotion,
         });
         await lab.ready;

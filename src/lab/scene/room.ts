@@ -1,7 +1,7 @@
 import { CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneGeometry, SRGBColorSpace } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PALETTE, ROOM } from "../config";
-import { box, cyl, rbox, sphere } from "../geometry";
+import { PartBuilder, box, cyl, rbox, sphere, type Xyz } from "../geometry";
 import type { BuildContext } from "./types";
 
 export interface RoomParts {
@@ -125,46 +125,198 @@ export function buildRoom(ctx: BuildContext): RoomParts {
 
   // Wordmark painted on the back wall above the console backdrop. It is a
   // child of the wall so it hides together with it.
-  const sign = buildWordmark(ctx, "DexterDevLab");
+  // The logo plaque on the back wall, and something on the side walls
+  const sign = buildLogoSign(ctx);
   sign.position.set(0, ROOM.height / 2 - 0.1, t / 2 + 0.01 + 0.03);
   back.add(sign);
+  decorateLeftWall(ctx, left, t);
+  decorateRightWall(ctx, right, t);
 
   return { group, walls: { back, left, right, skirtBack, skirtLeft, skirtRight }, lamp };
 }
 
 /**
- * Text rendered to a canvas texture on a plane, in the site's mono face.
- * Drawn with the fallback first and redrawn once the web font is ready.
+ * The site logo (src/assets/logo.svg) engraved on a cream plaque: the SVG is
+ * rasterised onto a canvas texture once it has loaded; until then the plaque
+ * is blank. The SVG only has a viewBox, so explicit dimensions are injected
+ * before drawing to get a crisp raster.
  */
-function buildWordmark(ctx: BuildContext, text: string) {
+function buildLogoSign(ctx: BuildContext) {
+  const sign = new Group();
+  sign.name = "wordmark";
+  const W = 3.1;
+  const H = 1.0;
+  const parts = new PartBuilder(ctx.makeMaterials());
+  parts.add(rbox(W, H, 0.06, 0.04), PALETTE.cream, { position: [0, 0, 0] });
+  // A slight inner step so the plaque reads as engraved, not printed
+  parts.add(rbox(W - 0.16, H - 0.16, 0.02, 0.03), PALETTE.wall, { position: [0, 0, 0.03] });
+  parts.build(sign, ctx.shared.outline);
+
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 192;
+  canvas.width = 2048;
+  canvas.height = 532; // 1500 × 390 viewBox
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
   texture.anisotropy = 4;
+  const logo = new Mesh(new PlaneGeometry(2.6, 2.6 * (532 / 2048)), new MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }));
+  logo.position.z = 0.045;
+  sign.add(logo);
 
-  const draw = () => {
-    const c = canvas.getContext("2d");
-    if (!c) return;
-    c.clearRect(0, 0, canvas.width, canvas.height);
-    c.font = `700 118px "Geist Mono", ui-monospace, monospace`;
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.fillStyle = "#4f7cff";
-    c.fillText(text, canvas.width / 2, canvas.height / 2 + 6);
-    texture.needsUpdate = true;
-    ctx.requestRender?.();
-  };
-  draw();
-  document.fonts?.load('700 118px "Geist Mono"').then(draw).catch(() => {});
-
-  // Plate behind the lettering so it reads on the wall colour
-  const plate = new Mesh(new PlaneGeometry(2.9, 0.56), ctx.makeMaterials().toon(PALETTE.charcoal));
-  const letters = new Mesh(new PlaneGeometry(2.56, 0.48), new MeshBasicMaterial({ map: texture, transparent: true, toneMapped: false }));
-  letters.position.z = 0.012;
-  const sign = new Group();
-  sign.name = "wordmark";
-  sign.add(plate, letters);
+  if (ctx.logoSrc) {
+    fetch(ctx.logoSrc)
+      .then((r) => r.text())
+      .then((svg) => {
+        const sized = svg.replace(/<svg\b/, '<svg width="1500" height="390"');
+        const url = URL.createObjectURL(new Blob([sized], { type: "image/svg+xml" }));
+        const img = new Image();
+        img.onload = () => {
+          const c = canvas.getContext("2d");
+          if (c) {
+            c.clearRect(0, 0, canvas.width, canvas.height);
+            c.drawImage(img, 0, 0, canvas.width, canvas.height);
+            texture.needsUpdate = true;
+            ctx.requestRender?.();
+          }
+          URL.revokeObjectURL(url);
+        };
+        img.onerror = () => URL.revokeObjectURL(url);
+        img.src = url;
+      })
+      .catch(() => {});
+  }
   return sign;
+}
+
+/**
+ * Left wall (x = minX, faces +x): a corkboard with pinned notes on the open
+ * front stretch, a wall clock high in the back corner above the rack. Children of the wall mesh so they
+ * hide with it; positions are in the wall's local space.
+ */
+function decorateLeftWall(ctx: BuildContext, wall: Mesh, t: number) {
+  const face = t / 2 + 0.01; // local x of the wall's inner face
+  const local = (y: number, z: number): Xyz => [face, y - ROOM.height / 2, z - wall.position.z];
+  const group = new Group();
+  group.name = "leftWallDecor";
+  const parts = new PartBuilder(ctx.makeMaterials());
+
+  // Corkboard on the open front stretch of the wall (the rack covers the back)
+  const bz = 1.0;
+  const by = 2.05;
+  parts
+    .add(box(0.05, 0.8, 1.05), PALETTE.wood, { position: local(by, bz) })
+    .add(box(0.03, 0.7, 0.95), 0xd8bf92, { position: [face + 0.035, by - ROOM.height / 2, bz - wall.position.z] });
+  const notes: [number, number, number, number, number][] = [
+    // dy, dz, w, h, colour
+    [0.17, -0.3, 0.22, 0.2, PALETTE.paper],
+    [0.14, 0.12, 0.2, 0.26, PALETTE.orange],
+    [-0.16, -0.22, 0.24, 0.18, PALETTE.teal],
+    [-0.14, 0.22, 0.2, 0.2, PALETTE.paper],
+  ];
+  notes.forEach(([dy, dz, w, h, color], i) => {
+    const tilt = (i % 2 ? 1 : -1) * 0.08;
+    parts.add(box(0.015, h, w), color, { position: [face + 0.06, by + dy - ROOM.height / 2, bz + dz - wall.position.z], rotation: [tilt, 0, 0] });
+    parts.add(cyl(0.02, 0.02, 0.02, 8), i % 2 ? PALETTE.red : PALETTE.charcoal, {
+      position: [face + 0.08, by + dy + h / 2 - 0.03 - ROOM.height / 2, bz + dz - wall.position.z],
+      rotation: [0, 0, Math.PI / 2],
+    });
+  });
+
+  // Wall clock high in the back corner, above the rack
+  const cz = -2.45;
+  const cy = 2.95;
+  parts
+    .add(cyl(0.27, 0.27, 0.04, 24), PALETTE.charcoal, { position: local(cy, cz), rotation: [0, 0, Math.PI / 2] })
+    .add(cyl(0.23, 0.23, 0.02, 24), PALETTE.cream, { position: [face + 0.03, cy - ROOM.height / 2, cz - wall.position.z], rotation: [0, 0, Math.PI / 2] })
+    // hour hand (toward 10), minute hand (toward 2), orange second hand
+    .add(box(0.01, 0.03, 0.12), PALETTE.charcoal, { position: [face + 0.045, cy + 0.04 - ROOM.height / 2, cz - 0.03 - wall.position.z], rotation: [0.6, 0, 0] })
+    .add(box(0.01, 0.025, 0.17), PALETTE.charcoal, { position: [face + 0.045, cy + 0.05 - ROOM.height / 2, cz + 0.05 - wall.position.z], rotation: [-0.5, 0, 0] })
+    .add(box(0.01, 0.012, 0.19), PALETTE.orange, { position: [face + 0.05, cy - 0.06 - ROOM.height / 2, cz + 0.02 - wall.position.z], rotation: [1.2, 0, 0] })
+    .add(cyl(0.025, 0.025, 0.02, 10), PALETTE.orange, { position: [face + 0.05, cy - ROOM.height / 2, cz - wall.position.z], rotation: [0, 0, Math.PI / 2] });
+
+  parts.build(group, ctx.shared.outline, new Set([PALETTE.wood, PALETTE.charcoal, PALETTE.orange, PALETTE.teal, PALETTE.paper]));
+  wall.add(group);
+}
+
+/**
+ * Right wall (x = maxX, faces −x; it only runs from the back to
+ * ROOM.rightWallEndZ): a whiteboard with a sketched plan and a marker tray
+ * beside the server cabinet, and a vent grille up near the top.
+ */
+function decorateRightWall(ctx: BuildContext, wall: Mesh, t: number) {
+  const face = -(t / 2 + 0.01);
+  const group = new Group();
+  group.name = "rightWallDecor";
+  const parts = new PartBuilder(ctx.makeMaterials());
+  const ly = (y: number) => y - ROOM.height / 2;
+  const lz = (z: number) => z - wall.position.z;
+
+  // Whiteboard between the cabinet and the wall's end
+  const wz = -1.15;
+  const wy = 2.05;
+  const bw = 0.9;
+  const bh = 0.66;
+  parts
+    .add(rbox(0.05, bh, bw, 0.02), PALETTE.charcoalLight, { position: [face, ly(wy), lz(wz)] })
+    // marker tray with two markers
+    .add(box(0.08, 0.03, 0.5), PALETTE.charcoal, { position: [face - 0.03, ly(wy - bh / 2 - 0.03), lz(wz)] })
+    .add(cyl(0.015, 0.015, 0.14, 8), PALETTE.teal, { position: [face - 0.045, ly(wy - bh / 2 - 0.0), lz(wz - 0.1)], rotation: [Math.PI / 2, 0, 0] })
+    .add(cyl(0.015, 0.015, 0.14, 8), PALETTE.orange, { position: [face - 0.045, ly(wy - bh / 2 - 0.0), lz(wz + 0.08)], rotation: [Math.PI / 2, 0, 0] });
+  // Vent grille up high, above the cabinet
+  const vz = -2.25;
+  const vy = 3.0;
+  parts.add(rbox(0.04, 0.3, 0.6, 0.02), PALETTE.charcoal, { position: [face, ly(vy), lz(vz)] });
+  for (let i = 0; i < 4; i++) {
+    parts.add(box(0.02, 0.035, 0.5), PALETTE.metal, { position: [face - 0.025, ly(vy - 0.1 + i * 0.065), lz(vz)] });
+  }
+  parts.build(group, ctx.shared.outline, new Set([PALETTE.charcoal, PALETTE.charcoalLight, PALETTE.teal, PALETTE.orange]));
+
+  // The board face: a sketched plan drawn on a canvas (boxes and arrows)
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 376;
+  const c = canvas.getContext("2d");
+  if (c) {
+    c.fillStyle = "#fdfaf2";
+    c.fillRect(0, 0, canvas.width, canvas.height);
+    c.lineCap = "round";
+    c.lineJoin = "round";
+    const boxAt = (x: number, y: number, w: number, h: number, color: string) => {
+      c.strokeStyle = color;
+      c.lineWidth = 9;
+      c.beginPath();
+      c.roundRect(x, y, w, h, 14);
+      c.stroke();
+    };
+    const line = (x1: number, y1: number, x2: number, y2: number, color: string, width = 7) => {
+      c.strokeStyle = color;
+      c.lineWidth = width;
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo(x2, y2);
+      c.stroke();
+    };
+    // three site boxes → one console box, plus a checklist
+    boxAt(40, 50, 110, 74, "#258f83");
+    boxAt(40, 150, 110, 74, "#258f83");
+    boxAt(40, 250, 110, 74, "#258f83");
+    boxAt(300, 140, 170, 100, "#25252b");
+    line(150, 87, 300, 170, "#f58a35", 8);
+    line(150, 187, 300, 190, "#f58a35", 8);
+    line(150, 287, 300, 210, "#f58a35", 8);
+    line(330, 170, 440, 170, "#258f83", 6);
+    line(330, 200, 410, 200, "#258f83", 6);
+    for (let i = 0; i < 3; i++) {
+      line(320, 285 + i * 30, 338, 303 + i * 30, "#25252b", 6);
+      line(338, 303 + i * 30, 362, 275 + i * 30, "#25252b", 6);
+      line(380, 290 + i * 30, 470, 290 + i * 30, "#b9b3a7", 6);
+    }
+  }
+  const sketch = new CanvasTexture(canvas);
+  sketch.colorSpace = SRGBColorSpace;
+  sketch.anisotropy = 4;
+  const board = new Mesh(new PlaneGeometry(bw - 0.08, bh - 0.08), new MeshBasicMaterial({ map: sketch, toneMapped: false }));
+  board.position.set(face - 0.03, ly(wy), lz(wz));
+  board.rotation.y = -Math.PI / 2;
+  group.add(board);
+  wall.add(group);
 }

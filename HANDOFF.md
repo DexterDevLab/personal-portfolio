@@ -2,7 +2,12 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Notebook lamp (latest)
+## Logo plaque + side-wall decor (latest)
+- **Back wall**: the painted "DexterDevLab" text is replaced by a cream plaque with `src/assets/logo.svg` rasterised onto a canvas texture (`buildLogoSign` in `src/lab/scene/room.ts`). The URL reaches the runtime as `data-logo-src` on the lab section (`Lab.astro` → `ui.ts` → `LabOptions.logoSrc` → `BuildContext.logoSrc`). The SVG only has a viewBox, so width/height are injected into the fetched markup before drawing; the plaque is blank until the image has loaded. Replace the logo file and the wall updates with it.
+- **Left wall**: a corkboard with four pinned notes on the open front stretch (the experiment rack covers the back half) and a wall clock high in the back corner. **Right wall**: a whiteboard with a sketched sites → console plan (canvas texture) and a marker tray beside the server cabinet, and a vent grille above it. All are children of the wall meshes, so they hide with the walls when the camera looks through them; positions are wall-local in `decorateLeftWall` / `decorateRightWall`.
+- Cost: draw calls 184 → 210 at the overview, triangles ≈ 53 k, two small canvas textures. Checked from the default angle and rotated −44°.
+
+## Notebook lamp
 The anglepoise lamp on the notebook table is now on: a warm bulb disc in the shade opening, a faint translucent beam cone to the page, a soft pool of light on the paper (`shared.lampBulb` / `shared.lampBeam` in `src/lab/materials.ts`), and one dim `PointLight` (0.45 cd, range 1.8, placed 0.22 units down the beam so the shade is not blown out) in `src/lab/scene/stations/notebook.ts`. Brightness: change the light's intensity and the `lampBeam` opacity (0.11). The point light adds one lit-shader variant (programs 9 → 10); draw calls are unchanged apart from the three new meshes.
 
 ## Section scenes — the page-wide cable is gone

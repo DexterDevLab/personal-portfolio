@@ -11,6 +11,7 @@ import StationList from "./StationList.astro";
 import StationPanel from "./StationPanel.astro";
 import ModeSwitch from "./ModeSwitch.astro";
 import portrait from "@/assets/portrait.jpg";
+import logoUrl from "@/assets/logo.svg?url";
 import { site } from "@/data/site";
 import { services, engagementLine } from "@/data/services";
 import { processSteps } from "@/data/process";
@@ -48,6 +49,7 @@ const otherServices = services.filter((s) => s !== hosting);
   data-screen-src={screen.src}
   data-portrait-src={face.src}
   data-thumb-srcs={JSON.stringify(thumbs.map((t) => t.src))}
+  data-logo-src={logoUrl}
   class="relative grid w-full grid-cols-1 grid-rows-[auto_auto_auto] overflow-hidden border-b-2 border-border-strong bg-background grid-floor pt-16 lg:min-h-svh lg:grid-cols-[calc(var(--col-left)+24rem)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)_auto]"
   aria-label="Interactive laboratory"
 >

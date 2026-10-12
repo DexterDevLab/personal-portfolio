@@ -29,6 +29,8 @@ export interface LabOptions {
   screenSrc: string;
   portraitSrc: string;
   thumbSrcs: string[];
+  /** The site logo (SVG URL), engraved on the back wall. */
+  logoSrc?: string;
   reducedMotion: boolean;
 }
 

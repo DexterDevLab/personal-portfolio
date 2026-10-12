@@ -585,6 +585,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
       shared,
       textures,
       reducedMotion: state.reducedMotion,
+      logoSrc: options.logoSrc,
       makeMaterials: () => {
         const set = new MaterialSet(gradientMap);
         materialSets.push(set);

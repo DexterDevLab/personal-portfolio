@@ -32,6 +32,8 @@ export interface BuildContext {
   textures: LabTextures;
   reducedMotion: boolean;
   makeMaterials(): MaterialSet;
+  /** Site logo URL for the wall sign. */
+  logoSrc?: string;
   /** Ask the runtime for a frame (e.g. after a texture finished drawing). */
   requestRender?(): void;
 }
