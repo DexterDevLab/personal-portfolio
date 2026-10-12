@@ -6,7 +6,7 @@ interface Props {
   tone?: "teal" | "orange" | "blue";
 }
 const { class: className, tone = "teal" } = Astro.props;
-const dot = { teal: "bg-teal", orange: "bg-orange", blue: "bg-accent" }[tone];
+const dot = { teal: "bg-teal", orange: "bg-teal", blue: "bg-accent" }[tone];
 ---
 
 <p class:list={["label-mono inline-flex items-center gap-2", className]}>

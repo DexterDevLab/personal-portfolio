@@ -51,7 +51,7 @@
 /* Design tokens — the lab's palette  */
 /* ---------------------------------- */
 /* Derived from the 3D room: warm off-white walls, charcoal outlines, teal and
-   orange accents, blue for "screens on". light-dark() follows the OS when no
+   teal accents, blue for "screens on". light-dark() follows the OS when no
    theme class is set; the inline script in Base.astro adds .dark/.light. */
 :root {
   color-scheme: light dark;
@@ -67,8 +67,9 @@
   --teal: light-dark(#258f83, #2fb3a4);
   --teal-deep: light-dark(#1b7268, #258f83);
   --teal-soft: light-dark(#cfe9e4, #1f3b38);
-  --orange: #f58a35;
-  --orange-deep: #d9721f;
+  /* Accent slots kept for compatibility; the page accent is teal now. */
+  --orange: var(--teal);
+  --orange-deep: var(--teal-deep);
   --red: #db5149;
   --blue: light-dark(#3b63e6, #6b8dff);
   --blue-soft: light-dark(rgba(59, 99, 230, 0.12), rgba(107, 141, 255, 0.18));
@@ -106,8 +107,8 @@
   --color-teal-deep: var(--teal-deep);
   --color-teal-soft: var(--teal-soft);
   --color-red: var(--red);
-  --color-orange: var(--orange);
-  --color-orange-deep: var(--orange-deep);
+  --color-orange: var(--teal);
+  --color-orange-deep: var(--teal-deep);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-frame: var(--frame);
@@ -143,12 +144,12 @@ body {
 }
 
 ::selection {
-  background-color: var(--orange);
+  background-color: var(--teal);
   color: #25252b;
 }
 
 :focus-visible {
-  outline: 3px solid var(--orange);
+  outline: 3px solid var(--teal);
   outline-offset: 2px;
 }
 
@@ -527,7 +528,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 /* Signal choreography                */
 /* ---------------------------------- */
 /* Every section is a station with its own short scene (src/scroll/). The
-   shared parts: a teal cable with a charcoal outline and an orange signal,
+   shared parts: a teal cable with a charcoal outline and a light signal,
    used only inside the diagrams. Everything here is CSS state; the markup's
    default is the completed state so the page reads fully without JS or
    motion. */
@@ -546,7 +547,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   fill: none;
 }
 .signal-dot {
-  fill: var(--orange);
+  fill: #fffcf3; /* a light on a teal cable */
   stroke: var(--line);
   stroke-width: 3;
 }
@@ -570,7 +571,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
 .bezel[data-display].is-on [data-display-led],
 [data-choreo="static"] .bezel[data-display] [data-display-led],
 .lab-panel .bezel[data-display] [data-display-led] {
-  background: var(--orange);
+  background: var(--teal);
 }
 .bezel[data-display].is-on [data-display-led] {
   animation: led-pop 0.45s ease-out both;
@@ -603,7 +604,7 @@ html[data-view="lab"] [data-mode-switch] [data-when="page"] {
   transform: scale(1.1);
   box-shadow:
     3px 3px 0 0 var(--shadow),
-    0 0 0 4px color-mix(in oklab, var(--orange) 45%, transparent);
+    0 0 0 4px color-mix(in oklab, var(--teal) 45%, transparent);
 }
 
 /* Notebook cover: a decorative flap over the portrait page; closed only

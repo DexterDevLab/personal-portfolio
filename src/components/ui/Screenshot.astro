@@ -19,7 +19,7 @@ const { class: className, chrome = true, label, tag, display = false } = Astro.p
   {
     chrome && (
       <div class="flex h-9 items-center gap-1.5 border-b-2 border-[#3d3d45] px-3" aria-hidden="true">
-        <span class="size-2.5 rounded-full bg-orange" data-display-led={display ? "" : undefined} />
+        <span class="size-2.5 rounded-full bg-teal" data-display-led={display ? "" : undefined} />
         <span class="size-2.5 rounded-full bg-teal" />
         <span class="size-2.5 rounded-full bg-accent" />
         {label && <span class="ml-3 truncate font-mono text-[11px] leading-none text-[#b9b3a7]">{label}</span>}

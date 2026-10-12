@@ -17,7 +17,7 @@ const { idPrefix = "" } = Astro.props;
 const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
 
 const inputClasses =
-  "w-full rounded-button border-2 border-border-strong bg-paper px-4 py-3 text-base text-foreground placeholder:text-muted focus:border-orange focus:outline-none focus:ring-0 aria-invalid:border-danger sm:py-2.5 sm:text-sm";
+  "w-full rounded-button border-2 border-border-strong bg-paper px-4 py-3 text-base text-foreground placeholder:text-muted focus:border-teal focus:outline-none focus:ring-0 aria-invalid:border-danger sm:py-2.5 sm:text-sm";
 ---
 
 <form method="post" action="/api/contact" class="space-y-4" data-contact-form>

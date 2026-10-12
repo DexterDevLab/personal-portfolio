@@ -1,5 +1,5 @@
 /**
- * How I work: when the section comes into view the orange signal runs once
+ * How I work: when the section comes into view the signal runs once
  * along the short cable inside the section, and each step lights in order
  * (badge emphasised while current, teal once done). Text never fades. Uses
  * whichever cable is visible (horizontal from lg, a vertical rail below).

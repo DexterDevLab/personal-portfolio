@@ -2,7 +2,10 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Copy, attribution and separators pass (latest)
+## Teal accent (latest)
+Every orange accent on the page is now teal, at the user's request: `--orange` / `--orange-deep` are aliases of `--teal` / `--teal-deep` (kept so existing `bg-orange`-style utilities keep working, but new code should use the teal names), inline SVG fills in `ServiceArt.astro` / `PageRobot.astro` and the scroll scenes use the teal, and primary buttons are teal in both themes (light: deeper teal + cream, 4.97:1; dark: bright teal + dark text, 5.87:1). The process signal dot is cream so it still reads on the teal cable. Buttons are flat (no offset shadow or lift). Not changed: the logo (brand asset, keeps its orange antenna/plates) and the 3D room's props (`PALETTE.orange` in `src/lab/config.ts`) — say the word if the room should follow.
+
+## Copy, attribution and separators pass
 
 ### Copy and attribution
 - **PandaVisuals is named and linked** (`site.partner` in `src/data/site.ts`; `src/components/ui/PartnerText.astro` turns the name into a link wherever a copy string is rendered). Every "designer colleague" / "two-person collaboration" / "hire me directly" line is gone. References: hero intro (both heroes), Work intro, project credits, Process step 2, About partnership paragraph and facts card, Panda Central "What I built", the case-study markdown, metadata description.

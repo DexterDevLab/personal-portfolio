@@ -83,7 +83,7 @@ export function setupServices(ctx: SectionContext) {
           const tl = gsap.timeline();
           tl.to([left, right, bottom], { x: 0, y: 0, opacity: 1, duration: duration * 0.5, ease: "back.out(1.4)", stagger })
             .to(links, { strokeDashoffset: 0, duration: 0.35, ease: "power1.inOut", stagger: 0.1 }, 0.3)
-            .to(hub, { attr: { fill: c.orange }, duration: 0.25 }, ">-0.05");
+            .to(hub, { attr: { fill: c.teal }, duration: 0.25 }, ">-0.05");
         },
       });
     } else if (kind === "server") {
