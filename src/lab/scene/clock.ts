@@ -36,31 +36,32 @@ export function buildClock(ctx: BuildContext, opts: ClockOptions): { group: Grou
     });
   }
   // Label plate under the face
-  const plateW = R * 1.5;
-  parts.add(rbox(plateW, 0.09, 0.02, 0.01), PALETTE.charcoal, { position: [0, -R - 0.09, 0.005] });
+  const plateW = R * 2.3;
+  const plateH = 0.13;
+  parts.add(rbox(plateW, plateH, 0.02, 0.012), PALETTE.charcoal, { position: [0, -R - plateH / 2 - 0.03, 0.005] });
   parts.build(group, ctx.shared.outline, new Set([PALETTE.charcoal]));
 
   // Label text
   const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 64;
+  canvas.width = 512;
+  canvas.height = 128;
   const c = canvas.getContext("2d");
   if (c) {
-    c.font = `700 40px "Geist Mono", ui-monospace, monospace`;
+    c.font = `700 92px "Geist Mono", ui-monospace, monospace`;
     c.textAlign = "center";
     c.textBaseline = "middle";
     c.fillStyle = "#f5eedc";
-    c.fillText(opts.label.toUpperCase(), 128, 34);
+    c.fillText(opts.label.toUpperCase(), 256, 68);
   }
   const tex = new CanvasTexture(canvas);
   tex.colorSpace = SRGBColorSpace;
-  const label = new Mesh(new PlaneGeometry(plateW - 0.04, (plateW - 0.04) / 4), new MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false }));
-  label.position.set(0, -R - 0.09, 0.018);
+  const label = new Mesh(new PlaneGeometry(plateW - 0.05, (plateW - 0.05) / 4), new MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false }));
+  label.position.set(0, -R - plateH / 2 - 0.03, 0.018);
   group.add(label);
-  document.fonts?.load('700 40px "Geist Mono"').then(() => {
+  document.fonts?.load('700 92px "Geist Mono"').then(() => {
     if (!c) return;
     c.clearRect(0, 0, canvas.width, canvas.height);
-    c.fillText(opts.label.toUpperCase(), 128, 34);
+    c.fillText(opts.label.toUpperCase(), 256, 68);
     tex.needsUpdate = true;
     ctx.requestRender?.();
   }).catch(() => {});

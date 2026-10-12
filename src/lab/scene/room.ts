@@ -140,7 +140,7 @@ export function buildRoom(ctx: BuildContext): RoomParts {
     [-2.55, "Manila", "Asia/Manila"],
     [2.55, "Berlin", "Europe/Berlin"],
   ] as const) {
-    const clock = buildClock(ctx, { label, timeZone });
+    const clock = buildClock(ctx, { label, timeZone, radius: 0.27 });
     clock.group.position.set(x, 2.55 - ROOM.height / 2, t / 2 + 0.03);
     back.add(clock.group);
     animators.push(clock.animator);
