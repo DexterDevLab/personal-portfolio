@@ -1,0 +1,55 @@
+---
+import { Moon, Sun } from "@lucide/astro";
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  aria-label="Switch theme"
+  class:list={["btn btn-sm size-11 px-0", className]}
+>
+  <Sun class="size-4 [.light_&]:hidden" aria-hidden="true" />
+  <Moon class="size-4 [.dark_&]:hidden" aria-hidden="true" />
+</button>
+
+<script>
+  const root = document.documentElement;
+  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]");
+  const media = matchMedia("(prefers-color-scheme: dark)");
+
+  function isDark() {
+    return root.classList.contains("dark");
+  }
+
+  function apply(dark: boolean) {
+    root.classList.toggle("dark", dark);
+    root.classList.toggle("light", !dark);
+    buttons.forEach((b) => {
+      b.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+    });
+  }
+
+  apply(isDark());
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const next = !isDark();
+      apply(next);
+      try {
+        localStorage.setItem("theme", next ? "dark" : "light");
+      } catch {}
+    });
+  });
+
+  media.addEventListener("change", (event) => {
+    try {
+      if (localStorage.getItem("theme")) return;
+    } catch {}
+    apply(event.matches);
+  });
+</script>

@@ -1,0 +1,719 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------- */
+/* Fonts — self-hosted, latin subset  */
+/* ---------------------------------- */
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: optional;
+  src: url("/fonts/geist-latin-wght.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Geist Mono";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: optional;
+  src: url("/fonts/geist-mono-latin-wght.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Geist Fallback";
+  src: local("Arial");
+  ascent-override: 95.94%;
+  descent-override: 25.18%;
+  line-gap-override: 0%;
+  size-adjust: 104.98%;
+}
+@font-face {
+  font-family: "Geist Mono Fallback";
+  src: local("Courier New");
+  ascent-override: 85.67%;
+  descent-override: 22.48%;
+  line-gap-override: 0%;
+  size-adjust: 112.01%;
+}
+
+:root {
+  --font-geist-sans: "Geist", "Geist Fallback", system-ui, sans-serif;
+  --font-geist-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+}
+
+/* ---------------------------------- */
+/* Design tokens — the lab's palette  */
+/* ---------------------------------- */
+/* Derived from the 3D room: warm off-white walls, charcoal outlines, teal and
+   teal accents, blue for "screens on". light-dark() follows the OS when no
+   theme class is set; the inline script in Base.astro adds .dark/.light. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f5eedc, #1c1c21);
+  --bg-deep: light-dark(#ece3cc, #151518);
+  --surface: light-dark(#fbf7ec, #26262c);
+  --surface-2: light-dark(#e6ddc6, #30303a);
+  --paper: light-dark(#fffcf3, #2a2a31);
+  --ink: light-dark(#25252b, #f5eedc);
+  --ink-soft: light-dark(#55525a, #b8b2a6);
+  --line: light-dark(#25252b, #f5eedc);
+  --line-soft: light-dark(#cdc4ae, #3f3f4a);
+  --teal: light-dark(#258f83, #2fb3a4);
+  --teal-deep: light-dark(#1b7268, #258f83);
+  --teal-soft: light-dark(#cfe9e4, #1f3b38);
+  /* Accent slots kept for compatibility; the page accent is teal now. */
+  --orange: var(--teal);
+  --orange-deep: var(--teal-deep);
+  --red: #db5149;
+  --blue: light-dark(#3b63e6, #6b8dff);
+  --blue-soft: light-dark(rgba(59, 99, 230, 0.12), rgba(107, 141, 255, 0.18));
+  --success: light-dark(#1f7a4a, #3ad48a);
+  --danger: light-dark(#c4332c, #ff7b74);
+  --shadow: light-dark(#25252b, #0b0b0d);
+  --frame: light-dark(#25252b, #0f0f11);
+  /* Left edge of the 70rem content column (Container.astro). */
+  --col-left: max(1.5rem, (100vw - 70rem) / 2);
+  /* Gutter for full-width strips (header, lab hero): follows the window edge
+     instead of the content column, so wide screens give the room the space. */
+  --edge: clamp(1.5rem, 4vw, 5rem);
+}
+.dark {
+  color-scheme: dark;
+}
+.light {
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-background-deep: var(--bg-deep);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-paper: var(--paper);
+  --color-border: var(--line-soft);
+  --color-border-strong: var(--line);
+  --color-foreground: var(--ink);
+  --color-muted: var(--ink-soft);
+  --color-accent: var(--blue);
+  --color-accent-strong: var(--blue);
+  --color-accent-weak: var(--blue-soft);
+  --color-teal: var(--teal);
+  --color-teal-deep: var(--teal-deep);
+  --color-teal-soft: var(--teal-soft);
+  --color-red: var(--red);
+  --color-orange: var(--teal);
+  --color-orange-deep: var(--teal-deep);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-frame: var(--frame);
+  --color-ink: var(--ink);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-card: 18px;
+  --radius-button: 12px;
+  --radius-plate: 8px;
+}
+
+/* ---------------------------------- */
+/* Base                               */
+/* ---------------------------------- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--teal);
+  color: #25252b;
+}
+
+:focus-visible {
+  outline: 3px solid var(--teal);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  letter-spacing: -0.02em;
+}
+
+/* Subtle floor-tile grid, like the room's floor, for section backdrops */
+.grid-floor {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--line) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--line) 5%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Header logo: src/assets/logo.svg rendered inline. Kept outside the
+   components layer so it overrides the SVG's own (unlayered) <style>. The artwork is drawn
+   for a cream background (charcoal outlines, charcoal "Dexter"); in the
+   dark theme charcoal and cream swap so it keeps the same contrast. */
+.logo {
+  display: inline-flex;
+  align-items: center;
+}
+.logo svg {
+  display: block;
+  height: 2.75rem;
+  width: auto;
+}
+.dark .logo [fill="#25252b"] {
+  fill: #f5eedc;
+}
+.dark .logo [stroke="#25252b"],
+.dark .logo .logo-outline {
+  stroke: #f5eedc;
+}
+.dark .logo [fill="#f5eedc"] {
+  fill: #25252b;
+}
+.dark .logo [stroke="#f5eedc"],
+.dark .logo .logo-word {
+  stroke: #25252b;
+}
+
+/* ---------------------------------- */
+/* Lab components                     */
+/* ---------------------------------- */
+/* In @layer components so utilities such as `hidden` can still override. */
+@layer components {
+  /* ---------------------------------- */
+  /* Everything with an outline + a hard offset shadow reads as a solid
+     cartoon object, like the props in the room. */
+  .outlined {
+    border: 2px solid var(--line);
+    box-shadow: 4px 4px 0 0 var(--shadow);
+  }
+  .outlined-sm {
+    border: 2px solid var(--line);
+    box-shadow: 3px 3px 0 0 var(--shadow);
+  }
+
+  /* Button: outlined, flat; hover tints the surface, press nudges it down */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.6rem 1.15rem;
+    border-radius: var(--radius-button);
+    border: 2px solid var(--line);
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    color: var(--ink);
+    background: var(--surface);
+    transition:
+      background-color 120ms ease,
+      translate 120ms ease;
+  }
+  .btn:hover {
+    background: var(--surface-2);
+  }
+  .btn:active {
+    translate: 0 1px;
+  }
+  /* Primary action in the logo's teal. Light: deeper teal with cream text
+     (4.97:1). Dark: the brighter teal with dark text (≈5.9:1). */
+  .btn-primary {
+    background: var(--teal-deep);
+    color: #f5eedc;
+  }
+  .btn-primary:hover {
+    background: var(--teal);
+  }
+  .dark .btn-primary {
+    background: var(--teal);
+    color: #0f2a27;
+  }
+  .dark .btn-primary:hover {
+    background: #3cc9b8;
+  }
+  .btn-teal {
+    background: var(--teal);
+    color: #0f2a27;
+  }
+  .btn-ghost {
+    background: transparent;
+    box-shadow: none;
+    border-color: transparent;
+  }
+  .btn-ghost:hover {
+    background: var(--surface-2);
+    translate: 0 0;
+    box-shadow: none;
+  }
+  .btn-sm {
+    min-height: 2.5rem;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn,
+    .btn:hover,
+    .btn:active {
+      transition: none;
+    }
+  }
+
+  /* Nameplate: charcoal plate with engraved mono text (the wordmark on the wall) */
+  .plate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-plate);
+    background: #25252b;
+    color: #f5eedc; /* 13.5:1 on charcoal */
+    font-family: var(--font-geist-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    box-shadow:
+      inset 0 0 0 2px #3f3f4a,
+      0 3px 0 0 #0b0b0d;
+  }
+  .dark .plate {
+    background: #0f0f11;
+  }
+
+  /* Mono technical label (section kickers, experiment numbers) */
+  .label-mono {
+    font-family: var(--font-geist-mono);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Display headings: heavy, tight, slightly condensed by tracking */
+  .display {
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+
+  /* Paper panel: notebook pages, the case-study body */
+  .paper {
+    background-color: var(--paper);
+    background-image: linear-gradient(to bottom, transparent 31px, color-mix(in oklab, var(--blue) 18%, transparent) 32px);
+    background-size: 100% 32px;
+  }
+
+  /* Screen bezel: dark instrument frame for screenshots */
+  .bezel {
+    background: var(--frame);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-card);
+    box-shadow:
+      4px 4px 0 0 var(--shadow),
+      inset 0 0 0 6px #3d3d45;
+  }
+
+  /* Interaction hint on a readable surface (lab control bar) */
+  .hint-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.5rem;
+    padding: 0.35rem 0.75rem;
+    border: 2px solid var(--line-soft);
+    border-radius: var(--radius-button);
+    background: var(--bg-deep);
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+  .hint-chip kbd {
+    font-family: var(--font-geist-mono);
+    color: var(--ink);
+  }
+
+  /* Status light */
+  .led {
+    display: inline-block;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 999px;
+    border: 2px solid var(--line);
+  }
+}
+
+/* ---------------------------------- */
+/* Entrance animations                */
+/* ---------------------------------- */
+@keyframes rise-in {
+  from {
+    transform: translateY(16px);
+  }
+  to {
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise-in 0.5s cubic-bezier(0.21, 0.47, 0.32, 0.98) both;
+  animation-delay: var(--rise-delay, 0s);
+}
+/* Entrance is transform-only: content is always fully opaque, so it stays
+   readable even if the observer never fires. */
+.reveal {
+  transform: translateY(12px);
+  transition: transform 0.4s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+  transition-delay: var(--reveal-delay, 0s);
+}
+.reveal.is-visible {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise {
+    animation: none;
+  }
+  .reveal {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------- */
+/* Mobile nav dialog                  */
+/* ---------------------------------- */
+dialog[data-mobile-nav] {
+  translate: 100% 0;
+  transition: translate 0.25s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+}
+dialog[data-mobile-nav][open] {
+  translate: 0 0;
+  @starting-style {
+    translate: 100% 0;
+  }
+}
+dialog[data-mobile-nav]::backdrop {
+  background: rgb(43 43 48 / 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog[data-mobile-nav] {
+    transition: none;
+  }
+}
+
+/* ---------------------------------- */
+/* Lab (3D hero) / simple view        */
+/* ---------------------------------- */
+/* data-view is set before paint by the inline script in Base.astro; with
+   no JS there is no attribute and the simple (static) hero shows. */
+html[data-view="lab"] [data-page-only] {
+  display: none;
+}
+html[data-view="page"] [data-lab-only],
+html:not([data-view]) [data-lab-only] {
+  display: none;
+}
+html:not([data-lab-supported]) [data-mode-switch] {
+  display: none;
+}
+[data-mode-switch] [data-when="lab"] {
+  display: none;
+}
+html[data-view="lab"] [data-mode-switch] [data-when="lab"] {
+  display: inline;
+}
+html[data-view="lab"] [data-mode-switch] [data-when="page"] {
+  display: none;
+}
+
+.lab-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  /* vertical swipes scroll the page; horizontal drags rotate the room */
+  touch-action: pan-y !important;
+}
+[data-lab-state="ready"] .lab-canvas {
+  opacity: 1;
+}
+.lab-stage {
+  /* Narrow screens: a fixed-height stage in the flow. From lg the grid row
+     sizes it (Lab.astro). */
+  height: clamp(16rem, 56svh, 30rem);
+}
+@media (min-width: 1024px) {
+  .lab-stage {
+    height: auto;
+    min-height: 24rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-canvas {
+    transition: none;
+  }
+}
+.lab-progress {
+  accent-color: var(--teal);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lab-progress::-webkit-progress-bar {
+  background: var(--surface-2);
+  border-radius: 999px;
+}
+.lab-progress::-webkit-progress-value {
+  background: var(--teal);
+}
+@media (max-width: 1023px) {
+  [data-lab-state="ready"][data-panel] .lab-hud {
+    visibility: hidden;
+  }
+}
+/* View-controls disclosure: a real <details> on narrow screens, always open
+   (summary hidden) from md up — src/lab/ui.ts keeps it open there. */
+@media (min-width: 768px) {
+  [data-view-controls] > summary {
+    display: none;
+  }
+}
+[data-view-controls] > summary {
+  list-style: none;
+}
+[data-view-controls] > summary::-webkit-details-marker {
+  display: none;
+}
+.lab-panel {
+  z-index: 60;
+  translate: 0 12px;
+  opacity: 0;
+  transition:
+    translate 0.25s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    opacity 0.25s ease,
+    display 0.25s allow-discrete;
+}
+.lab-panel[open] {
+  translate: 0 0;
+  opacity: 1;
+  @starting-style {
+    translate: 0 12px;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-panel {
+    transition: none;
+  }
+}
+
+/* ---------------------------------- */
+/* Signal choreography                */
+/* ---------------------------------- */
+/* Every section is a station with its own short scene (src/scroll/). The
+   shared parts: a teal cable with a charcoal outline and a light signal,
+   used only inside the diagrams. Everything here is CSS state; the markup's
+   default is the completed state so the page reads fully without JS or
+   motion. */
+.cable-outline {
+  stroke: var(--line);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.cable-core {
+  stroke: var(--teal);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.signal-dot {
+  fill: #fffcf3; /* a light on a teal cable */
+  stroke: var(--line);
+  stroke-width: 3;
+}
+/* Experiment display frames: a status light and ring that come on as the
+   signal reaches them (Work section). Off until the choreography runs; on
+   under reduced motion, in the lab panels and in static mode. */
+.bezel[data-display] {
+  transition: box-shadow 0.35s ease;
+}
+.bezel[data-display] [data-display-led] {
+  background: #5a5a64;
+  transition: background-color 0.25s ease;
+}
+.bezel[data-display].is-on,
+[data-choreo="static"] .bezel[data-display],
+.lab-panel .bezel[data-display] {
+  box-shadow:
+    4px 4px 0 0 var(--shadow),
+    inset 0 0 0 6px color-mix(in oklab, var(--teal) 45%, #3d3d45);
+}
+.bezel[data-display].is-on [data-display-led],
+[data-choreo="static"] .bezel[data-display] [data-display-led],
+.lab-panel .bezel[data-display] [data-display-led] {
+  background: var(--teal);
+}
+.bezel[data-display].is-on [data-display-led] {
+  animation: led-pop 0.45s ease-out both;
+}
+@keyframes led-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.6);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Process steps: the current step is emphasised by its badge, never by
+   fading the others. */
+[data-step] .step-badge {
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+[data-step="done"] .step-badge {
+  background: var(--teal);
+  color: #0f2a27;
+}
+[data-step="current"] .step-badge {
+  transform: scale(1.1);
+  box-shadow:
+    3px 3px 0 0 var(--shadow),
+    0 0 0 4px color-mix(in oklab, var(--teal) 45%, transparent);
+}
+
+/* Notebook cover: a decorative flap over the portrait page; closed only
+   while the choreography is about to open it. */
+.notebook {
+  perspective: 1400px;
+}
+.notebook .cover {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform-origin: left center;
+  background: var(--teal);
+  border-right: 2px solid var(--line);
+  background-image: radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--line) 12%, transparent) 0 2px, transparent 3px);
+  background-size: 18px 18px;
+}
+.notebook[data-cover="closed"] .cover {
+  display: block;
+}
+.notebook .cover .cover-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-plate);
+  background: var(--paper);
+  color: var(--ink);
+  white-space: nowrap;
+  box-shadow: 3px 3px 0 0 var(--shadow);
+}
+
+/* Communication console: dim until the signal arrives. */
+.console-strip {
+  transition:
+    opacity 0.3s ease,
+    translate 0.15s ease;
+}
+.console.is-off .console-strip {
+  opacity: 0.55;
+}
+.console.is-off .console-strip .led {
+  background: #5a5a64;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bezel[data-display],
+  .bezel[data-display] [data-display-led],
+  [data-step] .step-badge,
+  .console-strip {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ---------------------------------- */
+/* Case-study prose                   */
+/* ---------------------------------- */
+.prose {
+  max-width: 42rem;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+.prose > * + * {
+  margin-top: 1.25em;
+}
+.prose h2 {
+  margin-top: 2.5em;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.prose h2:first-child {
+  margin-top: 0;
+}
+.prose h2::before {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  margin-right: 0.5em;
+  border-radius: 999px;
+  background: var(--teal);
+  border: 2px solid var(--line);
+  vertical-align: 0.05em;
+}
+.prose p,
+.prose li {
+  color: var(--ink-soft);
+}
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.prose ul {
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.prose li + li {
+  margin-top: 0.5em;
+}
+.prose a {
+  color: var(--blue);
+  text-underline-offset: 4px;
+}
+.prose a:hover {
+  text-decoration: underline;
+}

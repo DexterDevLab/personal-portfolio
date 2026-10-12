@@ -1,0 +1,41 @@
+---
+/**
+ * Scroll-reveal wrapper: fade + 16px rise, once, with optional stagger.
+ * CSS transition + IntersectionObserver; fully visible under
+ * prefers-reduced-motion (see global.css). Never wrap above-the-fold content.
+ */
+interface Props {
+  delay?: number;
+  class?: string;
+}
+const { delay = 0, class: className } = Astro.props;
+---
+
+<div
+  class:list={["reveal", className]}
+  style={delay ? `--reveal-delay: ${delay}s` : undefined}
+>
+  <slot />
+</div>
+
+<script>
+  const els = document.querySelectorAll<HTMLElement>(".reveal");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reduce || !("IntersectionObserver" in window)) {
+    els.forEach((el) => el.classList.add("is-visible"));
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        }
+      },
+      { rootMargin: "-80px" },
+    );
+    els.forEach((el) => observer.observe(el));
+  }
+</script>

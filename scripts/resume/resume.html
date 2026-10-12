@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dexter R. Dela Iglesia — Résumé</title>
+    <style>
+      /* Fonts are resolved by scripts/generate-resume.mjs (file:// paths to node_modules/geist). */
+      @font-face { font-family: "Geist"; font-weight: 400; src: url("__FONT_SANS_REGULAR__") format("truetype"); }
+      @font-face { font-family: "Geist"; font-weight: 500; src: url("__FONT_SANS_MEDIUM__") format("truetype"); }
+      @font-face { font-family: "Geist"; font-weight: 700; src: url("__FONT_SANS_BOLD__") format("truetype"); }
+      @font-face { font-family: "Geist"; font-weight: 800; src: url("__FONT_SANS_BLACK__") format("truetype"); }
+      @font-face { font-family: "Geist Mono"; font-weight: 600; src: url("__FONT_MONO_SEMIBOLD__") format("truetype"); }
+
+      @page { size: A4; margin: 0; }
+      :root {
+        --cream: #f5eedc;
+        --paper: #fffcf3;
+        --ink: #25252b;
+        --ink-soft: #55525a;
+        --line: #25252b;
+        --teal: #258f83;
+        --teal-deep: #1b7268;
+        --teal-soft: #cfe9e4;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        width: 210mm;
+        height: 297mm;
+        font-family: "Geist", system-ui, sans-serif;
+        font-size: 8.9pt;
+        line-height: 1.36;
+        color: var(--ink);
+        background: var(--paper);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .page {
+        display: grid;
+        grid-template-columns: 66mm 1fr;
+        width: 210mm;
+        height: 297mm;
+        overflow: hidden;
+      }
+      .mono {
+        font-family: "Geist Mono", ui-monospace, monospace;
+        font-weight: 600;
+        font-size: 7.4pt;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      /* Sidebar: cream, charcoal rule on the right */
+      .side {
+        background: var(--cream);
+        border-right: 2px solid var(--line);
+        padding: 10mm 8mm 8mm 9mm;
+      }
+      .photo {
+        width: 42mm;
+        height: 48mm;
+        object-fit: cover;
+        object-position: top;
+        border: 2px solid var(--line);
+        border-radius: 3mm;
+        display: block;
+      }
+      .name { font-size: 15pt; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; margin: 6mm 0 1.5mm; }
+      .role { color: var(--teal-deep); font-weight: 500; font-size: 9.6pt; line-height: 1.3; }
+      .side h2, .main h2 {
+        display: flex; align-items: center; gap: 2.2mm;
+        margin: 5.5mm 0 2.2mm;
+        font-size: 7.6pt;
+      }
+      .side h2::before, .main h2::before {
+        content: ""; width: 2.4mm; height: 2.4mm; border-radius: 50%;
+        background: var(--teal); border: 1.5px solid var(--line); flex: none;
+      }
+      .side h2 { color: var(--teal-deep); }
+      .side p, .side li { margin: 0; color: var(--ink); }
+      .side ul { list-style: none; padding: 0; margin: 0; }
+      .side li { padding: 0.9mm 0; }
+      .side li + li { border-top: 1px dashed rgba(37, 37, 43, 0.25); }
+      .side .kv { display: grid; grid-template-columns: 16mm 1fr; gap: 1.5mm; padding: 1mm 0; }
+      .side .kv .k { color: var(--ink-soft); font-size: 7pt; }
+      .contact a { color: var(--ink); text-decoration: none; }
+      .contact li { word-break: break-all; }
+
+      /* Main column */
+      .main { padding: 10mm 10mm 8mm 9mm; }
+      .main h2 { color: var(--teal-deep); border-bottom: 2px solid var(--line); padding-bottom: 1.6mm; margin-top: 0; }
+      .main h2 + * { margin-top: 2.4mm; }
+      .main h2 ~ h2 { margin-top: 4.8mm; }
+      .profile { font-size: 9.2pt; line-height: 1.45; margin: 0; }
+      .profile a { color: var(--teal-deep); text-decoration: none; font-weight: 500; }
+
+      .job { display: grid; grid-template-columns: 1fr auto; column-gap: 4mm; margin-bottom: 2.6mm; }
+      .job + .job { padding-top: 2.4mm; border-top: 1px dashed rgba(37, 37, 43, 0.25); }
+      .job .title { font-weight: 700; font-size: 9.6pt; }
+      .job .where { color: var(--ink-soft); }
+      .job .when { color: var(--ink-soft); font-size: 8pt; text-align: right; white-space: nowrap; padding-top: 0.8mm; }
+      .job ul { grid-column: 1 / -1; margin: 1.4mm 0 0; padding-left: 4mm; }
+      .job li { margin: 0.3mm 0; }
+      .job li::marker { color: var(--teal); }
+
+      .projects { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 3.5mm; margin: 0; padding: 0; list-style: none; }
+      .projects li { border: 1.5px solid var(--line); border-radius: 2.5mm; padding: 1.8mm 2.4mm; background: var(--paper); }
+      .projects .pname { font-weight: 700; }
+      .projects .pname a { color: var(--ink); text-decoration: none; }
+      .projects .pwhat { color: var(--ink-soft); font-size: 8pt; line-height: 1.32; }
+      .projects .ptags { margin-top: 1mm; font-size: 6.6pt; color: var(--teal-deep); }
+
+      .chips { display: flex; flex-wrap: wrap; gap: 1.4mm; margin: 0; padding: 0; list-style: none; }
+      .chips li { border: 1.5px solid var(--line); border-radius: 99px; padding: 0.7mm 2.3mm; background: var(--teal-soft); font-size: 7.6pt; font-weight: 500; }
+      .foot { margin-top: 3.5mm; color: var(--ink-soft); font-size: 7.2pt; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <aside class="side">
+        <img class="photo" src="__PORTRAIT__" alt="" />
+        <div class="name">Dexter R.<br />Dela Iglesia</div>
+        <div class="role">Web Developer · WordPress &amp; WooCommerce, custom web apps</div>
+
+        <h2 class="mono">Contact</h2>
+        <ul class="contact">
+          <li><a href="mailto:info@dexteriglesia.com">info@dexteriglesia.com</a></li>
+          <li><a href="https://dexteriglesia.com">dexteriglesia.com</a></li>
+          <li><a href="https://github.com/DexterDevLab">github.com/DexterDevLab</a></li>
+          <li>+63 956 618 4502</li>
+          <li>Philippines · working remotely</li>
+        </ul>
+
+        <h2 class="mono">Tools</h2>
+        <ul>
+          <li>WordPress, WooCommerce, Elementor</li>
+          <li>PHP, HTML &amp; CSS, JavaScript</li>
+          <li>Next.js &amp; TypeScript, Astro</li>
+          <li>Postgres, BullMQ, Git, Vercel</li>
+          <li>Hosting, DNS &amp; deployment</li>
+          <li>AI‑assisted development</li>
+        </ul>
+
+        <h2 class="mono">Education</h2>
+        <p><strong>BS Electrical Engineering</strong><br />University of Saint Louis Tuguegarao</p>
+        <p style="margin-top: 1.6mm">Licensed Electrical Engineer</p>
+
+        <h2 class="mono">Languages</h2>
+        <div class="kv"><span class="k">English</span><span>Professional</span></div>
+        <div class="kv"><span class="k">Filipino</span><span>Native</span></div>
+
+        <h2 class="mono">Working style</h2>
+        <ul>
+          <li>Client‑focused, reliable, detail‑oriented</li>
+          <li>Self‑managed and organised</li>
+          <li>Clear remote communication</li>
+          <li>Quick to adopt new tools and workflows</li>
+        </ul>
+      </aside>
+
+      <main class="main">
+        <h2 class="mono">Profile</h2>
+        <p class="profile">
+          Web developer with over 10 years of experience building and maintaining WordPress and WooCommerce
+          websites, and more recently custom web applications. I work with
+          <a href="https://www.pandavisuals.de/">PandaVisuals</a> (Augsburg, Germany) on client projects: they handle
+          design, and I take care of development, technical troubleshooting, hosting, deployment, and ongoing
+          maintenance. I enjoy working out why something doesn't behave and building the thing that makes it work.
+        </p>
+
+        <h2 class="mono">Work experience</h2>
+        <div class="job">
+          <div><span class="title">Web Developer</span> <span class="where">· PandaVisuals (remote)</span></div>
+          <div class="when">2022 – present · Augsburg, Germany</div>
+          <ul>
+            <li>Develop and maintain WordPress and WooCommerce sites for clients in Germany and Spain: shops, rental platforms, multilingual and showroom sites.</li>
+            <li>Troubleshoot live sites: broken checkouts, plugin conflicts, white screens, slow pages; fix the cause, not the symptom.</li>
+            <li>Handle hosting, DNS, deployment, updates and backups after launch.</li>
+            <li>Planned and built Panda Central, our internal dashboard for managing client WordPress sites (Next.js, TypeScript, Postgres, BullMQ), with substantial AI assistance; in daily use.</li>
+            <li>Build static sites with Astro where a CMS isn't needed.</li>
+          </ul>
+        </div>
+        <div class="job">
+          <div><span class="title">Web Developer</span> <span class="where">· Jullie &amp; Sands (remote)</span></div>
+          <div class="when">2018 – 2022 · Augsburg, Germany</div>
+          <ul>
+            <li>Developed, customised and maintained dozens of WordPress websites for international clients.</li>
+            <li>Implemented responsive designs into WordPress themes; handled long‑term maintenance, updates and improvements.</li>
+            <li>Kept performance, stability and consistency across multiple WordPress projects, working remotely with designers.</li>
+          </ul>
+        </div>
+        <div class="job">
+          <div><span class="title">Web Developer</span> <span class="where">· PandaVisuals (remote)</span></div>
+          <div class="when">2014 – 2018 · Augsburg, Germany</div>
+          <ul>
+            <li>Developed and customised WordPress websites for international clients from design concepts.</li>
+            <li>Responsive front‑ends with HTML5, CSS3, JavaScript, jQuery and PHP; HTML email templates; 360° virtual tours with krpano.</li>
+          </ul>
+        </div>
+        <div class="job">
+          <div><span class="title">Web Developer</span> <span class="where">· Pandawebsolution</span></div>
+          <div class="when">2012 – 2014 · Las Piñas, Philippines</div>
+          <ul>
+            <li>Full lifecycle of website projects, from planning and development to deployment.</li>
+            <li>WordPress sites from scratch with custom themes; HTML &amp; CSS sites, HTML email and eBay templates.</li>
+          </ul>
+        </div>
+
+        <h2 class="mono">Selected projects</h2>
+        <ul class="projects">
+          <li>
+            <div class="pname"><a href="https://dexteriglesia.com/work/panda-central">Panda Central</a></div>
+            <div class="pwhat">Dashboard for managing WordPress websites: queued updates, history, notifications, client reports. Internal tool, in daily use.</div>
+            <div class="ptags mono">Next.js · TypeScript · Postgres · BullMQ</div>
+          </li>
+          <li>
+            <div class="pname"><a href="https://www.kaufbeiuns.de/">Kaufbeiuns</a></div>
+            <div class="pwhat">Large B2B shop for an electronics and IT wholesaler with a deep catalogue across 100+ brands.</div>
+            <div class="ptags mono">WordPress · WooCommerce</div>
+          </li>
+          <li>
+            <div class="pname"><a href="https://www.glanzstueck-verleih.de/">Glanzstück</a></div>
+            <div class="pwhat">Rental platform for an events‑equipment company, WooCommerce reshaped into a rental flow.</div>
+            <div class="ptags mono">WordPress · WooCommerce</div>
+          </li>
+          <li>
+            <div class="pname"><a href="https://rajrealestateservices.com/">RAJ Real Estate Services</a></div>
+            <div class="pwhat">Brokerage site with service pages, listings and partner developers for Tuguegarao City and Cagayan.</div>
+            <div class="ptags mono">Astro · static site</div>
+          </li>
+        </ul>
+        <p class="foot">More work on dexteriglesia.com. Design on client sites by PandaVisuals; development by me.</p>
+      </main>
+    </div>
+  </body>
+</html>

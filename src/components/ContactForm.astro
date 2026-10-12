@@ -1,0 +1,196 @@
+---
+import { LoaderCircle } from "@lucide/astro";
+import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
+
+/**
+ * Progressive-enhancement contact form. Without JS the browser enforces the
+ * native constraints and POSTs to /api/contact, which redirects to a status
+ * page. With JS the script below validates with the shared zod schema, posts
+ * JSON, and renders the result inline.
+ *
+ * `idPrefix` lets the form appear more than once on a page (page section and
+ * lab panel) without duplicate ids.
+ */
+interface Props {
+  idPrefix?: string;
+}
+const { idPrefix = "" } = Astro.props;
+const id = (name: string) => (idPrefix ? `${idPrefix}-${name}` : name);
+
+const inputClasses =
+  "w-full rounded-button border-2 border-border-strong bg-paper px-4 py-3 text-base text-foreground placeholder:text-muted focus:border-teal focus:outline-none focus:ring-0 aria-invalid:border-danger sm:py-2.5 sm:text-sm";
+---
+
+<form method="post" action="/api/contact" class="space-y-4" data-contact-form>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <label for={id("name")} class="label-mono mb-1.5 block text-muted">Name</label>
+      <input
+        id={id("name")}
+        name="name"
+        type="text"
+        autocomplete="name"
+        placeholder="Your name"
+        required
+        minlength="2"
+        maxlength="100"
+        aria-describedby={id("name-error")}
+        class={inputClasses}
+      />
+      <p id={id("name-error")} data-error-for="name" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+    </div>
+    <div>
+      <label for={id("email")} class="label-mono mb-1.5 block text-muted">Email</label>
+      <input
+        id={id("email")}
+        name="email"
+        type="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        required
+        aria-describedby={id("email-error")}
+        class={inputClasses}
+      />
+      <p id={id("email-error")} data-error-for="email" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+    </div>
+  </div>
+
+  <div>
+    <label for={id("message")} class="label-mono mb-1.5 block text-muted">Message</label>
+    <textarea
+      id={id("message")}
+      name="message"
+      rows="5"
+      placeholder="Tell me a little about your project…"
+      required
+      minlength="10"
+      maxlength="5000"
+      aria-describedby={id("message-error")}
+      class:list={[inputClasses, "resize-y"]}></textarea>
+    <p id={id("message-error")} data-error-for="message" role="alert" class="mt-1.5 text-xs text-danger" hidden></p>
+  </div>
+
+  <!-- Honeypot — visually hidden, real users never fill this -->
+  <div aria-hidden="true" class="absolute top-auto -left-[9999px]">
+    <label for={id("company")}>Company</label>
+    <input id={id("company")} name="company" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  {
+    PUBLIC_TURNSTILE_SITE_KEY && (
+      <div
+        class="cf-turnstile"
+        data-sitekey={PUBLIC_TURNSTILE_SITE_KEY}
+        data-theme="auto"
+        data-size="flexible"
+        data-appearance="interaction-only"
+        data-turnstile
+      />
+    )
+  }
+  <input type="hidden" name="elapsed" value="" data-elapsed />
+
+  <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+    <button type="submit" data-submit class="btn btn-primary shrink-0 disabled:opacity-60">
+      <span class="inline-flex" data-spinner hidden>
+        <LoaderCircle class="size-4 animate-spin" aria-hidden="true" />
+      </span>
+      <span data-submit-label>Send message</span>
+    </button>
+    <p aria-live="polite" class="min-w-0 text-sm data-[tone=error]:text-danger data-[tone=success]:text-success" data-status></p>
+  </div>
+</form>
+
+<script>
+  import { contactSchema } from "@/lib/contact-schema";
+  import { CONTACT_MESSAGES } from "@/lib/contact-messages";
+
+  const fields = ["name", "email", "message"] as const;
+
+  document.querySelectorAll<HTMLFormElement>("[data-contact-form]").forEach((form) => {
+    form.noValidate = true;
+
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]")!;
+    const label = form.querySelector<HTMLElement>("[data-submit-label]")!;
+    const spinner = form.querySelector<HTMLElement>("[data-spinner]")!;
+    const status = form.querySelector<HTMLElement>("[data-status]")!;
+    const elapsedField = form.querySelector<HTMLInputElement>("[data-elapsed]");
+    const turnstileBox = form.querySelector<HTMLElement>("[data-turnstile]");
+    const shownAt = performance.now();
+
+    const setStatus = (tone: "success" | "error" | "", text: string) => {
+      status.textContent = text;
+      if (tone) status.dataset.tone = tone;
+      else delete status.dataset.tone;
+    };
+
+    const setFieldError = (field: string, message?: string) => {
+      const input = form.elements.namedItem(field) as HTMLInputElement | null;
+      const error = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+      if (!input || !error) return;
+      input.setAttribute("aria-invalid", message ? "true" : "false");
+      error.textContent = message ?? "";
+      error.hidden = !message;
+    };
+
+    const setBusy = (busy: boolean) => {
+      submit.disabled = busy;
+      spinner.hidden = !busy;
+      label.textContent = busy ? "Sending…" : "Send message";
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setStatus("", "");
+
+      if (elapsedField) elapsedField.value = String(Math.round(performance.now() - shownAt));
+      const data = Object.fromEntries(new FormData(form));
+      const parsed = contactSchema.safeParse(data);
+
+      fields.forEach((f) => setFieldError(f));
+      if (!parsed.success) {
+        let firstInvalid: string | undefined;
+        for (const issue of parsed.error.issues) {
+          const field = String(issue.path[0]);
+          const error = form.querySelector<HTMLElement>(`[data-error-for="${field}"]`);
+          if (error && error.hidden) {
+            setFieldError(field, issue.message);
+            firstInvalid ??= field;
+          }
+        }
+        (form.elements.namedItem(firstInvalid ?? "name") as HTMLElement | null)?.focus();
+        return;
+      }
+
+      setBusy(true);
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          headers: { "content-type": "application/json", accept: "application/json" },
+          body: JSON.stringify(parsed.data),
+        });
+        const result = (await res.json().catch(() => null)) as
+          | { ok: true }
+          | { ok: false; error?: string }
+          | null;
+        if (result?.ok) {
+          form.reset();
+          setStatus("success", CONTACT_MESSAGES.success);
+        } else {
+          setStatus("error", result?.error ?? CONTACT_MESSAGES.failed);
+        }
+      } catch {
+        setStatus("error", CONTACT_MESSAGES.failed);
+      } finally {
+        setBusy(false);
+        // Turnstile tokens are single-use: get a fresh one for the next attempt.
+        const ts = (window as unknown as { turnstile?: { reset(el: Element): void } }).turnstile;
+        if (turnstileBox && ts) {
+          try {
+            ts.reset(turnstileBox);
+          } catch {}
+        }
+      }
+    });
+  });
+</script>

@@ -1,0 +1,16 @@
+---
+import Base from "@/layouts/Base.astro";
+import Button from "@/components/ui/Button.astro";
+import Eyebrow from "@/components/ui/Eyebrow.astro";
+import { CONTACT_MESSAGES } from "@/lib/contact-messages";
+import { site } from "@/data/site";
+---
+
+<Base title={`Message sent — ${site.name}`} description="Your message was sent." noindex>
+  <div class="mx-auto flex min-h-[70vh] max-w-xl flex-col items-start justify-center gap-4 px-5 py-32 sm:px-6">
+    <Eyebrow>Message sent</Eyebrow>
+    <h1 class="text-3xl font-semibold">{CONTACT_MESSAGES.success}</h1>
+    <p class="text-muted">I usually reply {site.responseTime}. If it's urgent, email me at <a href={`mailto:${site.email}`} class="text-accent underline-offset-4 hover:underline">{site.email}</a>.</p>
+    <Button href="/" class="mt-2">Back home</Button>
+  </div>
+</Base>

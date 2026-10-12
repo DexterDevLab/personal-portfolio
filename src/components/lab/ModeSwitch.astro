@@ -1,0 +1,16 @@
+---
+/**
+ * Toggles the 3D room hero. Hidden by CSS unless the inline view script
+ * marked the document as lab-capable. Click handling lives in src/lab/ui.ts.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button type="button" data-mode-switch class:list={["btn btn-sm", className]}>
+  <span class="led bg-teal" aria-hidden="true"></span>
+  <span data-when="page">3D lab: off</span>
+  <span data-when="lab">3D lab: on</span>
+</button>

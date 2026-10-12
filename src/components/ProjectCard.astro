@@ -1,0 +1,77 @@
+---
+import { Picture } from "astro:assets";
+import { ArrowUpRight, Lock } from "@lucide/astro";
+import type { CollectionEntry } from "astro:content";
+import Screenshot from "@/components/ui/Screenshot.astro";
+import Tag from "@/components/ui/Tag.astro";
+import PartnerText from "@/components/ui/PartnerText.astro";
+import { site } from "@/data/site";
+
+/**
+ * A completed build on the experiment rack: numbered label, screenshot in a
+ * display frame, the project's own title and description, contribution note,
+ * live link. Wide variants get a larger frame.
+ */
+interface Props {
+  project: CollectionEntry<"work">;
+  index?: number;
+  wide?: boolean;
+  /** Mark the frame as an experiment display the signal switches on (Work section). */
+  display?: boolean;
+}
+const { project, index = 1, wide = false, display = false } = Astro.props;
+const { data } = project;
+const host = data.liveUrl ? new URL(data.liveUrl).host.replace(/^www\./, "") : undefined;
+const number = `SITE-${String(index).padStart(2, "0")}`;
+---
+
+<article class="group relative flex h-full flex-col">
+  <Screenshot label={host} tag={number} display={display} class="transition-transform duration-200 group-hover:-translate-y-0.5">
+    <Picture
+      src={data.screenshot}
+      alt={data.screenshotAlt}
+      formats={["avif", "webp"]}
+      widths={wide ? [480, 800, 1100] : [400, 640, 800]}
+      sizes={wide ? "(max-width: 640px) calc(100vw - 2.5rem), (max-width: 1024px) 100vw, 560px" : "(max-width: 640px) calc(100vw - 2.5rem), (max-width: 1024px) 50vw, 360px"}
+      loading="lazy"
+      class:list={["w-full object-cover object-top", wide ? "aspect-[16/9]" : "aspect-16/10"]}
+    />
+  </Screenshot>
+  <div class="flex flex-1 flex-col pt-4">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 class="text-lg font-bold">
+        {
+          data.liveUrl ? (
+            <a
+              href={data.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 after:absolute after:inset-0 after:content-['']"
+            >
+              {data.title}
+              <ArrowUpRight
+                class="size-4 text-muted transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-teal"
+                aria-hidden="true"
+              />
+            </a>
+          ) : (
+            <span class="inline-flex items-center gap-1.5">
+              {data.title}
+              <Lock class="size-3.5 text-muted" aria-hidden="true" />
+            </span>
+          )
+        }
+      </h3>
+      <span class="label-mono text-muted">{number}</span>
+    </div>
+    <p class="mt-2 text-[15px] leading-relaxed text-muted">{data.summary}</p>
+    <p class="mt-3 text-sm text-muted">
+      <span class="font-semibold text-foreground">{data.role}: {site.shortPerson}</span>
+      {data.design && <span> · Design: <PartnerText text={data.design} /></span>}
+      {host && <span> · {host}</span>}
+    </p>
+    <div class="mt-4 flex flex-wrap gap-2">
+      {data.stack.map((tag) => <Tag>{tag}</Tag>)}
+    </div>
+  </div>
+</article>

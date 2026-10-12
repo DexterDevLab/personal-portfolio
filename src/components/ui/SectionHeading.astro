@@ -1,0 +1,24 @@
+---
+import Eyebrow from "./Eyebrow.astro";
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  class?: string;
+  tone?: "teal" | "orange" | "blue";
+}
+const { eyebrow, title, description, class: className, tone } = Astro.props;
+---
+
+<div class:list={["relative z-10 mb-10 max-w-2xl md:mb-12", className]}>
+  {eyebrow && <Eyebrow class="mb-3 text-teal-deep" tone={tone}>{eyebrow}</Eyebrow>}
+  <h2 class="display text-[2rem] md:text-[2.8rem]">{title}</h2>
+  {
+    description && (
+      <p class="mt-4 text-base leading-relaxed text-muted md:text-lg">
+        {description}
+      </p>
+    )
+  }
+</div>

@@ -1,0 +1,33 @@
+---
+import { STATIONS } from "@/lab/stations";
+
+/**
+ * Accessible equivalents of the 3D hotspots. Each button expands its
+ * station's panel (aria-expanded / aria-controls); src/lab/ui.ts keeps the
+ * state in sync whether the station was chosen here or in the scene.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<nav aria-label="Lab stations" class:list={["flex flex-wrap gap-2", className]}>
+  {
+    STATIONS.map((station) => (
+      <button
+        type="button"
+        data-station={station.id}
+        aria-expanded="false"
+        aria-controls={`panel-${station.id}`}
+        class="btn btn-sm gap-2 aria-expanded:bg-teal aria-expanded:text-[#0f2a27] data-[hover]:bg-surface-2"
+      >
+        <span class="font-mono text-[11px] text-teal-deep" aria-hidden="true">
+          0{station.index}
+        </span>
+        <span>{station.label}</span>
+        <span class="sr-only">— {station.subtitle}</span>
+      </button>
+    ))
+  }
+</nav>

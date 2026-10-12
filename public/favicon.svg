@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.logo-outline{stroke:#25252b;stroke-width:16;stroke-linecap:round;stroke-linejoin:round}.logo-word{font-family:'Arial Rounded MT Bold','Arial Rounded Bold','Arial Black',sans-serif;font-size:160px;font-weight:900;letter-spacing:-7px;paint-order:stroke fill;stroke:#f5eedc;stroke-width:15;stroke-linejoin:round}</style></defs><g transform="translate(45 20)">
+    <path d="M112 291 L204 291 Q222 303 235 331 Q241 344 225 346 H72 Q54 344 65 329 Q80 304 112 291Z" fill="#258f83" class="logo-outline"/>
+    <path d="M161 107 L175 62" fill="none" stroke="#25252b" stroke-width="28"/>
+    <path d="M161 107 L175 62" fill="none" stroke="#258f83" stroke-width="10"/>
+    <circle cx="182" cy="46" r="32" fill="#f5eedc" stroke="#f5eedc" stroke-width="13"/>
+    <circle cx="182" cy="46" r="28" fill="#f58a35" class="logo-outline"/>
+    <circle cx="175" cy="38" r="7" fill="#fff"/>
+    <path d="M49 102 Q49 88 65 88 H121 Q279 88 284 196 Q287 298 173 307 H62 Q47 307 47 290Z" fill="#f5eedc" stroke="#f5eedc" stroke-width="29" stroke-linejoin="round"/>
+    <path d="M49 102 Q49 88 65 88 H121 Q279 88 284 196 Q287 298 173 307 H62 Q47 307 47 290Z" fill="#f5eedc" class="logo-outline"/>
+    <path d="M111 144 Q100 144 100 160 V249 Q100 263 115 263 H172 Q231 263 231 206 Q231 151 174 147Z" fill="#258f83" class="logo-outline"/>
+    <path d="M116 174 V165 H129" fill="none" stroke="#73c5b7" stroke-width="10" stroke-linecap="round"/>
+    <path d="M145 184 L124 205 L145 225 M184 184 L205 205 L184 225" fill="none" stroke="#f5eedc" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#f58a35" stroke="#25252b" stroke-width="10">
+      <rect x="23" y="160" width="47" height="22" rx="11"/>
+      <rect x="23" y="194" width="47" height="22" rx="11"/>
+      <rect x="23" y="228" width="47" height="22" rx="11"/>
+    </g>
+  </g></svg>

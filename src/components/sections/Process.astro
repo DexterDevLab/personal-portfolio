@@ -1,0 +1,67 @@
+---
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/Reveal.astro";
+import PartnerText from "@/components/ui/PartnerText.astro";
+import { processIntro, processSteps } from "@/data/process";
+
+/**
+ * Four steps joined by a short cable inside this section. On wide screens
+ * the cable runs behind the step markers; on narrow screens it is a vertical
+ * rail beside them. When the section comes into view the orange signal runs
+ * along it once, lighting each step in order (src/scroll/sections/process.ts);
+ * afterwards, and without JS or motion, the signal sits at the last step and
+ * every step is marked done.
+ */
+---
+
+<Section id="process" compact tone="plain">
+  <SectionHeading eyebrow="How I work" title="From first conversation to launch." description={processIntro} />
+  <div class="relative" data-process>
+    <!-- Wide: horizontal cable through the four markers (they sit at the start of each grid column) -->
+    <svg
+      class="pointer-events-none absolute inset-x-0 -top-0.5 hidden h-12 w-full lg:block"
+      viewBox="0 0 1200 48"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      data-process-cable="wide"
+    >
+      <path class="cable-outline" d="M24 24 C 130 24, 230 42, 334 24 S 540 6, 643 24 S 850 42, 952 24 S 1100 10, 1176 24" vector-effect="non-scaling-stroke"></path>
+      <path data-cable-path class="cable-core" d="M24 24 C 130 24, 230 42, 334 24 S 540 6, 643 24 S 850 42, 952 24 S 1100 10, 1176 24" vector-effect="non-scaling-stroke"></path>
+      <circle data-cable-signal class="signal-dot" cx="1176" cy="24" r="8" vector-effect="non-scaling-stroke"></circle>
+    </svg>
+    <!-- Narrow: vertical rail beside the markers -->
+    <svg
+      class="pointer-events-none absolute top-0 bottom-0 left-0 w-11 lg:hidden"
+      viewBox="0 0 44 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      data-process-cable="narrow"
+    >
+      <path class="cable-outline" d="M22 4V96" vector-effect="non-scaling-stroke"></path>
+      <path data-cable-path class="cable-core" d="M22 4V96" vector-effect="non-scaling-stroke"></path>
+      <circle data-cable-signal class="signal-dot" cx="22" cy="96" r="8" vector-effect="non-scaling-stroke"></circle>
+    </svg>
+    <ol class="relative grid gap-6 lg:grid-cols-4 lg:gap-8">
+      {
+        processSteps.map((step, i) => (
+          <Reveal delay={i * 0.06}>
+            <li class="relative flex gap-4 lg:block" data-step="done" data-step-index={i}>
+              <span
+                class="step-badge outlined-sm z-10 flex size-11 shrink-0 items-center justify-center rounded-full bg-teal font-mono text-sm font-bold text-[#2b2b30] lg:mb-5"
+                aria-hidden="true"
+              >
+                0{i + 1}
+              </span>
+              <div>
+                <p class="label-mono text-muted">{step.short}</p>
+                <h3 class="mt-1 text-base font-bold">{step.title}</h3>
+                <p class="mt-2 text-sm leading-relaxed text-muted"><PartnerText text={step.description} /></p>
+              </div>
+            </li>
+          </Reveal>
+        ))
+      }
+    </ol>
+  </div>
+</Section>

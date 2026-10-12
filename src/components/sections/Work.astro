@@ -1,0 +1,56 @@
+---
+import type { CollectionEntry } from "astro:content";
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/Reveal.astro";
+import ProjectCard from "@/components/ProjectCard.astro";
+import { site } from "@/data/site";
+import { workIntro } from "@/data/about";
+import PartnerText from "@/components/ui/PartnerText.astro";
+
+/**
+ * The client-work rack: the first two builds get wide frames on the top
+ * row, the rest sit two across below.
+ */
+interface Props {
+  projects: CollectionEntry<"work">[];
+}
+const { projects } = Astro.props;
+const top = projects.slice(0, 2);
+const rest = projects.slice(2);
+---
+
+<Section id="work" tone="deep">
+  <SectionHeading eyebrow="Selected client work" title="Websites I've built with PandaVisuals.">
+    <PartnerText text={workIntro} />
+  </SectionHeading>
+  <div class="grid gap-x-8 gap-y-10 md:grid-cols-2">
+    {
+      top.map((project, i) => (
+        <Reveal delay={i * 0.06} class="relative">
+          <ProjectCard project={project} index={i + 1} wide display />
+        </Reveal>
+      ))
+    }
+  </div>
+  <div class="h-10" aria-hidden="true"></div>
+  <div class="grid gap-x-8 gap-y-10 sm:grid-cols-2">
+    {
+      rest.map((project, i) => (
+        <Reveal delay={(i % 2) * 0.06} class="relative">
+          <ProjectCard project={project} index={i + 3} display />
+        </Reveal>
+      ))
+    }
+  </div>
+  <Reveal delay={0.2}>
+    <p class="mt-8 max-w-2xl text-sm text-muted">
+      More work available on request —{" "}
+      <a href={`mailto:${site.email}`} class="font-medium text-accent underline-offset-4 hover:underline">
+        just ask
+      </a>
+      .
+    </p>
+  </Reveal>
+</Section>
+

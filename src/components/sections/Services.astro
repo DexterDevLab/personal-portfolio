@@ -1,0 +1,44 @@
+---
+import Section from "@/components/ui/Section.astro";
+import SectionHeading from "@/components/ui/SectionHeading.astro";
+import Reveal from "@/components/Reveal.astro";
+import ServiceArt from "@/components/decor/ServiceArt.astro";
+import { engagementLine, services, servicesIntro, type ServiceIcon } from "@/data/services";
+
+/**
+ * Four stations on a workbench row: illustration above, the plain service
+ * name and description below. Literal names stay; the art is decoration.
+ */
+const art: Record<ServiceIcon, "layout" | "wrench" | "app" | "server"> = {
+  layout: "layout",
+  wrench: "wrench",
+  app: "app",
+  server: "server",
+};
+---
+
+<Section id="services">
+  <SectionHeading eyebrow="Services" title="Build it, fix it, keep it running." description={servicesIntro} />
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      services.map((service, i) => (
+        <Reveal delay={(i % 4) * 0.06}>
+          <article
+            id={service.icon === "wrench" ? "troubleshooting" : undefined}
+            class="outlined flex h-full flex-col rounded-card bg-surface p-5 transition-transform duration-200 hover:-translate-y-0.5"
+          >
+            <div class="rounded-[12px] bg-background-deep p-3" data-service-art={art[service.icon]}>
+              <ServiceArt kind={art[service.icon]} />
+            </div>
+            <p class="label-mono mt-4 text-muted">Station 0{i + 1}</p>
+            <h3 class="mt-1 text-lg font-bold">{service.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">{service.description}</p>
+          </article>
+        </Reveal>
+      ))
+    }
+  </div>
+  <Reveal delay={0.2}>
+    <p class="mt-8 max-w-2xl text-sm text-muted">{engagementLine}</p>
+  </Reveal>
+</Section>

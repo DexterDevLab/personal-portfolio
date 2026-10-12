@@ -1,36 +1,73 @@
 # dexteriglesia.com — DexterDevLab
 
-Personal portfolio of **Dexter Dela Iglesia** (DexterDevLab) — a frontend developer with 10+ years building fast, modern websites and web apps for businesses, agencies, and startups.
+Personal portfolio of **Dexter Iglesia** (DexterDevLab), a web developer based in the Philippines working with PandaVisuals: websites and web apps, WordPress & WooCommerce troubleshooting, hosting, deployment, and maintenance.
 
-Premium-minimal, dark-first, single-page site built as both a client-facing portfolio and a living proof of React/Next.js capability.
+The whole site is styled as one cartoon inventor's laboratory: the homepage opens with the rotatable 3D room (Three.js) whose six stations open the portfolio content, and the same content continues below as a normal scrolling page where every section is a station with its own short animated scene. Visitors can turn the 3D lab off at any time; no-WebGL browsers and no-JS visitors get the static hero.
 
 ## Stack
 
-- **Next.js 16** (App Router, TypeScript, RSC, fully static)
-- **Tailwind CSS v4** with CSS-variable design tokens (dark + light themes)
-- **Framer Motion** — subtle scroll reveals, `prefers-reduced-motion` respected
-- **Radix UI** (accessible mobile drawer) · **lucide-react** icons
-- **React Hook Form + Zod → Brevo API** contact form (server action, honeypot, zero-dependency fetch)
-- **Geist Sans / Geist Mono** via `next/font`
+- **Astro 7** — static output; one on-demand route (`/api/contact`) and the no-JS contact error page run as Vercel functions via `@astrojs/vercel`
+- **Three.js + GSAP** — the laboratory (`src/lab/`), loaded lazily as its own chunk; procedural geometry, toon shading, OrbitControls (drag to rotate 360°, bounded zoom) plus click-to-explore station travel
+- **Tailwind CSS 4** with CSS-variable design tokens (`light-dark()` for both themes) in `src/styles/global.css`
+- **Content collections** for projects (`src/content/work/*.md`), plain TS for site constants and services
+- **Zod → Brevo** contact form (progressive enhancement: works without JavaScript)
+- **Geist / Geist Mono** self-hosted from `public/fonts`
+- `@lucide/astro` icons, `@astrojs/sitemap`, `astro:assets` image optimisation
 
-## Getting started
+## Commands
 
 ```bash
 npm install
-cp .env.example .env.local   # add your Brevo API key
-npm run dev
+cp .env.example .env.local   # add your Brevo API key for local form testing
+npm run dev                  # http://localhost:4321
+npm run build                # outputs dist/ and .vercel/output/
+npm run check                # astro check (types + templates)
+npm run brand                # regenerate favicon / og.png from scripts/generate-brand-assets.mjs
 ```
 
-## Content
+`astro preview` is not supported with the Vercel adapter; test server routes with `npm run dev` or on a Vercel preview deployment.
 
-All content is typed local data in `src/content/` — projects, services, skills, and testimonials. Site-wide constants (name, domain, email, GitHub) live in `src/lib/site.ts`.
+## Where to edit things
 
-To-do before launch:
+| What | Where |
+|---|---|
+| Name, role, email, GitHub, résumé path, page title/description | `src/data/site.ts` |
+| Availability badge (show/hide, label) | `src/data/site.ts` → `availability` |
+| Response-time promise | `src/data/site.ts` → `responseTime` |
+| Navigation links | `src/data/site.ts` → `navLinks` |
+| Services (4 cards + engagement line) | `src/data/services.ts` |
+| "How I work" steps | `src/data/process.ts` |
+| Projects (cards, featured project, case study) | `src/content/work/*.md` — one file per project; frontmatter is validated by `src/content.config.ts` |
+| Panda Central case study text | `src/content/work/panda-central.md` (markdown body) |
+| Screenshots / portrait | `src/assets/projects/*.jpg`, `src/assets/portrait.jpg` |
+| Headline, intro, about paragraphs, featured copy, troubleshooting steps, contact hints (shared by page and lab panels) | `src/data/about.ts` |
+| Station names / panel titles / hashes | `src/lab/stations.ts`; panel bodies in `src/components/lab/Lab.astro` |
+| Lab palette, room size, camera, DPR caps | `src/lab/config.ts`; props per station in `src/lab/scene/stations/` |
+| 3D lab on/off default (WebGL check) | inline script in `src/layouts/Base.astro` |
+| Design tokens, button/plate/bezel/paper components | `src/styles/global.css` |
+| Section scenes (entry animations) and the page robot | `src/scroll/motion.ts` (breakpoint, timing, distances); per-section timelines in `src/scroll/sections/`; robot lines in `src/scroll/sections/robot.ts`, art in `src/components/decor/PageRobot.astro` |
+| Service illustrations | `src/components/decor/ServiceArt.astro` |
+| Colours, fonts, motion, prose styles | `src/styles/global.css` |
+| Metadata, favicon links, theme script | `src/layouts/Base.astro` |
+| Résumé PDF | `scripts/resume/resume.html`, then `npm run resume` (writes `public/resume.pdf` with headless Chrome) |
+| Contact delivery (Brevo) | `src/lib/contact.ts`; messages in `src/lib/contact-messages.ts`; validation in `src/lib/contact-schema.ts` |
+| Résumé | `public/resume.pdf` |
 
-- [ ] Drop `resume.pdf` into `/public`
-- [ ] Add 2–3 testimonials to `src/content/testimonials.ts` (section auto-appears)
-- [ ] Set `BREVO_API_KEY` in Vercel env (sender email must be verified in Brevo)
+### Adding a project
 
-## Plan
+Create `src/content/work/<slug>.md` with the frontmatter fields from `src/content.config.ts` (title, summary, role, stack, screenshot, screenshotAlt, order, …). Set `caseStudy: true` and write a markdown body to get a page at `/work/<slug>`. Exactly one project should have `featured: true`; it appears in the hero and the featured block.
 
-The full PRD / design brief that guided this build is in [`portfolio-plan.md`](./portfolio-plan.md).
+## Environment variables
+
+| Variable | Purpose |
+|---|---|
+| `BREVO_API_KEY` | Brevo transactional email key (server only). Without it the form returns a "not set up yet" message and nothing is sent. |
+| `CONTACT_EMAIL` | Where messages are delivered; must be a verified Brevo sender. Defaults to `site.email`. |
+
+## Deployment
+
+Vercel, auto-deploying from `main`. The Vercel project's **Framework Preset must be set to Astro** (it was Next.js before the migration). Build command `astro build`, output handled by the adapter. Env vars above must be present in the Vercel project.
+
+## History
+
+The original brief and design notes from the first (Next.js) build are kept in [`portfolio-plan.md`](./portfolio-plan.md). Migration notes, verification, and open questions are in [`HANDOFF.md`](./HANDOFF.md).
