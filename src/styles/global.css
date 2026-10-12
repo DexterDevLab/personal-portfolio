@@ -247,9 +247,13 @@ h3 {
     line-height: 1.2;
     color: var(--ink);
     background: var(--surface);
+    cursor: pointer;
     transition:
       background-color 120ms ease,
       translate 120ms ease;
+  }
+  .btn:disabled {
+    cursor: default;
   }
   .btn:hover {
     background: var(--surface-2);
