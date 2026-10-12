@@ -85,17 +85,16 @@ export class Robot {
     torso.position.y = 0.72;
     const torsoHull = new Mesh(torso.geometry, ctx.shared.outline);
     torsoHull.position.copy(torso.position);
-    // Chest plate with the logo's symbol as an animated emblem
-    const chest = new Mesh(rbox(0.3, 0.3, 0.03, 0.03), mats.toon(PALETTE.cream));
-    chest.position.set(0, 0.74, 0.185);
-    this.emblem = buildEmblem(ctx, 0.24);
-    this.emblem.group.position.set(0, 0.74, 0.202);
+    // The logo's symbol printed straight onto the torso (no plate), sized to
+    // the flat part of the rounded front, as an animated emblem
+    this.emblem = buildEmblem(ctx, 0.2);
+    this.emblem.group.position.set(0, 0.74, 0.182);
     this.body.add(this.emblem.group);
     const button = new Mesh(sphere(0.03, 8, 6), mats.toon(PALETTE.orange));
     button.position.set(0.14, 0.6, 0.18);
     const belt = new Mesh(cyl(0.2, 0.2, 0.05, 14), mats.toon(PALETTE.teal));
     belt.position.y = 0.49;
-    this.body.add(pelvis, torso, torsoHull, chest, button, belt);
+    this.body.add(pelvis, torso, torsoHull, button, belt);
 
     // Neck + head
     const neck = new Mesh(cyl(0.07, 0.08, 0.1, 10), mats.toon(PALETTE.metalDark));
