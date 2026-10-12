@@ -1,5 +1,6 @@
 ---
 import { LoaderCircle } from "@lucide/astro";
+import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
 
 /**
  * Progressive-enhancement contact form. Without JS the browser enforces the
@@ -75,6 +76,20 @@ const inputClasses =
     <input id={id("company")} name="company" type="text" tabindex="-1" autocomplete="off" />
   </div>
 
+  {
+    PUBLIC_TURNSTILE_SITE_KEY && (
+      <div
+        class="cf-turnstile"
+        data-sitekey={PUBLIC_TURNSTILE_SITE_KEY}
+        data-theme="auto"
+        data-size="flexible"
+        data-appearance="interaction-only"
+        data-turnstile
+      />
+    )
+  }
+  <input type="hidden" name="elapsed" value="" data-elapsed />
+
   <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
     <button type="submit" data-submit class="btn btn-primary shrink-0 disabled:opacity-60">
       <span class="inline-flex" data-spinner hidden>
@@ -99,6 +114,9 @@ const inputClasses =
     const label = form.querySelector<HTMLElement>("[data-submit-label]")!;
     const spinner = form.querySelector<HTMLElement>("[data-spinner]")!;
     const status = form.querySelector<HTMLElement>("[data-status]")!;
+    const elapsedField = form.querySelector<HTMLInputElement>("[data-elapsed]");
+    const turnstileBox = form.querySelector<HTMLElement>("[data-turnstile]");
+    const shownAt = performance.now();
 
     const setStatus = (tone: "success" | "error" | "", text: string) => {
       status.textContent = text;
@@ -125,6 +143,7 @@ const inputClasses =
       event.preventDefault();
       setStatus("", "");
 
+      if (elapsedField) elapsedField.value = String(Math.round(performance.now() - shownAt));
       const data = Object.fromEntries(new FormData(form));
       const parsed = contactSchema.safeParse(data);
 
@@ -164,6 +183,13 @@ const inputClasses =
         setStatus("error", CONTACT_MESSAGES.failed);
       } finally {
         setBusy(false);
+        // Turnstile tokens are single-use: get a fresh one for the next attempt.
+        const ts = (window as unknown as { turnstile?: { reset(el: Element): void } }).turnstile;
+        if (turnstileBox && ts) {
+          try {
+            ts.reset(turnstileBox);
+          } catch {}
+        }
       }
     });
   });

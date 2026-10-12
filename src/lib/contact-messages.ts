@@ -7,4 +7,5 @@ export const CONTACT_MESSAGES = {
   notConfigured: `The contact form isn't set up yet — please email me directly at ${site.email}.`,
   failed: `Something went wrong — please email me directly at ${site.email}.`,
   invalid: "Invalid input.",
+  challenge: `The spam check didn't pass. Please try again, or email me directly at ${site.email}.`,
 } as const;

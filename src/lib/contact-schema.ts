@@ -10,6 +10,11 @@ export const contactSchema = z.object({
   // Honeypot — real users never see it; a filled value is handled in
   // sendContact() (fake success), not rejected here, so bots learn nothing.
   company: z.string().optional(),
+  // Cloudflare Turnstile token (the widget writes this field into the form).
+  "cf-turnstile-response": z.string().optional(),
+  // Milliseconds between the form appearing and the submit (set by the client
+  // script; absent without JS). Instant submits are treated like the honeypot.
+  elapsed: z.coerce.number().optional(),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;

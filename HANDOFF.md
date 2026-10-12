@@ -2,7 +2,15 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Résumé PDF (latest)
+## Contact form spam protection (latest)
+- **Cloudflare Turnstile**: when `TURNSTILE_SECRET_KEY` is set, every submission must carry a valid token, verified server-side at Cloudflare's siteverify endpoint (`verifyTurnstile` in `src/lib/contact.ts`); failures return `403` / `code=challenge` with a clear message. The widget (`PUBLIC_TURNSTILE_SITE_KEY`, `appearance: interaction-only`, so it is invisible unless a challenge is needed) renders in both contact forms; the Turnstile script loads once from `index.astro`, only when the key exists. The client script resets the widget after each attempt (tokens are single-use). Without the keys the form works as before (honeypot + validation).
+- **Instant submits**: the client script records how long the form was open (`elapsed`); anything under 2.5 s is treated like the honeypot (fake success). Absent without JS.
+- **Origin check**: a POST whose `Origin` header does not match the site (localhost allowed in dev) gets `403`.
+- Still not in place: rate limiting. Add a Vercel WAF rate-limit rule for `/api/contact` in the dashboard.
+- Keys: `.env` locally (gitignored; a `.env` with Cloudflare's public always-pass *test* keys was created for development — replace with the real ones), `TURNSTILE_SECRET_KEY` + `PUBLIC_TURNSTILE_SITE_KEY` in Vercel. `.env.example` documents them.
+- Verified with curl: missing token → 403 challenge; foreign origin → 403; instant submit → fake success; no-JS post without token → 303 to `/contact/error?code=challenge`; widget + hidden token field present in both forms. **Note:** one probe with a passing test token went through to Brevo via the real key in `.env.local` and delivered a test email ("Test Person") — delete it.
+
+## Résumé PDF
 `public/resume.pdf` is now generated from `scripts/resume/resume.html` by `npm run resume` (`scripts/generate-resume.mjs`, headless Chrome at `/Applications/Google Chrome.app`, override with `CHROME_PATH`). One A4 page in the site's palette and fonts (Geist from `node_modules/geist`, portrait from `src/assets/portrait.jpg`). Content keeps every fact from the previous PDF — the four roles (Pandawebsolution 2012–2014, PandaVisuals 2014–2018, Jullie & Sands 2018–2022, PandaVisuals 2022–present), BS Electrical Engineering at the University of Saint Louis Tuguegarao, Licensed Electrical Engineer, languages, working-style points — rewritten in the site's voice with the PandaVisuals partnership, Panda Central, troubleshooting/hosting work and a Selected Projects block (Panda Central, Kaufbeiuns, Glanzstück, RAJ Real Estate Services). Contact is now info@dexteriglesia.com, dexteriglesia.com and GitHub plus the existing phone number; the old personal Gmail is gone. The latest PandaVisuals role reads "2022 – present" (the old PDF said 2022–2025). Edit the HTML and rerun the script to change anything.
 
 ## Hover hints in the room

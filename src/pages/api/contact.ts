@@ -4,7 +4,17 @@ import { sendContact } from "@/lib/contact";
 // The only server-rendered route: it needs the Brevo secret at request time.
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, redirect }) => {
+export const POST: APIRoute = async ({ request, redirect, clientAddress, url }) => {
+  // Browsers always send Origin on form posts: a mismatched one is a request
+  // from another site. (Absent = non-browser client; validation still applies.)
+  const origin = request.headers.get("origin");
+  if (origin && origin !== url.origin && !(import.meta.env.DEV && origin.startsWith("http://localhost"))) {
+    return new Response(JSON.stringify({ ok: false, error: "Forbidden" }), {
+      status: 403,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
   const contentType = request.headers.get("content-type") ?? "";
   const wantsJson =
     contentType.includes("application/json") ||
@@ -18,7 +28,11 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     input = formData ? Object.fromEntries(formData) : null;
   }
 
-  const result = await sendContact(input);
+  let ip: string | null = null;
+  try {
+    ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? clientAddress;
+  } catch {}
+  const result = await sendContact(input, { ip });
 
   if (wantsJson) {
     const body = result.ok ? { ok: true } : { ok: false, error: result.error };

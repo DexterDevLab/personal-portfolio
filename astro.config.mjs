@@ -41,6 +41,18 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
+      // Cloudflare Turnstile (spam check on the contact form). Both optional:
+      // without them the form works with the honeypot and validation only.
+      TURNSTILE_SECRET_KEY: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
+      PUBLIC_TURNSTILE_SITE_KEY: envField.string({
+        context: "client",
+        access: "public",
+        optional: true,
+      }),
     },
   },
 });

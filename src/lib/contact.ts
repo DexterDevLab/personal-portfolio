@@ -1,4 +1,4 @@
-import { BREVO_API_KEY, CONTACT_EMAIL } from "astro:env/server";
+import { BREVO_API_KEY, CONTACT_EMAIL, TURNSTILE_SECRET_KEY } from "astro:env/server";
 import { contactSchema } from "@/lib/contact-schema";
 import { CONTACT_MESSAGES } from "@/lib/contact-messages";
 import { site } from "@/data/site";
@@ -9,6 +9,7 @@ export type ContactErrorCode =
   | "invalid-message"
   | "invalid"
   | "not-configured"
+  | "challenge"
   | "failed";
 
 export type ContactResult =
@@ -28,6 +29,8 @@ export function messageForCode(code: string | null): string {
       return CONTACT_MESSAGES.invalid;
     case "not-configured":
       return CONTACT_MESSAGES.notConfigured;
+    case "challenge":
+      return CONTACT_MESSAGES.challenge;
     default:
       return CONTACT_MESSAGES.failed;
   }
@@ -37,7 +40,7 @@ export function messageForCode(code: string | null): string {
  * Validates the submission and delivers it through Brevo's transactional
  * email API. Reads BREVO_API_KEY / CONTACT_EMAIL from the server environment.
  */
-export async function sendContact(input: unknown): Promise<ContactResult> {
+export async function sendContact(input: unknown, meta: { ip?: string | null } = {}): Promise<ContactResult> {
   const parsed = contactSchema.safeParse(input);
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
@@ -47,9 +50,19 @@ export async function sendContact(input: unknown): Promise<ContactResult> {
     return { ok: false, code, error: issue?.message ?? CONTACT_MESSAGES.invalid, status: 400 };
   }
 
-  // Honeypot tripped — pretend success so bots learn nothing.
-  if (parsed.data.company) {
+  // Honeypot tripped, or submitted faster than a person can type — pretend
+  // success so bots learn nothing.
+  if (parsed.data.company || (parsed.data.elapsed !== undefined && parsed.data.elapsed < 2500)) {
     return { ok: true };
+  }
+
+  // Turnstile: when the secret is configured every submission needs a valid token.
+  if (TURNSTILE_SECRET_KEY) {
+    const token = parsed.data["cf-turnstile-response"];
+    const passed = token ? await verifyTurnstile(TURNSTILE_SECRET_KEY, token, meta.ip) : false;
+    if (!passed) {
+      return { ok: false, code: "challenge", error: CONTACT_MESSAGES.challenge, status: 403 };
+    }
   }
 
   const apiKey = BREVO_API_KEY;
@@ -86,5 +99,21 @@ export async function sendContact(input: unknown): Promise<ContactResult> {
   } catch (err) {
     console.error("sendContact failed:", err);
     return { ok: false, code: "failed", error: CONTACT_MESSAGES.failed, status: 502 };
+  }
+}
+
+/** Ask Cloudflare whether a Turnstile token is genuine (tokens are single-use). */
+async function verifyTurnstile(secret: string, token: string, ip?: string | null): Promise<boolean> {
+  try {
+    const body = new URLSearchParams({ secret, response: token });
+    if (ip) body.set("remoteip", ip);
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { success?: boolean; "error-codes"?: string[] };
+    if (!data.success) console.warn("Turnstile rejected a token:", data["error-codes"]);
+    return data.success === true;
+  } catch (err) {
+    console.error("Turnstile verification failed:", err);
+    return false;
   }
 }

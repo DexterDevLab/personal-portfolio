@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { PUBLIC_TURNSTILE_SITE_KEY } from "astro:env/client";
 import Base from "@/layouts/Base.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import Lab from "@/components/lab/Lab.astro";
@@ -21,6 +22,11 @@ const clientWork = work.filter((entry) => !entry.data.featured);
 <Base lab>
   <Fragment slot="head">
     <JsonLd projects={work} />
+    {
+      PUBLIC_TURNSTILE_SITE_KEY && (
+        <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+      )
+    }
   </Fragment>
 
   <!-- Hero: the interactive room on WebGL devices (3D lab on), a static hero otherwise -->
