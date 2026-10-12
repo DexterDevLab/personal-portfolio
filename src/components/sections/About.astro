@@ -200,6 +200,14 @@ const tabs = ["Bio", "Tools", "CV"];
     color: #25252b;
     font-size: 0.85rem;
   }
+  /* Light theme: the note and tabs are deep teal, so their text goes light */
+  :root:not(.dark) .sticky .handwritten,
+  :root:not(.dark) .tab {
+    color: #fffcf3;
+  }
+  :root:not(.dark) .tab:nth-child(3) {
+    color: var(--ink);
+  }
   /* stickers: chunkier than the usual tags */
   .sticker {
     padding: 0.3rem 0.65rem;

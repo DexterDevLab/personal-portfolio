@@ -152,6 +152,18 @@ body {
   outline: 3px solid var(--teal);
   outline-offset: 2px;
 }
+/* Light theme: anything sitting on the teal accent reads in light text
+   (step numbers, the contact console strip, the active station button,
+   screenshot markers). The dark theme keeps dark text on its brighter teal. */
+:root:not(.dark) .bg-teal,
+:root:not(.dark) .step-badge,
+:root:not(.dark) [data-step="done"] .step-badge,
+:root:not(.dark) .console-strip,
+:root:not(.dark) .btn-teal,
+:root:not(.dark) [data-station][aria-expanded="true"] {
+  color: #fffcf3;
+}
+
 /* Form fields show focus with their own teal border (ContactForm), so they
    skip the ring; otherwise the two stack into a double outline. */
 input:focus-visible,

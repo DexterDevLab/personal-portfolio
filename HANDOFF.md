@@ -2,7 +2,11 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Production fix: Vercel function crashed on every request (latest)
+## Logo beacon + light-theme teal text (latest)
+- The plaque's logo symbol is partly animated: the antenna ball is now a small 3D sphere (orange, inverted-hull outline) over the plaque that pulses and blinks once a second, and the `<>` on its screen glows in a slow heartbeat (a cream glyph plane whose opacity breathes). The painted ball is stripped from the rasterised SVG so the two don't double up. `logoBeacon` animator in `buildLogoSign` (`src/lab/scene/room.ts`); positions map the logo's 1500 × 390 viewBox onto the 2.6-unit plane. Skipped under reduced motion (static ball, glow at 0).
+- Light theme: text on teal surfaces is light (`#fffcf3`): step badges, the contact console strip, the active station button, screenshot markers, the notebook's sticky note and index tabs (`global.css` "Light theme: anything sitting on the teal accent", `About.astro`). The dark theme keeps dark text on its brighter teal.
+
+## Production fix: Vercel function crashed on every request
 After the first production deploy every server-rendered request (`/api/contact`, `/contact/error`) returned `FUNCTION_INVOCATION_FAILED`. Runtime log: `Cannot find native binding … @rolldown/binding-wasm32-wasi` thrown from `node_modules/rolldown`. Cause: `@astrojs/vercel@11.0.13`'s runtime entrypoint imports constants from the integration module (`dist/index.js`), which imports `rolldown` and `@vercel/routing-utils` (build-time tools); the bundler kept them as side-effect imports in the server entry, the file tracer shipped them, and rolldown's native binary is not available in the function. Fix in `astro.config.mjs`: `vite.resolve.alias` maps both packages to `src/lib/empty-module.ts` (named no-op exports) for the app bundle only; nothing from them runs at request time. Verified by invoking the built function locally (`_render.func/.vercel/output/server/entry.mjs` → `default.fetch`): 405 / 200. Remove the alias once the adapter stops importing its build code from the runtime entry.
 
 ## Contact form spam protection
