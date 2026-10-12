@@ -212,7 +212,7 @@ h3 {
     box-shadow: 3px 3px 0 0 var(--shadow);
   }
 
-  /* Physical button: lifts on hover, presses down on click */
+  /* Button: outlined, flat; hover tints the surface, press nudges it down */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -227,20 +227,15 @@ h3 {
     line-height: 1.2;
     color: var(--ink);
     background: var(--surface);
-    box-shadow: 0 4px 0 0 var(--shadow);
-    translate: 0 0;
     transition:
-      translate 120ms ease,
-      box-shadow 120ms ease,
-      background-color 120ms ease;
+      background-color 120ms ease,
+      translate 120ms ease;
   }
   .btn:hover {
-    translate: 0 -1px;
-    box-shadow: 0 5px 0 0 var(--shadow);
+    background: var(--surface-2);
   }
   .btn:active {
-    translate: 0 3px;
-    box-shadow: 0 1px 0 0 var(--shadow);
+    translate: 0 1px;
   }
   .btn-primary {
     background: var(--orange);
@@ -276,13 +271,6 @@ h3 {
     min-height: 2.5rem;
     padding: 0.45rem 0.9rem;
     font-size: 0.85rem;
-    box-shadow: 0 3px 0 0 var(--shadow);
-  }
-  .btn-sm:hover {
-    box-shadow: 0 4px 0 0 var(--shadow);
-  }
-  .btn-sm:active {
-    box-shadow: 0 1px 0 0 var(--shadow);
   }
   @media (prefers-reduced-motion: reduce) {
     .btn,
