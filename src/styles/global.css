@@ -76,9 +76,11 @@
   --danger: light-dark(#c4332c, #ff7b74);
   --shadow: light-dark(#25252b, #0b0b0d);
   --frame: light-dark(#25252b, #0f0f11);
-  /* Left edge of the 70rem content column (Container.astro); the lab hero's
-     intro column uses it as its padding. */
+  /* Left edge of the 70rem content column (Container.astro). */
   --col-left: max(1.5rem, (100vw - 70rem) / 2);
+  /* Gutter for full-width strips (header, lab hero): follows the window edge
+     instead of the content column, so wide screens give the room the space. */
+  --edge: clamp(1.5rem, 4vw, 5rem);
 }
 .dark {
   color-scheme: dark;

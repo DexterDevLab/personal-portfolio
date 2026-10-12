@@ -50,7 +50,7 @@ const otherServices = services.filter((s) => s !== hosting);
   data-portrait-src={face.src}
   data-thumb-srcs={JSON.stringify(thumbs.map((t) => t.src))}
   data-logo-src={logoUrl}
-  class="relative grid w-full grid-cols-1 grid-rows-[auto_auto_auto] overflow-hidden border-b-2 border-border-strong bg-background grid-floor pt-16 lg:min-h-svh lg:grid-cols-[calc(var(--col-left)+24rem)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)_auto]"
+  class="relative grid w-full grid-cols-1 grid-rows-[auto_auto_auto] overflow-hidden border-b-2 border-border-strong bg-background grid-floor pt-16 lg:min-h-svh lg:grid-cols-[calc(var(--edge)+25rem)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)_auto]"
   aria-label="Interactive laboratory"
 >
   <span id="top" class="absolute top-0"></span>
@@ -58,7 +58,7 @@ const otherServices = services.filter((s) => s !== hosting);
   <!-- 1. Introduction (left column from lg) -->
   <div
     data-lab-intro
-    class="lab-intro z-10 self-center px-5 pt-6 pb-4 sm:px-6 lg:py-5 lg:pr-6 lg:pl-[var(--col-left)]"
+    class="lab-intro z-10 self-center px-5 pt-6 pb-4 sm:px-6 lg:py-5 lg:pr-6 lg:pl-[var(--edge)]"
   >
     <div data-lab-intro-text>
       <p class="label-mono inline-flex items-center gap-2 text-teal-deep">
@@ -105,7 +105,7 @@ const otherServices = services.filter((s) => s !== hosting);
 
   <!-- 3. Station and view controls along the bottom -->
   <div data-lab-hud class="lab-hud relative z-10 border-t-2 border-border-strong bg-surface lg:col-span-2">
-    <div class="flex w-full flex-wrap items-center gap-x-6 gap-y-3 px-5 py-3 sm:px-6">
+    <div class="flex w-full flex-wrap items-center gap-x-6 gap-y-3 px-5 py-3 sm:px-6 lg:px-[var(--edge)]">
       <StationList class="lab-station-list" />
       <div class="flex flex-wrap items-center gap-2 lg:ml-auto">
         <details data-view-controls class="group/vc">
