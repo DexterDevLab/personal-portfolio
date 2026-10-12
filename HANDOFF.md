@@ -2,7 +2,10 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Hover hints in the room (latest)
+## Résumé PDF (latest)
+`public/resume.pdf` is now generated from `scripts/resume/resume.html` by `npm run resume` (`scripts/generate-resume.mjs`, headless Chrome at `/Applications/Google Chrome.app`, override with `CHROME_PATH`). One A4 page in the site's palette and fonts (Geist from `node_modules/geist`, portrait from `src/assets/portrait.jpg`). Content keeps every fact from the previous PDF — the four roles (Pandawebsolution 2012–2014, PandaVisuals 2014–2018, Jullie & Sands 2018–2022, PandaVisuals 2022–present), BS Electrical Engineering at the University of Saint Louis Tuguegarao, Licensed Electrical Engineer, languages, working-style points — rewritten in the site's voice with the PandaVisuals partnership, Panda Central, troubleshooting/hosting work and a Selected Projects block (Panda Central, Kaufbeiuns, Glanzstück, RAJ Real Estate Services). Contact is now info@dexteriglesia.com, dexteriglesia.com and GitHub plus the existing phone number; the old personal Gmail is gone. The latest PandaVisuals role reads "2022 – present" (the old PDF said 2022–2025). Edit the HTML and rerun the script to change anything.
+
+## Hover hints in the room
 Hovering a station in the 3D room (or its button in the control bar) makes the robot say a line about it in its thought bubble — "Want to know more about me?" for the notebook, "Something broken? This is where I fix it." for the repair bench, and so on (`HOVER_LINES` in `src/lab/index.ts`, inside `setHover`). Only in the overview, not under reduced motion, and the same station is not repeated within six seconds so sweeping the pointer around does not spam the bubble.
 
 ## Teal accent
