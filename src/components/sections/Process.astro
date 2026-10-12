@@ -18,7 +18,7 @@ import { processIntro, processSteps } from "@/data/process";
 <Section id="process" compact tone="plain">
   <SectionHeading eyebrow="How I work" title="From first conversation to launch." description={processIntro} />
   <div class="relative" data-process>
-    <!-- Wide: horizontal cable through the markers -->
+    <!-- Wide: horizontal cable through the four markers (they sit at the start of each grid column) -->
     <svg
       class="pointer-events-none absolute inset-x-0 -top-0.5 hidden h-12 w-full lg:block"
       viewBox="0 0 1200 48"
@@ -26,9 +26,9 @@ import { processIntro, processSteps } from "@/data/process";
       aria-hidden="true"
       data-process-cable="wide"
     >
-      <path class="cable-outline" d="M24 24 C 200 24, 240 40, 400 24 S 600 8, 776 24 S 1000 40, 1176 24" vector-effect="non-scaling-stroke"></path>
-      <path data-cable-path class="cable-core" d="M24 24 C 200 24, 240 40, 400 24 S 600 8, 776 24 S 1000 40, 1176 24" vector-effect="non-scaling-stroke"></path>
-      <circle data-cable-signal class="signal-dot" cx="1176" cy="24" r="8" vector-effect="non-scaling-stroke"></circle>
+      <path class="cable-outline" d="M24 24 C 130 24, 230 42, 334 24 S 540 6, 643 24 S 850 42, 952 24" vector-effect="non-scaling-stroke"></path>
+      <path data-cable-path class="cable-core" d="M24 24 C 130 24, 230 42, 334 24 S 540 6, 643 24 S 850 42, 952 24" vector-effect="non-scaling-stroke"></path>
+      <circle data-cable-signal class="signal-dot" cx="952" cy="24" r="8" vector-effect="non-scaling-stroke"></circle>
     </svg>
     <!-- Narrow: vertical rail beside the markers -->
     <svg
