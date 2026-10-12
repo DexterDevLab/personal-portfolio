@@ -34,7 +34,7 @@ import { processIntro, processSteps } from "@/data/process";
     <svg
       class="pointer-events-none absolute top-0 left-0 h-full w-11 lg:hidden"
       viewBox="0 0 44 100"
-      preserveAspectRatio="none"
+      preserveAspectRatio="xMidYMin meet"
       aria-hidden="true"
       data-process-cable="narrow"
     >
@@ -65,3 +65,23 @@ import { processIntro, processSteps } from "@/data/process";
     </ol>
   </div>
 </Section>
+
+<script>
+  // The narrow (below lg) rail is stretched to the list's height. Keep its
+  // SVG coordinate box in real pixels so the round signal stays round, and
+  // park the signal at the bottom when nothing animates it. Runs with or
+  // without the scroll scenes (reduced motion included).
+  document.querySelectorAll<HTMLElement>("[data-process]").forEach((wrap) => {
+    const rail = wrap.querySelector<SVGSVGElement>('[data-process-cable="narrow"]');
+    if (!rail) return;
+    const fit = () => {
+      const h = Math.max(100, Math.round(wrap.clientHeight));
+      rail.setAttribute("viewBox", `0 0 44 ${h}`);
+      rail.querySelectorAll("path").forEach((p) => p.setAttribute("d", `M22 4V${h - 4}`));
+      const dot = rail.querySelector("circle");
+      if (dot && !wrap.dataset.animated) dot.setAttribute("cy", String(h - 4));
+    };
+    fit();
+    new ResizeObserver(fit).observe(wrap);
+  });
+</script>

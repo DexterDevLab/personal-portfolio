@@ -20,6 +20,10 @@ export function setupProcess(ctx: SectionContext) {
     dot: cable.querySelector<SVGCircleElement>("[data-cable-signal]"),
   }));
 
+  // Process.astro keeps the narrow rail's coordinate box in sync with its
+  // pixel height; re-place the signal whenever ScrollTrigger re-measures.
+  ctx.ScrollTrigger.create({ trigger: wrap, onRefresh: () => apply() });
+
   const state = { p: 1 };
   const apply = () => {
     const cable = visibleCable();
@@ -32,6 +36,7 @@ export function setupProcess(ctx: SectionContext) {
     });
   };
 
+  wrap.dataset.animated = ""; // Process.astro's fit script then leaves the dot to us
   entryOnce(ctx, wrap, {
     start: "top 70%",
     init: () => {
