@@ -10,6 +10,7 @@ import Services from "@/components/sections/Services.astro";
 import Process from "@/components/sections/Process.astro";
 import About from "@/components/sections/About.astro";
 import Contact from "@/components/sections/Contact.astro";
+import PageRobot from "@/components/decor/PageRobot.astro";
 
 const work = (await getCollection("work")).sort((a, b) => a.data.order - b.data.order);
 const featured = work.find((entry) => entry.data.featured);
@@ -37,6 +38,8 @@ const clientWork = work.filter((entry) => !entry.data.featured);
     <About />
     <Contact />
   </div>
+  <!-- The assistant, walking down the margin beside the page (wide screens, motion allowed) -->
+  <PageRobot />
 </Base>
 
 <script>

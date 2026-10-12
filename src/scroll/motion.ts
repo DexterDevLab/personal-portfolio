@@ -8,8 +8,8 @@
  *              states in the markup are shown as they are.
  */
 export const MOTION = {
-  /** Below this width scenes use the shorter "simple" distances. */
-  wideMinWidth: 1024,
+  /** Below this width scenes use the shorter "simple" distances and the page robot stays home (it needs the ≥1280px margin; see PageRobot.astro). */
+  wideMinWidth: 1280,
   /** Where a scene starts: the element's top crosses this viewport line. */
   enterLine: "top 78%",
   /** Entry animation lengths, seconds. */

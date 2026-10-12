@@ -61,6 +61,7 @@ async function start(body: HTMLElement, mode: Exclude<ChoreoMode, "static">): Pr
       import("./sections/process"),
       import("./sections/about"),
       import("./sections/contact"),
+      import("./sections/robot"),
     ]),
   ]);
   gsap.registerPlugin(ScrollTrigger);
@@ -76,13 +77,16 @@ async function start(body: HTMLElement, mode: Exclude<ChoreoMode, "static">): Pr
     distance: mode === "full" ? MOTION.distance.wide : MOTION.distance.narrow,
   };
 
-  const [work, services, process, about, contact] = sections;
+  const [work, services, process, about, contact, robot] = sections;
+  let stopRobot: (() => void) | null = null;
   const gsapCtx = gsap.context(() => {
     work.setupWork(ctx);
     services.setupServices(ctx);
     process.setupProcess(ctx);
     about.setupAbout(ctx);
     contact.setupContact(ctx);
+    // The page robot only has room in the margin of the "full" mode
+    if (mode === "full") stopRobot = robot.setupRobot(ctx);
   }, body);
 
   // Layout settles after fonts/images and when the hero changes (3D lab on/off):
@@ -97,6 +101,7 @@ async function start(body: HTMLElement, mode: Exclude<ChoreoMode, "static">): Pr
   ro.observe(body);
 
   return () => {
+    stopRobot?.();
     ro.disconnect();
     cancelAnimationFrame(pending);
     gsapCtx.revert();
