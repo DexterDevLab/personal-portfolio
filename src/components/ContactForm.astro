@@ -171,13 +171,16 @@ const inputClasses =
         });
         const result = (await res.json().catch(() => null)) as
           | { ok: true }
-          | { ok: false; error?: string }
+          | { ok: false; error?: unknown }
           | null;
         if (result?.ok) {
           form.reset();
           setStatus("success", CONTACT_MESSAGES.success);
         } else {
-          setStatus("error", result?.error ?? CONTACT_MESSAGES.failed);
+          // Only our own string messages are shown; a platform error page
+          // (an object, or no JSON at all) falls back to the generic text.
+          const error = result && typeof result.error === "string" ? result.error : CONTACT_MESSAGES.failed;
+          setStatus("error", error);
         }
       } catch {
         setStatus("error", CONTACT_MESSAGES.failed);
