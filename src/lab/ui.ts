@@ -74,7 +74,7 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     if (!anchor) return;
     const el = document.getElementById(anchor);
     if (!el) return;
-    requestAnimationFrame(() => el.scrollIntoView({ behavior }));
+    setTimeout(() => el.scrollIntoView({ behavior }), 0);
   }
 
   // ---------- panels ----------
@@ -316,9 +316,13 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
   // the scroll scenes measure the page, so re-apply it once loading settles.
   const sectionHash = location.hash && !stationFromHash(location.hash) ? location.hash : "";
   if (sectionHash && document.getElementById(sectionHash.slice(1))) {
-    const settle = () => scrollToAnchor(sectionHash, "auto");
+    const settle = () => {
+      if (location.hash === sectionHash) scrollToAnchor(sectionHash, "auto");
+    };
     if (document.readyState === "complete") setTimeout(settle, 150);
     else window.addEventListener("load", () => setTimeout(settle, 150), { once: true });
+    // …and again once the room has booted, in case that shifted anything.
+    on("lab:ready", () => setTimeout(settle, 50));
   }
 
   if (view() === "lab") {
