@@ -86,6 +86,15 @@ const ink = "#25252b";
     transform-box: fill-box;
     transform-origin: center;
   }
+  /* The head pivots at the neck, the torso at the hips */
+  [data-robot-head] {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
+  [data-robot-torso] {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+  }
   /* Thought bubble, like the one in the room: a compact pill above the head,
      right-aligned to the robot so it grows leftward into the margin and
      never crosses the content column (it is capped at the margin width). */
@@ -93,11 +102,11 @@ const ink = "#25252b";
     position: absolute;
     right: -0.25rem;
     width: max-content;
-    max-width: calc(var(--col-left) - 1.5rem);
+    max-width: min(8rem, calc(var(--col-left) - 1.5rem));
     bottom: calc(100% + 0.6rem);
-    padding: 0.4rem 0.55rem;
+    padding: 0.45rem 0.6rem;
     border: 2px solid #25252b;
-    border-radius: 12px;
+    border-radius: 14px;
     background: #fffcf3;
     color: #25252b;
     font-family: var(--font-geist-mono);

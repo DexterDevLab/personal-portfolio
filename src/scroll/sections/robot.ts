@@ -71,8 +71,9 @@ export function setupRobot(ctx: SectionContext): () => void {
     arms[0]!.style.transform = `rotate(${-s * 22}deg)`;
     arms[1]!.style.transform = `rotate(${s * 22}deg)`;
     torso.style.transform = `translateY(${-bob}px)`;
-    head.style.transform = `translateY(${-bob * 1.4}px) translateX(${look * 3}px) rotate(${s * 2 + look * 9}deg)`;
-    eyes.forEach((e) => (e.style.transform = `translateX(${look * 2.5}px) scaleY(${blink})`));
+    // A small tilt toward the title (pivot at the neck) and the eyes glance that way
+    head.style.transform = `translateY(${-bob * 1.4}px) rotate(${s * 2 + look * 6}deg)`;
+    eyes.forEach((e) => (e.style.transform = `translateX(${look * 3}px) scaleY(${blink})`));
   };
   const settled = () => swing === 0 && Math.abs(look - lookTarget) < 0.005 && blink === 1;
 
