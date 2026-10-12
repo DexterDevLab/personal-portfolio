@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, envField } from "astro/config";
+import { fileURLToPath } from "node:url";
 import vercel from "@astrojs/vercel";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
@@ -22,6 +23,18 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      // @astrojs/vercel's runtime entry re-exports constants from the
+      // integration module, which drags `rolldown` and `@vercel/routing-utils`
+      // (build-time tools) into the server bundle as side-effect imports; on
+      // Vercel the rolldown native binding is missing and every request fails
+      // (FUNCTION_INVOCATION_FAILED). Nothing from them runs at request time,
+      // so the server bundle gets an empty module instead.
+      alias: [
+        { find: /^rolldown$/, replacement: fileURLToPath(new URL("./src/lib/empty-module.ts", import.meta.url)) },
+        { find: /^@vercel\/routing-utils$/, replacement: fileURLToPath(new URL("./src/lib/empty-module.ts", import.meta.url)) },
+      ],
+    },
   },
 
   redirects: {
