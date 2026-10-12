@@ -44,7 +44,7 @@ export const CAMERA = {
   portraitKeep: 0.62,
   near: 0.25,
   far: 60,
-  overview: { position: [7.4, 6.0, 9.2] as const, target: [0, 1.05, -0.6] as const },
+  overview: { position: [6.6, 5.45, 8.1] as const, target: [0, 1.05, -0.6] as const },
   travelSeconds: 1.1,
 } as const;
 

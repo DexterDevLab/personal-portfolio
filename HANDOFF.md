@@ -2,7 +2,11 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Logo plaque + side-wall decor (latest)
+## More room for the lab + panel scrolling (latest)
+- **Station panels could not scroll** (side panel from `md`): a `<dialog>` has `height: fit-content` in the UA stylesheet, which beat the `top/bottom` anchoring, so the panel was as tall as its content (2966 px for Experiments) and `overflow-y: auto` never kicked in. `h-auto` on the dialog fixes it (693 px tall at 1440 × 757, scrolls inside).
+- **Bigger room on desktop**: the stage bleeds to the right edge; the control bar is one row spanning the full width (the visible "Stations" kicker is gone, the `<nav>` keeps its label; the hint chip and the "Scroll to read" cue moved into the intro column under the CTA); the overview camera is 11 % closer (`CAMERA.overview` position 6.6 / 5.45 / 8.1). At 1440 × 757 the stage went from 861 × 573 to 881 × 625 and the hero still fits the viewport exactly; the bar wraps to two rows below ≈ 1330 px wide, where the hero simply grows.
+
+## Logo plaque + side-wall decor
 - **Back wall**: the painted "DexterDevLab" text is replaced by a cream plaque with `src/assets/logo.svg` rasterised onto a canvas texture (`buildLogoSign` in `src/lab/scene/room.ts`). The URL reaches the runtime as `data-logo-src` on the lab section (`Lab.astro` → `ui.ts` → `LabOptions.logoSrc` → `BuildContext.logoSrc`). The SVG only has a viewBox, so width/height are injected into the fetched markup before drawing; the plaque is blank until the image has loaded. Replace the logo file and the wall updates with it.
 - **Left wall**: a corkboard with four pinned notes on the open front stretch (the experiment rack covers the back half) and a wall clock high in the back corner. **Right wall**: a whiteboard with a sketched sites → console plan (canvas texture) and a marker tray beside the server cabinet, and a vent grille above it. All are children of the wall meshes, so they hide with the walls when the camera looks through them; positions are wall-local in `decorateLeftWall` / `decorateRightWall`.
 - The wall clock keeps real time: hour and minute hands follow `Date.now()`, the second hand jumps once a second with a small overshoot (`wallClock` animator returned by `decorateLeftWall`, registered with the other ambient animators). Under reduced motion the animators are skipped, so the clock shows the time at load.
