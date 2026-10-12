@@ -237,21 +237,21 @@ h3 {
   .btn:active {
     translate: 0 1px;
   }
+  /* Primary action in the logo's teal. Light: deeper teal with cream text
+     (4.97:1). Dark: the brighter teal with dark text (≈5.9:1). */
   .btn-primary {
-    background: var(--orange);
-    color: #2b2b30;
-  }
-  .btn-primary:hover {
-    background: #ff9955;
-  }
-  /* Light theme: the primary action takes the logo's teal (deeper shade with
-     cream text, 4.8:1); orange stays the accent in the dark theme. */
-  :root:not(.dark) .btn-primary {
     background: var(--teal-deep);
     color: #f5eedc;
   }
-  :root:not(.dark) .btn-primary:hover {
+  .btn-primary:hover {
     background: var(--teal);
+  }
+  .dark .btn-primary {
+    background: var(--teal);
+    color: #0f2a27;
+  }
+  .dark .btn-primary:hover {
+    background: #3cc9b8;
   }
   .btn-teal {
     background: var(--teal);
