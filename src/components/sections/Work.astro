@@ -10,7 +10,7 @@ import PartnerText from "@/components/ui/PartnerText.astro";
 
 /**
  * The client-work rack: the first two builds get wide frames on the top
- * shelf, the rest sit three across below. A shelf line runs under each row.
+ * shelf, the rest sit two across below. A shelf line runs under each row.
  */
 interface Props {
   projects: CollectionEntry<"work">[];
@@ -34,10 +34,10 @@ const rest = projects.slice(2);
     }
   </div>
   <div class="shelf my-10" aria-hidden="true"></div>
-  <div class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="grid gap-x-8 gap-y-10 sm:grid-cols-2">
     {
       rest.map((project, i) => (
-        <Reveal delay={(i % 3) * 0.06} class="relative">
+        <Reveal delay={(i % 2) * 0.06} class="relative">
           <ProjectCard project={project} index={i + 3} display />
         </Reveal>
       ))

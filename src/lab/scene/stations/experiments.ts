@@ -29,13 +29,14 @@ export function buildExperiments(ctx: BuildContext): StationDefinition {
     .add(rbox(1.95, 0.06, 0.52, 0.02), PALETTE.wood, { position: [0, 2.05, 0] })
     .add(rbox(1.9, 0.14, 0.04, 0.02), PALETTE.teal, { position: [0, 2.22, 0.22] });
 
-  // Five specimen units: boxes with a screen bezel; positions on two shelves
+  // Six client-site units: boxes with a screen bezel, three per shelf
   const units: [number, number][] = [
     [-0.62, 0.58],
     [0, 0.58],
     [0.62, 0.58],
-    [-0.34, 1.33],
-    [0.34, 1.33],
+    [-0.62, 1.33],
+    [0, 1.33],
+    [0.62, 1.33],
   ];
   units.forEach(([x, y], i) => {
     parts
