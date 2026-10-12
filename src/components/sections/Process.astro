@@ -2,7 +2,8 @@
 import Section from "@/components/ui/Section.astro";
 import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/Reveal.astro";
-import { processSteps } from "@/data/process";
+import PartnerText from "@/components/ui/PartnerText.astro";
+import { processIntro, processSteps } from "@/data/process";
 
 /**
  * Four steps joined by a short cable inside this section. On wide screens
@@ -12,11 +13,10 @@ import { processSteps } from "@/data/process";
  * afterwards, and without JS or motion, the signal sits at the last step and
  * every step is marked done.
  */
-const short = ["Understand", "Collaborate", "Build & test", "Launch & maintain"];
 ---
 
-<Section id="process" compact tone="plain" class="border-y-2 border-border-strong">
-  <SectionHeading eyebrow="How I work" title="Plain steps, no surprises." />
+<Section id="process" compact tone="plain">
+  <SectionHeading eyebrow="How I work" title="From first conversation to launch." description={processIntro} />
   <div class="relative" data-process>
     <!-- Wide: horizontal cable through the markers -->
     <svg
@@ -54,9 +54,9 @@ const short = ["Understand", "Collaborate", "Build & test", "Launch & maintain"]
                 0{i + 1}
               </span>
               <div>
-                <p class="label-mono text-muted">{short[i]}</p>
+                <p class="label-mono text-muted">{step.short}</p>
                 <h3 class="mt-1 text-base font-bold">{step.title}</h3>
-                <p class="mt-2 text-sm leading-relaxed text-muted">{step.description}</p>
+                <p class="mt-2 text-sm leading-relaxed text-muted"><PartnerText text={step.description} /></p>
               </div>
             </li>
           </Reveal>

@@ -7,6 +7,7 @@ import Container from "@/components/ui/Container.astro";
 import Eyebrow from "@/components/ui/Eyebrow.astro";
 import Screenshot from "@/components/ui/Screenshot.astro";
 import ModeSwitch from "@/components/lab/ModeSwitch.astro";
+import PartnerText from "@/components/ui/PartnerText.astro";
 import { site } from "@/data/site";
 import { intro } from "@/data/about";
 
@@ -21,7 +22,7 @@ const { featured } = Astro.props;
 const liveHost = featured.data.liveUrl ? new URL(featured.data.liveUrl).host : undefined;
 ---
 
-<div id="top" class="relative overflow-hidden border-b-2 border-border-strong bg-background-deep grid-floor">
+<div id="top" class="relative overflow-hidden bg-background-deep grid-floor">
   <Container class="grid items-center gap-10 pt-28 pb-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14 lg:pt-36 lg:pb-20">
     <div>
       <div class="animate-rise">
@@ -33,7 +34,7 @@ const liveHost = featured.data.liveUrl ? new URL(featured.data.liveUrl).host : u
         </h1>
       </div>
       <div class="animate-rise" style="--rise-delay: 0.16s">
-        <p class="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">{intro.paragraph}</p>
+        <p class="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg"><PartnerText text={intro.paragraph} /></p>
       </div>
       <div class="animate-rise" style="--rise-delay: 0.24s">
         <div class="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">

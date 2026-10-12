@@ -11,7 +11,7 @@ export const services: Service[] = [
   {
     title: "Website development",
     description:
-      "Marketing sites, shops, and multilingual sites built on WordPress and WooCommerce. I develop from start to finish; when a project needs design, I collaborate with a designer.",
+      "Marketing sites, online shops, and multilingual sites built on WordPress and WooCommerce, from setup through to launch.",
     icon: "layout",
   },
   {
@@ -23,7 +23,7 @@ export const services: Service[] = [
   {
     title: "Custom web applications",
     description:
-      "Internal tools and web apps when a plugin won't cut it, like Panda Central, the platform I built to manage our client WordPress sites.",
+      "Internal tools and web apps when a plugin won't do the job, like Panda Central, the dashboard we use to manage client WordPress sites.",
     icon: "app",
   },
   {
@@ -34,5 +34,6 @@ export const services: Service[] = [
   },
 ];
 
-export const engagementLine =
-  "Hire me directly, or work with my designer colleague and me as a two-person team. Fixed-scope projects, ongoing maintenance, or hourly troubleshooting.";
+export const servicesIntro = "I handle the technical work behind our projects, from development and deployment to troubleshooting and maintenance.";
+
+export const engagementLine = "For new projects or technical support, get in touch and tell me what you need.";

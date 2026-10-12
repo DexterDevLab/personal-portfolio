@@ -5,9 +5,11 @@ import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/Reveal.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
 import { site } from "@/data/site";
+import { workIntro } from "@/data/about";
+import PartnerText from "@/components/ui/PartnerText.astro";
 
 /**
- * The experiment rack: the first two builds get wide frames on the top
+ * The client-work rack: the first two builds get wide frames on the top
  * shelf, the rest sit three across below. A shelf line runs under each row.
  */
 interface Props {
@@ -18,12 +20,10 @@ const top = projects.slice(0, 2);
 const rest = projects.slice(2);
 ---
 
-<Section id="work" tone="deep" class="border-b-2 border-border-strong">
-  <SectionHeading
-    eyebrow="Experiments · completed builds"
-    title="Client sites I've developed."
-    description="WordPress and WooCommerce sites for businesses in Germany and Spain: a B2B shop, a rental platform, multilingual and showroom sites. I handled development; design came from my designer colleague."
-  />
+<Section id="work" tone="deep">
+  <SectionHeading eyebrow="Selected client work" title="Websites I've built with PandaVisuals.">
+    <PartnerText text={workIntro} />
+  </SectionHeading>
   <div class="grid gap-x-8 gap-y-10 md:grid-cols-2">
     {
       top.map((project, i) => (

@@ -6,7 +6,7 @@ import SectionHeading from "@/components/ui/SectionHeading.astro";
 import Reveal from "@/components/Reveal.astro";
 import ContactForm from "@/components/ContactForm.astro";
 import { site } from "@/data/site";
-import { contactHelp } from "@/data/about";
+import { contactHelp, contactIntro } from "@/data/about";
 
 /**
  * The communication station: a normal form in an outlined console with a
@@ -14,11 +14,11 @@ import { contactHelp } from "@/data/about";
  */
 ---
 
-<Section id="contact" tone="deep" class="border-t-2 border-border-strong">
+<Section id="contact" tone="deep">
   <SectionHeading
     eyebrow="Communication station"
     title="Tell me about your project."
-    description={`A new site, a web app, or something broken on WordPress: send a message and I'll get back to you ${site.responseTime}.`}
+    description={`${contactIntro} I usually reply ${site.responseTime}.`}
   />
   <div class="grid gap-8 md:grid-cols-[minmax(0,1fr)_300px] lg:gap-12">
     <Reveal>
@@ -26,7 +26,6 @@ import { contactHelp } from "@/data/about";
         <div class="console-strip flex items-center gap-3 border-b-2 border-border-strong bg-teal px-5 py-3 text-[#0f2a27]">
           <span class="led bg-orange" aria-hidden="true"></span>
           <span class="label-mono font-semibold">Open channel</span>
-          <span class="ml-auto font-mono text-xs">{site.email}</span>
         </div>
         <div class="p-5 sm:p-6">
           <ContactForm />

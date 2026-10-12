@@ -1,7 +1,7 @@
 ---
 title: Panda Central
-summary: A web app my designer colleague and I use to manage our client WordPress sites from one dashboard, with updates, monitoring, and client reports.
-tagline: Internal app for managing client WordPress sites
+summary: A dashboard for managing WordPress websites. PandaVisuals and I use it to look after our client sites from one place, with updates, monitoring, and client reports.
+tagline: A dashboard for managing WordPress websites
 role: Planning and development, with substantial AI assistance
 stack: [Next.js, TypeScript, BullMQ, Postgres]
 screenshot: ../../assets/projects/panda-central.jpg
@@ -16,7 +16,7 @@ statusLabel: In daily use, actively developed
 
 ## Overview
 
-Panda Central is a self-hosted web application for managing the WordPress sites my designer colleague and I look after for clients. Instead of logging into each site's admin to check for plugin updates, run a backup, or see whether something broke, we open one dashboard that shows the whole fleet.
+Panda Central is a self-hosted web application for managing the WordPress sites [PandaVisuals](https://www.pandavisuals.de/) and I look after for clients. Instead of logging into each site's admin to check for plugin updates, run a backup, or see whether something broke, we open one dashboard that shows the whole fleet.
 
 It is an internal tool, login-gated, and in daily use. It is also still growing: we are currently adding a support system so client requests land in the same place as the sites they belong to.
 
@@ -28,7 +28,7 @@ We wanted a single place that answers "which sites need attention right now?" an
 
 ## My role and how we worked
 
-The idea came out of our own maintenance routine; my colleague and I shaped it together. I planned the application and did the development: the data model, the job queue, the WordPress connector, and the dashboard itself.
+The idea came out of our own maintenance routine, and PandaVisuals and I shaped it together. I planned the application and did the development: the data model, the job queue, the WordPress connector, and the dashboard itself.
 
 A large part of that development was AI-assisted. I used AI tools heavily for prompting through implementation, exploring approaches, and generating code that I then reviewed, tested, and adjusted. I did not hand-write every line, and I don't claim to have. What I did do was decide what to build, how the pieces fit, what was acceptable to ship, and what to fix when it didn't work.
 

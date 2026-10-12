@@ -1,0 +1,32 @@
+---
+import { site } from "@/data/site";
+
+/**
+ * Renders a copy string from src/data with every mention of the partner's
+ * name (PandaVisuals) turned into a link to their site. Keeps the copy in
+ * plain strings so page sections and lab panels share it.
+ */
+interface Props {
+  text: string;
+}
+const { text } = Astro.props;
+const parts = text.split(site.partner.name);
+---
+
+{
+  parts.map((part, i) => (
+    <>
+      {part}
+      {i < parts.length - 1 && (
+        <a
+          href={site.partner.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-medium text-accent underline-offset-4 hover:underline"
+        >
+          {site.partner.name}
+        </a>
+      )}
+    </>
+  ))
+}

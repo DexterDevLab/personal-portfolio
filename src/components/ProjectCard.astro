@@ -4,6 +4,8 @@ import { ArrowUpRight, Lock } from "@lucide/astro";
 import type { CollectionEntry } from "astro:content";
 import Screenshot from "@/components/ui/Screenshot.astro";
 import Tag from "@/components/ui/Tag.astro";
+import PartnerText from "@/components/ui/PartnerText.astro";
+import { site } from "@/data/site";
 
 /**
  * A completed build on the experiment rack: numbered label, screenshot in a
@@ -20,7 +22,7 @@ interface Props {
 const { project, index = 1, wide = false, display = false } = Astro.props;
 const { data } = project;
 const host = data.liveUrl ? new URL(data.liveUrl).host.replace(/^www\./, "") : undefined;
-const number = `EXP-${String(index).padStart(2, "0")}`;
+const number = `SITE-${String(index).padStart(2, "0")}`;
 ---
 
 <article class="group relative flex h-full flex-col">
@@ -64,8 +66,8 @@ const number = `EXP-${String(index).padStart(2, "0")}`;
     </div>
     <p class="mt-2 text-[15px] leading-relaxed text-muted">{data.summary}</p>
     <p class="mt-3 text-sm text-muted">
-      <span class="font-semibold text-foreground">{data.role}</span>
-      {data.design && <span> · Design by {data.design}</span>}
+      <span class="font-semibold text-foreground">{data.role}: {site.shortPerson}</span>
+      {data.design && <span> · Design: <PartnerText text={data.design} /></span>}
       {host && <span> · {host}</span>}
     </p>
     <div class="mt-4 flex flex-wrap gap-2">

@@ -34,7 +34,14 @@ export function setupRobot(ctx: SectionContext): () => void {
   const contact = document.getElementById("contact");
   if (!robot || !bubble || !bubbleText || !torso || !head || !hero || !contact || legs.length < 2) return () => {};
 
-  robot.dataset.active = "";
+  // Only where the margin fits it (PageRobot.astro hides it below 1360px too)
+  const room = matchMedia("(min-width: 1360px)");
+  const syncRoom = () => {
+    if (room.matches) robot.dataset.active = "";
+    else delete robot.dataset.active;
+  };
+  syncRoom();
+  room.addEventListener("change", syncRoom);
 
   // ----- walking -----
   let phase = 0; // gait phase, radians
@@ -148,6 +155,7 @@ export function setupRobot(ctx: SectionContext): () => void {
   }
 
   return () => {
+    room.removeEventListener("change", syncRoom);
     window.removeEventListener("scroll", wake);
     window.removeEventListener("resize", wake);
     if (raf) cancelAnimationFrame(raf);

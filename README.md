@@ -1,6 +1,6 @@
 # dexteriglesia.com — DexterDevLab
 
-Personal portfolio of **Dexter Iglesia** (DexterDevLab), a freelance web developer based in the Philippines: websites and web apps, WordPress & WooCommerce troubleshooting, hosting, deployment, and maintenance.
+Personal portfolio of **Dexter Iglesia** (DexterDevLab), a web developer based in the Philippines working with PandaVisuals: websites and web apps, WordPress & WooCommerce troubleshooting, hosting, deployment, and maintenance.
 
 The whole site is styled as one cartoon inventor's laboratory: the homepage opens with the rotatable 3D room (Three.js) whose six stations open the portfolio content, and the same content continues below as a normal scrolling page where every section is a station with its own short animated scene. Visitors can turn the 3D lab off at any time; no-WebGL browsers and no-JS visitors get the static hero.
 

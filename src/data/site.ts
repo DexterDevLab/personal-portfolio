@@ -7,26 +7,26 @@ export const site = {
   name: "DexterDevLab",
   person: "Dexter Dela Iglesia",
   shortPerson: "Dexter Iglesia",
-  role: "Freelance Web Developer",
+  role: "Web Developer",
   url: "https://dexteriglesia.com",
   email: "info@dexteriglesia.com",
   github: "https://github.com/DexterDevLab",
   resume: "/resume.pdf",
-  title: "Dexter Iglesia — Freelance Web Developer | DexterDevLab",
+  title: "Dexter Iglesia — Web Developer | DexterDevLab",
   description:
-    "Freelance web developer in the Philippines with 10+ years building websites and web apps. WordPress & WooCommerce troubleshooting, custom web apps, hosting, deployment, and ongoing maintenance.",
+    "Web developer in the Philippines working with PandaVisuals: WordPress and WooCommerce development and troubleshooting, custom web apps, hosting, deployment, and ongoing maintenance.",
 
   /** Hero availability badge. Set `show: false` to hide it. */
   availability: {
     show: true,
-    label: "Available for freelance projects",
+    label: "Available for new projects",
   },
 
   /** Response-time promise shown in the contact section. */
   responseTime: "within a day or two",
 
-  /** How the design collaborator is referred to in copy. */
-  designer: "a designer colleague",
+  /** The design partner. Copy mentions the name; PartnerText.astro links it. */
+  partner: { name: "PandaVisuals", url: "https://www.pandavisuals.de/" },
 } as const;
 
 export const navLinks = [

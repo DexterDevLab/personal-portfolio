@@ -2,7 +2,28 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Notebook redesign (latest)
+## Copy, attribution and separators pass (latest)
+
+### Copy and attribution
+- **PandaVisuals is named and linked** (`site.partner` in `src/data/site.ts`; `src/components/ui/PartnerText.astro` turns the name into a link wherever a copy string is rendered). Every "designer colleague" / "two-person collaboration" / "hire me directly" line is gone. References: hero intro (both heroes), Work intro, project credits, Process step 2, About partnership paragraph and facts card, Panda Central "What I built", the case-study markdown, metadata description.
+- Role label is now "Web Developer" (title/metadata, hero kicker); availability badge "Available for new projects". The brief's intro, Work heading and copy, Services intro and invitation, Process heading/steps (`src/data/process.ts`, now with `short` labels and `processIntro`), About heading and partnership paragraph, Panda Central descriptor ("A dashboard for managing WordPress websites" as the project's `tagline`, shown under the title and in the summary), Contact intro (`contactIntro`) are applied verbatim or lightly tightened.
+- Project frames are tagged SITE-01… instead of EXP-01…. Lab panels read the same sources: station 02 is now "Client sites" / "Websites I've built with PandaVisuals", the notebook panel "The developer behind DexterDevLab", the servers panel carries the services intro and the new invitation, the comms panel the new contact intro. "Experiments" is no longer used for client sites (the station's internal id stays `experiments`).
+- **Project credits** now read "Development: Dexter Iglesia · Design: PandaVisuals" on all five client sites (`design: PandaVisuals` in each `src/content/work/*.md`). This follows the earlier decision that all client sites were designed by the design partner; **please confirm it holds for every one of the five** (Kaufbeiuns, Glanzstück, MR Saddle Fitting, Luxury Lashshop, Küchen-Galerie) and I will adjust any exception.
+- Panda Central case study: "PandaVisuals and I" replaces the anonymous colleague; AI-assisted development wording unchanged; unfinished support system still described as in progress; no metrics.
+
+### Separators
+- Removed the full-width rules on the hero, Panda Central, Work, Process and Contact. Kept: the header's bottom border, the control bar's top border under the lab, and the footer's top border. Background changes (ink / deep / plain) now separate sections; Services → Process → About sit on the same plain tone with spacing only.
+- Double line under the header on `#about` / `#contact`: gone with the removed section borders. Anchors land with the section top 16 px under the header (`scroll-padding-top: 5rem`) and the heading in view.
+
+### Visual fixes
+- Page robot: centred in the left margin (`left: (col-left − robot width) / 2`) instead of hanging off the edge; shown only from 1360 px where the margin fits it (CSS + a live media-query check in `robot.ts`); bubble centred above its head. At 1440 it sits at x 44–116 with the column at 160.
+- Contact console header: the small mono email label on the teal strip is removed; "Open channel" remains, the prominent email link stays under "Direct channels".
+
+### Checks
+- `npm run check` 0 errors, `npm run build` passes. Rendered homepage: 18 links to pandavisuals.de; case study 4 mentions. No remaining "colleague/designer/two-person/freelance" strings in `src/`.
+- Chrome 1440: hero intro link, section borders (all 0 except HUD/footer), `#about` and `#contact` anchors, robot placement, contact strip, no horizontal overflow; 820 and 390 widths checked for heading wraps and overflow (see below).
+
+## Notebook redesign
 `src/components/sections/About.astro` is now a proper lab-notebook spread: left page with "Entry 00 · Who", the polaroid (light frame, tape, a handwritten caption in a cursive system face), an index card of plain facts (base, 10+ years, started with WordPress, works with a designer colleague — all from existing copy), the résumé button and a page number; right page with an orange sticky note ("Ask me about WordPress fixes") in the flow above the biography, the three paragraphs as numbered entries with teal margin rules and mono labels, and the tools as rotated sticker chips. Index tabs (Bio / Tools / CV) sit on the right edge from `md`, a paper clip hangs over the top-left corner. Decorative pieces are `aria-hidden`; the photo keeps its alt and a visually-hidden name/role line. The cover-open scene is unchanged. Checked in both themes at 1440 (sticky note never overlaps the entries) and at 390 px.
 
 ## Page robot
