@@ -10,12 +10,12 @@
 import type { SectionContext } from "../signal";
 
 const LINES: Record<string, string> = {
-  "panda-central": "This console runs Panda Central.",
-  work: "Client sites are on the shelves.",
-  services: "Four things I can do for you.",
-  process: "Here's how a project goes.",
-  about: "That's me, in the notebook.",
-  contact: "Tell me about your project!",
+  "panda-central": "Meet Panda Central, the dashboard I built to manage client sites.",
+  work: "These are websites I've built together with PandaVisuals.",
+  services: "Here's what I can take care of on your project.",
+  process: "This is how a project runs, from the first call to launch.",
+  about: "A little about the developer behind the lab.",
+  contact: "Ready when you are. Tell me about your project!",
 };
 
 const CRUISE = 0.55; // viewport fraction the robot walks at
