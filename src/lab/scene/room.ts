@@ -129,13 +129,13 @@ export function buildRoom(ctx: BuildContext): RoomParts {
   // Wordmark painted on the back wall above the console backdrop. It is a
   // child of the wall so it hides together with it.
   // The logo plaque on the back wall, and something on the side walls
-  const sign = buildLogoSign(ctx);
+  const { group: sign, animators: signAnimators } = buildLogoSign(ctx);
   sign.position.set(0, ROOM.height / 2 - 0.1, t / 2 + 0.01 + 0.03);
   back.add(sign);
   decorateLeftWall(ctx, left, t);
   decorateRightWall(ctx, right, t);
   // Two clocks beside the monitor: where I am, and where most clients are
-  const animators: Animator[] = [];
+  const animators: Animator[] = [...signAnimators];
   for (const [x, label, timeZone] of [
     [-2.55, "Manila", "Asia/Manila"],
     [2.55, "Berlin", "Europe/Berlin"],
@@ -155,7 +155,7 @@ export function buildRoom(ctx: BuildContext): RoomParts {
  * is blank. The SVG only has a viewBox, so explicit dimensions are injected
  * before drawing to get a crisp raster.
  */
-function buildLogoSign(ctx: BuildContext) {
+function buildLogoSign(ctx: BuildContext): { group: Group; animators: Animator[] } {
   const sign = new Group();
   sign.name = "wordmark";
   const W = 3.1;
@@ -176,11 +176,73 @@ function buildLogoSign(ctx: BuildContext) {
   logo.position.z = 0.045;
   sign.add(logo);
 
+  // The symbol's antenna ball and the <> on its screen are drawn as separate
+  // pieces over the plaque so they can move: the ball is a blinking beacon,
+  // the brackets glow in a slow heartbeat. Positions map the logo's 1500 × 390
+  // viewBox onto the 2.6-unit-wide logo plane.
+  const planeW = 2.6;
+  const planeH = planeW * (532 / 2048);
+  const toPlane = (x: number, y: number): [number, number] => [(x / 1500 - 0.5) * planeW, (0.5 - y / 390) * planeH];
+  const [ballX, ballY] = toPlane(182, 46);
+  const ballR = (28 / 1500) * planeW;
+  const beacon = new Group();
+  beacon.position.set(ballX, ballY, 0.05 + ballR);
+  // Inverted hull for the outline (back faces only), like every other prop
+  const beaconOutline = new Mesh(sphere(ballR * 1.14, 16, 12), ctx.shared.outline);
+  const beaconBall = new Mesh(sphere(ballR, 16, 12), ctx.shared.ledOrange);
+  beacon.add(beaconOutline, beaconBall);
+  sign.add(beacon);
+
+  const glyph = document.createElement("canvas");
+  glyph.width = 256;
+  glyph.height = 160;
+  const gc = glyph.getContext("2d");
+  if (gc) {
+    // Same strokes as the logo's <> (viewBox 119–210 × 179–230), scaled 2.8×
+    gc.strokeStyle = "#dff7f2";
+    gc.lineWidth = 40;
+    gc.lineCap = "round";
+    gc.lineJoin = "round";
+    const sx = 256 / 91;
+    const sy = 160 / 51;
+    const P = (x: number, y: number): [number, number] => [(x - 119) * sx, (y - 179) * sy];
+    gc.beginPath();
+    gc.moveTo(...P(145, 184)); gc.lineTo(...P(124, 205)); gc.lineTo(...P(145, 225));
+    gc.moveTo(...P(184, 184)); gc.lineTo(...P(205, 205)); gc.lineTo(...P(184, 225));
+    gc.stroke();
+  }
+  const glyphTex = new CanvasTexture(glyph);
+  glyphTex.colorSpace = SRGBColorSpace;
+  const glyphMat = new MeshBasicMaterial({ map: glyphTex, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+  const [gx, gy] = toPlane(164.5, 204.5);
+  const glow = new Mesh(new PlaneGeometry((91 / 1500) * planeW, (51 / 390) * planeH), glyphMat);
+  glow.position.set(gx, gy, 0.047);
+  sign.add(glow);
+
+  const beaconAnimator: Animator = {
+    id: "logoBeacon",
+    update: (_dt, t) => {
+      // Beacon: a soft pulse with a brighter blink once a second
+      const pulse = 0.5 + 0.5 * Math.sin(t * 2.4);
+      const blink = (t % 1) < 0.15;
+      beacon.scale.setScalar(1 + pulse * 0.12 + (blink ? 0.08 : 0));
+      beaconBall.material = blink ? ctx.shared.lampBulb : ctx.shared.ledOrange;
+      // Brackets: slow heartbeat glow
+      glyphMat.opacity = 0.35 + 0.55 * (0.5 + 0.5 * Math.sin(t * 1.6));
+      return true;
+    },
+  };
+
   if (ctx.logoSrc) {
     fetch(ctx.logoSrc)
       .then((r) => r.text())
       .then((svg) => {
-        const sized = svg.replace(/<svg\b/, '<svg width="1500" height="390"');
+        // Drop the painted antenna ball (the 3D beacon replaces it)
+        const withoutBall = svg
+          .replace(/<circle cx="182" cy="46" r="32"[^>]*\/>\s*/g, "")
+          .replace(/<circle cx="182" cy="46" r="28"[^>]*\/>\s*/g, "")
+          .replace(/<circle cx="175" cy="38" r="7"[^>]*\/>\s*/g, "");
+        const sized = withoutBall.replace(/<svg\b/, '<svg width="1500" height="390"');
         const url = URL.createObjectURL(new Blob([sized], { type: "image/svg+xml" }));
         const img = new Image();
         img.onload = () => {
@@ -198,7 +260,7 @@ function buildLogoSign(ctx: BuildContext) {
       })
       .catch(() => {});
   }
-  return sign;
+  return { group: sign, animators: [beaconAnimator] };
 }
 
 /**
