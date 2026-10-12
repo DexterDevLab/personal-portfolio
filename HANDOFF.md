@@ -2,7 +2,10 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Teal accent (latest)
+## Hover hints in the room (latest)
+Hovering a station in the 3D room (or its button in the control bar) makes the robot say a line about it in its thought bubble — "Want to know more about me?" for the notebook, "Something broken? This is where I fix it." for the repair bench, and so on (`HOVER_LINES` in `src/lab/index.ts`, inside `setHover`). Only in the overview, not under reduced motion, and the same station is not repeated within six seconds so sweeping the pointer around does not spam the bubble.
+
+## Teal accent
 Every orange accent on the page is now teal, at the user's request: `--orange` / `--orange-deep` are aliases of `--teal` / `--teal-deep` (kept so existing `bg-orange`-style utilities keep working, but new code should use the teal names), inline SVG fills in `ServiceArt.astro` / `PageRobot.astro` and the scroll scenes use the teal, and primary buttons are teal in both themes (light: deeper teal + cream, 4.97:1; dark: bright teal + dark text, 5.87:1). The process signal dot is cream so it still reads on the teal cable. Buttons are flat (no offset shadow or lift). Not changed: the logo (brand asset, keeps its orange antenna/plates) and the 3D room's props (`PALETTE.orange` in `src/lab/config.ts`) — say the word if the room should follow.
 
 ## Copy, attribution and separators pass

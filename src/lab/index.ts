@@ -272,6 +272,18 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
   // ----- hover / gestures -----
   const seq = { camera, lookTarget: controls.target, reducedMotion: state.reducedMotion, requestRender };
 
+  // What the assistant says when the visitor hovers a station (room or list button)
+  const HOVER_LINES: Record<StationId, string> = {
+    console: "That's Panda Central, our site dashboard.",
+    experiments: "Client sites I built with PandaVisuals.",
+    repair: "Something broken? This is where I fix it.",
+    servers: "Hosting, deployment and maintenance live here.",
+    notebook: "Want to know more about me?",
+    comms: "Want to start a project? Call me here!",
+  };
+  let lastHoverLine: StationId | null = null;
+  let lastHoverLineAt = -Infinity;
+
   function setHover(id: StationId | null) {
     if (state.hovered === id) return;
     if (state.hovered) stations.get(state.hovered)?.materials.setHighlight(false);
@@ -280,6 +292,13 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     canvas.style.cursor = id ? "pointer" : dragging ? "grabbing" : "grab";
     if (robot && state.phase === "overview") {
       robot.lookTarget.copy(id ? stations.get(id)!.focus : camera.position);
+      // A hint in the thought bubble; the same station isn't repeated within a few seconds
+      const now = performance.now();
+      if (id && !state.reducedMotion && (id !== lastHoverLine || now - lastHoverLineAt > 6000)) {
+        robot.say(HOVER_LINES[id], 2.8);
+        lastHoverLine = id;
+        lastHoverLineAt = now;
+      }
     }
     emit("lab:hover", { id });
     requestRender();
