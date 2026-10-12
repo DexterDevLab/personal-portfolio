@@ -595,6 +595,7 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     };
 
     room = buildRoom(ctx);
+    animators.push(...room.animators);
     scene.add(room.group);
     const built = buildStations(ctx);
     repairParts = built.repair;

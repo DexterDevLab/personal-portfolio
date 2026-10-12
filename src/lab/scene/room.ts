@@ -2,7 +2,7 @@ import { CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneGeometry, SRGBColor
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { PALETTE, ROOM } from "../config";
 import { PartBuilder, box, cyl, rbox, sphere, type Xyz } from "../geometry";
-import type { BuildContext } from "./types";
+import type { Animator, BuildContext } from "./types";
 
 export interface RoomParts {
   group: Group;
@@ -10,6 +10,8 @@ export interface RoomParts {
   walls: { back: Mesh; left: Mesh; right: Mesh; skirtBack: Mesh; skirtLeft: Mesh; skirtRight: Mesh };
   /** Hanging lamp, hidden while the console is focused so it never blocks the monitor. */
   lamp: Group;
+  /** Ambient motion owned by the room (the wall clock). */
+  animators: Animator[];
 }
 
 /**
@@ -129,10 +131,10 @@ export function buildRoom(ctx: BuildContext): RoomParts {
   const sign = buildLogoSign(ctx);
   sign.position.set(0, ROOM.height / 2 - 0.1, t / 2 + 0.01 + 0.03);
   back.add(sign);
-  decorateLeftWall(ctx, left, t);
+  const animators = decorateLeftWall(ctx, left, t);
   decorateRightWall(ctx, right, t);
 
-  return { group, walls: { back, left, right, skirtBack, skirtLeft, skirtRight }, lamp };
+  return { group, walls: { back, left, right, skirtBack, skirtLeft, skirtRight }, lamp, animators };
 }
 
 /**
@@ -192,7 +194,7 @@ function buildLogoSign(ctx: BuildContext) {
  * front stretch, a wall clock high in the back corner above the rack. Children of the wall mesh so they
  * hide with it; positions are in the wall's local space.
  */
-function decorateLeftWall(ctx: BuildContext, wall: Mesh, t: number) {
+function decorateLeftWall(ctx: BuildContext, wall: Mesh, t: number): Animator[] {
   const face = t / 2 + 0.01; // local x of the wall's inner face
   const local = (y: number, z: number): Xyz => [face, y - ROOM.height / 2, z - wall.position.z];
   const group = new Group();
@@ -221,20 +223,92 @@ function decorateLeftWall(ctx: BuildContext, wall: Mesh, t: number) {
     });
   });
 
-  // Wall clock high in the back corner, above the rack
+  // Wall clock high in the back corner, above the rack: rim, face, hour marks
   const cz = -2.45;
   const cy = 2.95;
   parts
     .add(cyl(0.27, 0.27, 0.04, 24), PALETTE.charcoal, { position: local(cy, cz), rotation: [0, 0, Math.PI / 2] })
-    .add(cyl(0.23, 0.23, 0.02, 24), PALETTE.cream, { position: [face + 0.03, cy - ROOM.height / 2, cz - wall.position.z], rotation: [0, 0, Math.PI / 2] })
-    // hour hand (toward 10), minute hand (toward 2), orange second hand
-    .add(box(0.01, 0.03, 0.12), PALETTE.charcoal, { position: [face + 0.045, cy + 0.04 - ROOM.height / 2, cz - 0.03 - wall.position.z], rotation: [0.6, 0, 0] })
-    .add(box(0.01, 0.025, 0.17), PALETTE.charcoal, { position: [face + 0.045, cy + 0.05 - ROOM.height / 2, cz + 0.05 - wall.position.z], rotation: [-0.5, 0, 0] })
-    .add(box(0.01, 0.012, 0.19), PALETTE.orange, { position: [face + 0.05, cy - 0.06 - ROOM.height / 2, cz + 0.02 - wall.position.z], rotation: [1.2, 0, 0] })
-    .add(cyl(0.025, 0.025, 0.02, 10), PALETTE.orange, { position: [face + 0.05, cy - ROOM.height / 2, cz - wall.position.z], rotation: [0, 0, Math.PI / 2] });
-
+    .add(cyl(0.23, 0.23, 0.02, 24), PALETTE.cream, { position: [face + 0.03, cy - ROOM.height / 2, cz - wall.position.z], rotation: [0, 0, Math.PI / 2] });
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const big = i % 3 === 0;
+    parts.add(box(0.01, big ? 0.04 : 0.025, 0.012), PALETTE.charcoal, {
+      position: [face + 0.042, cy + Math.cos(a) * 0.19 - ROOM.height / 2, cz - Math.sin(a) * 0.19 - wall.position.z],
+      rotation: [-a, 0, 0],
+    });
+  }
   parts.build(group, ctx.shared.outline, new Set([PALETTE.wood, PALETTE.charcoal, PALETTE.orange, PALETTE.teal, PALETTE.paper]));
+
+  // Hands pivot at the centre and follow real time; the second hand ticks.
+  const mats = ctx.makeMaterials();
+  const pivot = new Group();
+  pivot.position.set(face + 0.048, cy - ROOM.height / 2, cz - wall.position.z);
+  const hand = (length: number, width: number, color: number, lift: number) => {
+    const h = new Group();
+    const blade = new Mesh(box(0.01, length, width), mats.toon(color));
+    blade.position.set(lift, length / 2 - 0.02, 0);
+    h.add(blade);
+    pivot.add(h);
+    return h;
+  };
+  const hour = hand(0.12, 0.03, PALETTE.charcoal, 0);
+  const minute = hand(0.17, 0.025, PALETTE.charcoal, 0.006);
+  const second = hand(0.2, 0.012, PALETTE.orange, 0.012);
+  const cap = new Mesh(cyl(0.025, 0.025, 0.02, 10), mats.toon(PALETTE.orange));
+  cap.rotation.z = Math.PI / 2;
+  cap.position.x = 0.018;
+  pivot.add(cap);
+  group.add(pivot);
   wall.add(group);
+
+  // Seen from inside the room (looking toward −x) clockwise runs +y → −z,
+  // which is a negative rotation about x.
+  const TWO_PI = Math.PI * 2;
+  const setHands = (ms: number) => {
+    const d = new Date(ms);
+    const s = d.getSeconds() + d.getMilliseconds() / 1000;
+    const m = d.getMinutes() + s / 60;
+    const h = (d.getHours() % 12) + m / 60;
+    hour.rotation.x = -(h / 12) * TWO_PI;
+    minute.rotation.x = -(m / 60) * TWO_PI;
+    return d.getSeconds();
+  };
+  let shownSecond = setHands(Date.now());
+  second.rotation.x = -(shownSecond / 60) * TWO_PI;
+  let tickStart = -1;
+  let fromAngle = second.rotation.x;
+  const TICK = 0.16;
+  const clock: Animator = {
+    id: "wallClock",
+    update: (_dt, t) => {
+      const now = Date.now();
+      const sec = setHands(now);
+      if (sec !== shownSecond) {
+        shownSecond = sec;
+        fromAngle = second.rotation.x;
+        tickStart = t;
+      }
+      const target = -(shownSecond / 60) * TWO_PI;
+      if (tickStart >= 0) {
+        // Short jump with a small overshoot, like a quartz movement
+        const k = Math.min(1, (t - tickStart) / TICK);
+        const ease = 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2); // back.out-ish
+        // keep the jump going the short way round (59 → 0)
+        let delta = target - fromAngle;
+        if (delta > Math.PI) delta -= TWO_PI;
+        if (delta < -Math.PI) delta += TWO_PI;
+        second.rotation.x = fromAngle + delta * ease;
+        if (k >= 1) {
+          second.rotation.x = target;
+          tickStart = -1;
+        }
+        return true;
+      }
+      // Minute/hour hands creep; redraw a few times a minute is plenty
+      return false;
+    },
+  };
+  return [clock];
 }
 
 /**
