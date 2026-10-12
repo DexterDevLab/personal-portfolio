@@ -4,12 +4,11 @@
  * from a "before" state they set themselves).
  */
 import { MOTION } from "../motion";
-import { entryOnce, trackSectionPort, type SectionContext } from "../signal";
+import { entryOnce, type SectionContext } from "../signal";
 
 export function setupServices(ctx: SectionContext) {
   const section = document.getElementById("services");
   if (!section) return;
-  trackSectionPort(ctx, section, "services");
 
   const { gsap, distance } = ctx;
   const { duration, stagger } = MOTION.entry;

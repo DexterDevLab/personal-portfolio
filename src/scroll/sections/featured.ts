@@ -3,12 +3,11 @@
  * (NetworkArt.astro), once, when the diagram comes into view.
  */
 import { MOTION } from "../motion";
-import { entryOnce, followPath, trackSectionPort, type SectionContext } from "../signal";
+import { entryOnce, followPath, type SectionContext } from "../signal";
 
 export function setupFeatured(ctx: SectionContext) {
   const section = document.getElementById("panda-central");
   if (!section) return;
-  trackSectionPort(ctx, section, "panda-central");
 
   const art = section.querySelector<SVGSVGElement>("[data-network]");
   if (!art) return;

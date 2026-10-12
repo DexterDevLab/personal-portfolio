@@ -678,11 +678,6 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     hover: (id) => {
       if (state.phase === "overview" || state.phase === "station") setHover(id);
     },
-    pulse: () => {
-      if (state.reducedMotion || state.phase === "loading" || state.phase === "error") return;
-      stations.get("console")?.pulse?.();
-      requestRender();
-    },
     pause: () => {
       paused = true;
       setVisible(false);

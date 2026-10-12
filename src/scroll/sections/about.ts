@@ -2,12 +2,11 @@
  * About: the notebook's decorative cover opens and the taped portrait
  * settles. The biography, portrait and résumé button are never transformed.
  */
-import { entryOnce, trackSectionPort, type SectionContext } from "../signal";
+import { entryOnce, type SectionContext } from "../signal";
 
 export function setupAbout(ctx: SectionContext) {
   const section = document.getElementById("about");
   if (!section) return;
-  trackSectionPort(ctx, section, "about");
 
   const notebook = section.querySelector<HTMLElement>("[data-notebook]");
   const cover = notebook?.querySelector<HTMLElement>("[data-notebook-cover]");

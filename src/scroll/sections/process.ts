@@ -1,46 +1,45 @@
 /**
- * How I work: the orange signal travels along the cable as the section
- * scrolls; the step it has reached is "current", earlier ones "done".
- * Text never fades. Uses whichever cable is visible (wide or narrow).
+ * How I work: when the section comes into view the orange signal runs once
+ * along the short cable inside the section, and each step lights in order
+ * (badge emphasised while current, teal once done). Text never fades. Uses
+ * whichever cable is visible (horizontal from lg, a vertical rail below).
  */
 import { MOTION } from "../motion";
-import { followPath, trackSectionPort, type SectionContext } from "../signal";
+import { entryOnce, followPath, type SectionContext } from "../signal";
 
 export function setupProcess(ctx: SectionContext) {
   const section = document.getElementById("process");
   const wrap = section?.querySelector<HTMLElement>("[data-process]");
   if (!section || !wrap) return;
-  trackSectionPort(ctx, section, "process");
 
   const steps = [...wrap.querySelectorAll<HTMLElement>("[data-step]")];
   const cables = [...wrap.querySelectorAll<SVGSVGElement>("[data-process-cable]")];
   const visibleCable = () => cables.find((c) => c.getClientRects().length > 0) ?? null;
+  const dotsAndPaths = cables.map((cable) => ({
+    path: cable.querySelector<SVGPathElement>("[data-cable-path]"),
+    dot: cable.querySelector<SVGCircleElement>("[data-cable-signal]"),
+  }));
 
-  const state = { p: 0 };
+  const state = { p: 1 };
   const apply = () => {
     const cable = visibleCable();
-    if (cable) {
-      const path = cable.querySelector<SVGPathElement>("[data-cable-path]");
-      const dot = cable.querySelector<SVGCircleElement>("[data-cable-signal]");
-      if (path && dot) followPath(path, dot)(state.p);
-    }
+    const i = cables.indexOf(cable!);
+    const { path, dot } = dotsAndPaths[i] ?? {};
+    if (path && dot) followPath(path, dot)(state.p);
     const reached = Math.min(steps.length - 1, Math.floor(state.p * steps.length));
-    steps.forEach((step, i) => {
-      step.dataset.step = i < reached ? "done" : i === reached ? "current" : "pending";
+    steps.forEach((step, k) => {
+      step.dataset.step = state.p >= 1 || k < reached ? "done" : k === reached ? "current" : "pending";
     });
   };
 
-  ctx.gsap.to(state, {
-    p: 1,
-    ease: "none",
-    onUpdate: apply,
-    scrollTrigger: {
-      trigger: wrap,
-      start: "top 72%",
-      end: "bottom 45%",
-      scrub: MOTION.scrub,
-      onRefresh: apply,
+  entryOnce(ctx, wrap, {
+    start: "top 70%",
+    init: () => {
+      state.p = 0;
+      apply();
+    },
+    play: () => {
+      ctx.gsap.to(state, { p: 1, duration: MOTION.entry.duration * 2.4, ease: "power1.inOut", onUpdate: apply });
     },
   });
-  apply();
 }

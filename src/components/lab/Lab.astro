@@ -137,13 +137,6 @@ const otherServices = services.filter((s) => s !== hosting);
     <p data-lab-status class="sr-only" aria-live="polite"></p>
   </div>
 
-  <!-- Connection point for the page's signal cable: the console's output socket -->
-  <svg class="hero-port" viewBox="0 0 40 40" width="40" height="40" data-signal-port="hero" aria-hidden="true">
-    <path class="cable-outline" d="M20 20v24" />
-    <path class="cable-core" d="M20 20v24" />
-    <circle class="port-led" cx="20" cy="18" r="6" />
-  </svg>
-
   <!-- Station panels (readable HTML, same sources as the page sections) -->
   <StationPanel id="console">
     <p class="text-sm text-muted">{featured.data.statusLabel} · {featured.data.role}</p>

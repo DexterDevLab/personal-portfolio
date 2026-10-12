@@ -45,8 +45,6 @@ export interface LabHandle {
   /** Dolly by a factor (< 1 zooms in, > 1 zooms out), within the current limits. */
   zoom(factor: number): void;
   hover(id: StationId | null): void;
-  /** One short signal on the main console (tile lights run, links speed up); no camera motion. */
-  pulse(): void;
   pause(): void;
   resume(): void;
   requestRender(): void;

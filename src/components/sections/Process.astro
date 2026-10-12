@@ -5,18 +5,18 @@ import Reveal from "@/components/Reveal.astro";
 import { processSteps } from "@/data/process";
 
 /**
- * Four steps joined by a cable. On wide screens the cable runs behind the
- * step markers; on narrow screens it is a vertical rail beside them. The
- * orange signal travels along it as the section scrolls, and the step it
- * has reached is emphasised by its badge (src/scroll/sections/process.ts).
- * Without JS or motion the signal sits at the last step and every step is
- * marked done.
+ * Four steps joined by a short cable inside this section. On wide screens
+ * the cable runs behind the step markers; on narrow screens it is a vertical
+ * rail beside them. When the section comes into view the orange signal runs
+ * along it once, lighting each step in order (src/scroll/sections/process.ts);
+ * afterwards, and without JS or motion, the signal sits at the last step and
+ * every step is marked done.
  */
 const short = ["Understand", "Collaborate", "Build & test", "Launch & maintain"];
 ---
 
 <Section id="process" compact tone="plain" class="border-y-2 border-border-strong">
-  <SectionHeading port="process" eyebrow="How I work" title="Plain steps, no surprises." />
+  <SectionHeading eyebrow="How I work" title="Plain steps, no surprises." />
   <div class="relative" data-process>
     <!-- Wide: horizontal cable through the markers -->
     <svg

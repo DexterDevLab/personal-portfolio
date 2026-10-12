@@ -25,8 +25,6 @@ export interface StationDefinition {
   animators: Animator[];
   /** Runs when the camera arrives; may return a cleanup for deselect. */
   onSelect?(): void | (() => void);
-  /** A brief, material-only "signal" on the station (used by the page choreography). */
-  pulse?(): void;
 }
 
 export interface BuildContext {

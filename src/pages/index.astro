@@ -3,7 +3,6 @@ import { getCollection } from "astro:content";
 import Base from "@/layouts/Base.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import Lab from "@/components/lab/Lab.astro";
-import Trunk from "@/components/decor/Trunk.astro";
 import Hero from "@/components/sections/Hero.astro";
 import Featured from "@/components/sections/Featured.astro";
 import Work from "@/components/sections/Work.astro";
@@ -29,9 +28,8 @@ const clientWork = work.filter((entry) => !entry.data.featured);
     <Hero featured={featured} />
   </div>
 
-  <!-- The portfolio, with the signal cable running down the left margin -->
+  <!-- The portfolio: one station per section, each with its own short scene -->
   <div class="relative" data-page-body>
-    <Trunk />
     <Featured project={featured} />
     <Work projects={clientWork} />
     <Services />

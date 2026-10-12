@@ -102,15 +102,11 @@ export function buildConsole(ctx: BuildContext): StationDefinition {
   const hotspots = [hitBox(3.0, 2.2, 1.3, { position: [0, 1.5, 0] })];
   hotspots.forEach((h) => group.add(h));
 
-  // A pulse (page choreography) runs the links and tile lights fast for a moment.
-  let boost = 0;
   const animators: Animator[] = [
     {
       id: "consoleLinks",
       update: (dt) => {
-        const speed = boost > 0 ? 1.6 : 0.35;
-        ctx.shared.linksOffset.value = (ctx.shared.linksOffset.value - dt * speed) % 16;
-        boost = Math.max(0, boost - dt);
+        ctx.shared.linksOffset.value = (ctx.shared.linksOffset.value - dt * 0.35) % 16;
         return true;
       },
     },
@@ -121,7 +117,7 @@ export function buildConsole(ctx: BuildContext): StationDefinition {
         id: "consoleTiles",
         update: (_dt, t) => {
           if (t < next) return false;
-          next = t + (boost > 0 ? 0.09 : 0.45);
+          next = t + 0.45;
           lights.forEach((l, k) => (l.material = k === i % lights.length ? ctx.shared.ledOrange : ctx.shared.ledTeal));
           i++;
           return true;
@@ -129,10 +125,6 @@ export function buildConsole(ctx: BuildContext): StationDefinition {
       } satisfies Animator;
     })(),
   ];
-  const pulse = () => {
-    boost = 1.2;
-    ctx.requestRender?.();
-  };
 
   const focus = new Vector3(X, 1.55, Z + 0.1);
   return {
@@ -145,7 +137,6 @@ export function buildConsole(ctx: BuildContext): StationDefinition {
     pose: poseFor(focus, new Vector3(-0.3, 0, 1), 5.2, 0.9, 0.15),
     focus,
     animators,
-    pulse,
   };
 }
 

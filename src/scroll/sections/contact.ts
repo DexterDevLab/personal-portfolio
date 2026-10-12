@@ -2,12 +2,11 @@
  * Contact: the communication console powers on as it enters view — an
  * invitation, not a transmission. The form itself is untouched.
  */
-import { entryOnce, trackSectionPort, type SectionContext } from "../signal";
+import { entryOnce, type SectionContext } from "../signal";
 
 export function setupContact(ctx: SectionContext) {
   const section = document.getElementById("contact");
   if (!section) return;
-  trackSectionPort(ctx, section, "contact");
 
   const console_ = section.querySelector<HTMLElement>("[data-console]");
   const strip = console_?.querySelector<HTMLElement>(".console-strip");
