@@ -152,6 +152,13 @@ body {
   outline: 3px solid var(--teal);
   outline-offset: 2px;
 }
+/* Form fields show focus with their own teal border (ContactForm), so they
+   skip the ring; otherwise the two stack into a double outline. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
 
 h1,
 h2,
