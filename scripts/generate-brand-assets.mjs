@@ -1,4 +1,4 @@
-// One-off generator for the favicon, touch icon, and social share image.
+// One-off generator for the favicon, touch icon (from src/assets/logo.svg), and social share image.
 // Run with `npm run brand` and commit the files it writes to public/.
 //
 // satori renders a small JSX-like object tree to SVG with text converted to
@@ -26,35 +26,29 @@ const bg = "#0a0a0b";
 
 const el = (type, style, children) => ({ type, props: { style, children } });
 
+// Favicon and touch icon: the monitor symbol from src/assets/logo.svg, centred
+// in a square. The symbol is pure paths (no text), so sharp rasterises it
+// exactly as the browser draws the logo.
 async function icon() {
-  const mono = await font("geist-mono/GeistMono-Bold.ttf");
-  const svg = await satori(
-    el(
-      "div",
-      {
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: accent,
-        borderRadius: 112,
-        color: "#ffffff",
-        fontFamily: "Geist Mono",
-        fontSize: 384,
-        fontWeight: 700,
-      },
-      "D",
-    ),
-    { width: 512, height: 512, fonts: [{ name: "Geist Mono", data: mono, weight: 700, style: "normal" }] },
-  );
+  const logo = await readFile("src/assets/logo.svg", "utf8");
+  const style = logo.match(/<style>([\s\S]*?)<\/style>/)?.[1] ?? "";
+  const symbol = logo.match(/<g id="symbol">([\s\S]*?)<\/g>\s*<g id="wordmark"/)?.[1];
+  if (!symbol) throw new Error("Could not find <g id=\"symbol\"> in src/assets/logo.svg");
+  // The symbol spans roughly x 15–295, y 8–352 in the logo's coordinates.
+  const art = (background) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">` +
+    `<defs><style>${style}</style></defs>` +
+    (background ? `<rect width="400" height="400" rx="88" fill="${background}"/>` : "") +
+    `<g transform="translate(45 20)">${symbol}</g></svg>`;
+
+  const svg = art(null);
   await writeFile("public/favicon.svg", svg);
-  const png = (size) => sharp(Buffer.from(svg)).resize(size, size).png();
+  const png = (size) => sharp(Buffer.from(svg), { density: 300 }).resize(size, size).png();
   await png(32).toFile("public/favicon-32.png");
   await png(192).toFile("public/favicon-192.png");
-  // Apple touch icons are masked by iOS; render without the rounded corners.
-  const square = svg.replace(/rx="[^"]+"/g, 'rx="0"').replace(/ry="[^"]+"/g, 'ry="0"');
-  await sharp(Buffer.from(square)).resize(180, 180).png().toFile("public/apple-touch-icon.png");
+  // iOS applies its own corner radius and dislikes transparency: cream square behind the symbol.
+  const touch = art("#f5eedc").replace('rx="88"', 'rx="0"');
+  await sharp(Buffer.from(touch), { density: 300 }).resize(180, 180).png().toFile("public/apple-touch-icon.png");
 }
 
 async function og() {
