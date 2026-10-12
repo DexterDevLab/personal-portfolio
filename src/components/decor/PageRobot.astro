@@ -32,8 +32,24 @@ const ink = "#25252b";
     {/* body: capsule torso with a teal chest plate */}
     <g data-robot-torso>
       <rect x="20" y="50" width="40" height="38" rx="14" fill="#fffcf3" />
-      <rect x="30" y="60" width="20" height="14" rx="4" fill="#258f83" />
-      <circle cx="40" cy="67" r="2.5" fill="#258f83" stroke="none" />
+      {/* The logo's symbol on the chest (from src/assets/logo.svg, scaled to ~26 units) */}
+      <g class="page-robot__emblem" transform="translate(28.5 55) scale(0.0765)" stroke-width="16">
+        <path d="M112 291 L204 291 Q222 303 235 331 Q241 344 225 346 H72 Q54 344 65 329 Q80 304 112 291Z" fill="#258f83" />
+        <path d="M161 107 L175 62" fill="none" stroke-width="28" />
+        <path d="M161 107 L175 62" fill="none" stroke="#258f83" stroke-width="10" />
+        <path d="M49 102 Q49 88 65 88 H121 Q279 88 284 196 Q287 298 173 307 H62 Q47 307 47 290Z" fill="#fffcf3" />
+        <path d="M111 144 Q100 144 100 160 V249 Q100 263 115 263 H172 Q231 263 231 206 Q231 151 174 147Z" fill="#258f83" />
+        <path d="M116 174 V165 H129" fill="none" stroke="#73c5b7" stroke-width="10" />
+        <path class="page-robot__code" d="M145 184 L124 205 L145 225 M184 184 L205 205 L184 225" fill="none" stroke="#f5eedc" stroke-width="13" />
+        <path class="page-robot__code-glow" d="M145 184 L124 205 L145 225 M184 184 L205 205 L184 225" fill="none" stroke="#ffffff" stroke-width="18" />
+        <g fill="#f58a35" stroke-width="10">
+          <rect x="23" y="160" width="47" height="22" rx="11" />
+          <rect x="23" y="194" width="47" height="22" rx="11" />
+          <rect x="23" y="228" width="47" height="22" rx="11" />
+        </g>
+        <circle class="page-robot__beacon" cx="182" cy="46" r="28" fill="#f58a35" />
+        <circle cx="175" cy="38" r="7" fill="#fff" stroke="none" />
+      </g>
       {/* arms (pivot at the shoulder) */}
       <g data-robot-arm="l" class="page-robot__arm">
         <rect x="11" y="54" width="9" height="24" rx="4.5" fill="#fffcf3" />
@@ -87,6 +103,31 @@ const ink = "#25252b";
   .page-robot__eye {
     transform-box: fill-box;
     transform-origin: center;
+  }
+  /* Chest emblem: the symbol's antenna ball blinks like a beacon and the <>
+     on its screen glows in a slow heartbeat (same as the plaque in the room). */
+  .page-robot__beacon {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: robot-beacon 1s steps(1, end) infinite;
+  }
+  .page-robot__code-glow {
+    opacity: 0;
+    animation: robot-code-glow 3.9s ease-in-out infinite;
+  }
+  @keyframes robot-beacon {
+    0%, 85% { fill: #f58a35; }
+    85.1%, 100% { fill: #ffe9b8; }
+  }
+  @keyframes robot-code-glow {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.85; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .page-robot__beacon,
+    .page-robot__code-glow {
+      animation: none;
+    }
   }
   /* The head pivots at the neck, the torso at the hips */
   [data-robot-head] {

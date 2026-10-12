@@ -2,6 +2,7 @@ import { CanvasTexture, Group, MathUtils, Mesh, SRGBColorSpace, Sprite, SpriteMa
 import { PALETTE } from "../config";
 import { contactShadow, cyl, plane, rbox, sphere } from "../geometry";
 import type { Animator, BuildContext } from "./types";
+import { buildEmblem, type Emblem } from "./emblem";
 
 /**
  * A small, original lab assistant that walks around the room. Proportions:
@@ -38,6 +39,7 @@ export class Robot {
     "The console runs Panda Central.",
   ];
 
+  private readonly emblem: Emblem;
   private readonly bubble: Sprite;
   private readonly bubbleCanvas: HTMLCanvasElement;
   private readonly bubbleTexture: CanvasTexture;
@@ -83,8 +85,12 @@ export class Robot {
     torso.position.y = 0.72;
     const torsoHull = new Mesh(torso.geometry, ctx.shared.outline);
     torsoHull.position.copy(torso.position);
-    const chest = new Mesh(rbox(0.22, 0.16, 0.03, 0.02), mats.toon(PALETTE.blue));
+    // Chest plate with the logo's symbol as an animated emblem
+    const chest = new Mesh(rbox(0.3, 0.3, 0.03, 0.03), mats.toon(PALETTE.cream));
     chest.position.set(0, 0.74, 0.185);
+    this.emblem = buildEmblem(ctx, 0.24);
+    this.emblem.group.position.set(0, 0.74, 0.202);
+    this.body.add(this.emblem.group);
     const button = new Mesh(sphere(0.03, 8, 6), mats.toon(PALETTE.orange));
     button.position.set(0.14, 0.6, 0.18);
     const belt = new Mesh(cyl(0.2, 0.2, 0.05, 14), mats.toon(PALETTE.teal));
@@ -241,6 +247,7 @@ export class Robot {
     return {
       id: "robot",
       update: (dt, t) => {
+        this.emblem.update(t); // beacon blink + <> glow, always on
         const walking = this.roaming && !this.busy && this.path.length > 1 && t >= this.pauseUntil;
 
         if (walking) {

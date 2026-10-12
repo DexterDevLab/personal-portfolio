@@ -2,6 +2,9 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
+## Robot chest emblem (latest)
+Both robots wear the logo's symbol on the chest, animated like the plaque. 3D: `src/lab/scene/emblem.ts` (`buildEmblem`) rasterises the symbol group from `logo.svg` onto a 0.24-unit plane over a cream chest plate, with the antenna ball as a tiny beacon sphere and a glow plane over the `<>`; `Robot.animator()` calls `emblem.update(t)` every frame. Page robot (`PageRobot.astro`): the symbol's paths are inlined on the SVG chest; CSS keyframes blink the ball (`robot-beacon`) and breathe the `<>` glow (`robot-code-glow`), off under reduced motion.
+
 ## Logo beacon + light-theme teal text (latest)
 - The plaque's logo symbol is partly animated: the antenna ball is now a small 3D sphere (orange, inverted-hull outline) over the plaque that pulses and blinks once a second, and the `<>` on its screen glows in a slow heartbeat (a cream glyph plane whose opacity breathes). The painted ball is stripped from the rasterised SVG so the two don't double up. `logoBeacon` animator in `buildLogoSign` (`src/lab/scene/room.ts`); positions map the logo's 1500 × 390 viewBox onto the 2.6-unit plane. Skipped under reduced motion (static ball, glow at 0).
 - Light theme: text on teal surfaces is light (`#fffcf3`): step badges, the contact console strip, the active station button, screenshot markers, the notebook's sticky note and index tabs (`global.css` "Light theme: anything sitting on the teal accent", `About.astro`). The dark theme keeps dark text on its brighter teal.
