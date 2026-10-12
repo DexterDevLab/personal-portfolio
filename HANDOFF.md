@@ -2,7 +2,10 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Contact form spam protection (latest)
+## Production fix: Vercel function crashed on every request (latest)
+After the first production deploy every server-rendered request (`/api/contact`, `/contact/error`) returned `FUNCTION_INVOCATION_FAILED`. Runtime log: `Cannot find native binding … @rolldown/binding-wasm32-wasi` thrown from `node_modules/rolldown`. Cause: `@astrojs/vercel@11.0.13`'s runtime entrypoint imports constants from the integration module (`dist/index.js`), which imports `rolldown` and `@vercel/routing-utils` (build-time tools); the bundler kept them as side-effect imports in the server entry, the file tracer shipped them, and rolldown's native binary is not available in the function. Fix in `astro.config.mjs`: `vite.resolve.alias` maps both packages to `src/lib/empty-module.ts` (named no-op exports) for the app bundle only; nothing from them runs at request time. Verified by invoking the built function locally (`_render.func/.vercel/output/server/entry.mjs` → `default.fetch`): 405 / 200. Remove the alias once the adapter stops importing its build code from the runtime entry.
+
+## Contact form spam protection
 - **Cloudflare Turnstile**: when `TURNSTILE_SECRET_KEY` is set, every submission must carry a valid token, verified server-side at Cloudflare's siteverify endpoint (`verifyTurnstile` in `src/lib/contact.ts`); failures return `403` / `code=challenge` with a clear message. The widget (`PUBLIC_TURNSTILE_SITE_KEY`, `appearance: interaction-only`, so it is invisible unless a challenge is needed) renders in both contact forms; the Turnstile script loads once from `index.astro`, only when the key exists. The client script resets the widget after each attempt (tokens are single-use). Without the keys the form works as before (honeypot + validation).
 - **Instant submits**: the client script records how long the form was open (`elapsed`); anything under 2.5 s is treated like the honeypot (fake success). Absent without JS.
 - **Origin check**: a POST whose `Origin` header does not match the site (localhost allowed in dev) gets `403`.
