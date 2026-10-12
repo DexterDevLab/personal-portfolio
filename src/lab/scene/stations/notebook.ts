@@ -1,4 +1,4 @@
-import { Euler, Group, Mesh, Quaternion, Vector3 } from "three";
+import { CylinderGeometry, Euler, Group, Mesh, PointLight, Quaternion, Vector3 } from "three";
 import { PALETTE } from "../../config";
 import { PartBuilder, box, contactShadow, cyl, hitBox, plane, rbox, type Xyz } from "../../geometry";
 import { screenMaterial } from "../../materials";
@@ -104,12 +104,28 @@ export function buildNotebook(ctx: BuildContext): StationDefinition {
     l.rotation.x = tilt;
     group.add(l);
   }
-  // Glowing disc in the shade opening
-  const lampLight = new Mesh(cyl(0.11, 0.11, 0.01, 14), ctx.shared.ledOrange);
-  const opening = shadeAt.clone().add(shadeDir.clone().normalize().multiplyScalar(0.09));
-  lampLight.position.copy(opening);
-  lampLight.rotation.set(...alignY(shadeDir.clone().negate()));
-  group.add(lampLight);
+  // The lamp is on: a warm bulb in the shade opening, a faint beam down to
+  // the page, a soft pool of light on the paper, and one small point light
+  // so the notebook really is lit (kept dim: it only has to read as "on").
+  const dir = shadeDir.clone().normalize();
+  const opening = shadeAt.clone().add(dir.clone().multiplyScalar(0.09));
+  const bulb = new Mesh(cyl(0.11, 0.11, 0.01, 14), ctx.shared.lampBulb);
+  bulb.position.copy(opening);
+  bulb.rotation.set(...alignY(dir.clone().negate()));
+  group.add(bulb);
+  const reach = shadeDir.length() - 0.09;
+  const cone = new Mesh(new CylinderGeometry(0.1, 0.32, reach, 16, 1, true), ctx.shared.lampBeam);
+  cone.position.copy(opening).add(dir.clone().multiplyScalar(reach / 2));
+  cone.rotation.set(...alignY(dir.clone().negate()));
+  group.add(cone);
+  const pool = new Mesh(cyl(0.34, 0.34, 0.002, 20), ctx.shared.lampBeam);
+  pool.position.set(pageAt.x, pageAt.y + 0.03, pageAt.z);
+  pool.rotation.x = tilt;
+  group.add(pool);
+  const light = new PointLight(0xffd9a0, 0.45, 1.8, 2);
+  // A little way down the beam, so the shade itself is not blown out
+  light.position.copy(opening).add(dir.clone().multiplyScalar(0.22));
+  group.add(light);
 
   group.add(contactShadow(ctx.shared, 0.75, { position: [0, 0, 0], scale: [1.1, 1, 0.75] }));
 

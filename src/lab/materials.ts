@@ -1,4 +1,5 @@
 import {
+  DoubleSide,
   BackSide,
   DataTexture,
   LineDashedMaterial,
@@ -95,6 +96,9 @@ export function makeSharedMaterials() {
     ledGreen: new MeshBasicMaterial({ color: PALETTE.green }),
     ledBlue: new MeshBasicMaterial({ color: PALETTE.blue }),
     glow: new MeshBasicMaterial({ color: PALETTE.blue, transparent: true, opacity: 0.35, depthWrite: false }),
+    /** Warm bulb and the soft beam / pool of a desk lamp */
+    lampBulb: new MeshBasicMaterial({ color: 0xffe9b8 }),
+    lampBeam: new MeshBasicMaterial({ color: 0xffd98a, transparent: true, opacity: 0.11, depthWrite: false, side: DoubleSide }),
     spark: new MeshBasicMaterial({ color: PALETTE.orange, transparent: true, depthWrite: false }),
     steam: new MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, depthWrite: false }),
     screenOff: new MeshBasicMaterial({ color: 0x1b1d26 }),

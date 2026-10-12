@@ -2,7 +2,10 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Section scenes (latest) — the page-wide cable is gone
+## Notebook lamp (latest)
+The anglepoise lamp on the notebook table is now on: a warm bulb disc in the shade opening, a faint translucent beam cone to the page, a soft pool of light on the paper (`shared.lampBulb` / `shared.lampBeam` in `src/lab/materials.ts`), and one dim `PointLight` (0.45 cd, range 1.8, placed 0.22 units down the beam so the shade is not blown out) in `src/lab/scene/stations/notebook.ts`. Brightness: change the light's intensity and the `lampBeam` opacity (0.11). The point light adds one lit-shader variant (programs 9 → 10); draw calls are unchanged apart from the three new meshes.
+
+## Section scenes — the page-wide cable is gone
 
 ### Removed
 - The trunk cable in the left margin, its tracking dot, the per-section taps/sockets, the heading stubs below 1280 px, the hero sockets in both heroes, and the port states (`pending/active/done`). Files: `src/components/decor/Trunk.astro`, `src/scroll/sections/{trunk,hero}.ts`, the `port` prop of `SectionHeading`, the port/trunk/stub CSS. Also the console `pulse()` (lab handle + console station) that only existed for the hero → Panda Central handoff. Nothing reserved layout space for the cable (it sat in the margin), so the sections' alignment is unchanged; `--col-left` stays because the lab hero's intro column uses it.
