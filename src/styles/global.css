@@ -249,6 +249,15 @@ h3 {
   .btn-primary:hover {
     background: #ff9955;
   }
+  /* Light theme: the primary action takes the logo's teal (deeper shade with
+     cream text, 4.8:1); orange stays the accent in the dark theme. */
+  :root:not(.dark) .btn-primary {
+    background: var(--teal-deep);
+    color: #f5eedc;
+  }
+  :root:not(.dark) .btn-primary:hover {
+    background: var(--teal);
+  }
   .btn-teal {
     background: var(--teal);
     color: #0f2a27;
