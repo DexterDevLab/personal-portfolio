@@ -2,7 +2,10 @@
 
 Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesign; the laboratory; and the **orbit-controls / composition fix pass** described first below. Earlier notes follow.
 
-## Page robot (latest)
+## Notebook redesign (latest)
+`src/components/sections/About.astro` is now a proper lab-notebook spread: left page with "Entry 00 · Who", the polaroid (light frame, tape, a handwritten caption in a cursive system face), an index card of plain facts (base, 10+ years, started with WordPress, works with a designer colleague — all from existing copy), the résumé button and a page number; right page with an orange sticky note ("Ask me about WordPress fixes") in the flow above the biography, the three paragraphs as numbered entries with teal margin rules and mono labels, and the tools as rotated sticker chips. Index tabs (Bio / Tools / CV) sit on the right edge from `md`, a paper clip hangs over the top-left corner. Decorative pieces are `aria-hidden`; the photo keeps its alt and a visually-hidden name/role line. The cover-open scene is unchanged. Checked in both themes at 1440 (sticky note never overlaps the entries) and at 390 px.
+
+## Page robot
 The lab assistant now also walks the page: `src/components/decor/PageRobot.astro` is a flat SVG twin of the 3D robot (same proportions and colours), fixed in the viewport's left margin. `src/scroll/sections/robot.ts` drives it: as the page scrolls the legs and arms swing with scroll speed and the body bobs; when scrolling stops it settles upright. It steps out below the hero, cruises at 55 % of the viewport height, and stops above the footer. At each section (`LINES` in robot.ts) it says a short line in a compact thought bubble above its head (right-aligned to the robot, capped at the margin width so it never crosses the content column) and turns its head and eyes toward the section title while speaking. It blinks every few seconds. Shown only in the "full" mode (≥ 1280 px, motion allowed): the `simple` mode and reduced motion never start it, and it is hidden from assistive tech and pointer events. Its own listeners and rAF loop are torn down with the choreography. Verified at 1440: walking pose mid-scroll, rest pose after, bubble at 8–148 px with the column at 153 px.
 
 ## More room for the lab + panel scrolling
