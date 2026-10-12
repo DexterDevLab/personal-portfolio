@@ -68,13 +68,13 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
     }
   }
 
-  function scrollToAnchor(hash: string) {
+  function scrollToAnchor(hash: string, behavior: ScrollBehavior = reducedMotion ? "auto" : "smooth") {
     const id = stationFromHash(hash);
     const anchor = id ? STATION_BY_ID[id].pageAnchor : hash.replace(/^#/, "");
     if (!anchor) return;
     const el = document.getElementById(anchor);
     if (!el) return;
-    requestAnimationFrame(() => el.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" }));
+    requestAnimationFrame(() => el.scrollIntoView({ behavior }));
   }
 
   // ---------- panels ----------
@@ -310,6 +310,16 @@ export function initLabUi(root: HTMLElement, options: LabUiOptions) {
   }
 
   // ---------- initial state ----------
+
+  // Deep links to page sections (header links from other pages, shared URLs):
+  // the browser's own jump to the hash can be undone while the lab boots and
+  // the scroll scenes measure the page, so re-apply it once loading settles.
+  const sectionHash = location.hash && !stationFromHash(location.hash) ? location.hash : "";
+  if (sectionHash && document.getElementById(sectionHash.slice(1))) {
+    const settle = () => scrollToAnchor(sectionHash, "auto");
+    if (document.readyState === "complete") setTimeout(settle, 150);
+    else window.addEventListener("load", () => setTimeout(settle, 150), { once: true });
+  }
 
   if (view() === "lab") {
     const id = stationFromHash(location.hash);
