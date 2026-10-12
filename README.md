@@ -45,7 +45,7 @@ npm run brand                # regenerate favicon / og.png from scripts/generate
 | Lab palette, room size, camera, DPR caps | `src/lab/config.ts`; props per station in `src/lab/scene/stations/` |
 | 3D lab on/off default (WebGL check) | inline script in `src/layouts/Base.astro` |
 | Design tokens, button/plate/bezel/paper components | `src/styles/global.css` |
-| Section scenes (entry animations) | `src/scroll/motion.ts` (breakpoint, timing, distances); per-section timelines in `src/scroll/sections/`; diagram art in `src/components/decor/NetworkArt.astro` |
+| Section scenes (entry animations) | `src/scroll/motion.ts` (breakpoint, timing, distances); per-section timelines in `src/scroll/sections/` |
 | Service illustrations | `src/components/decor/ServiceArt.astro` |
 | Colours, fonts, motion, prose styles | `src/styles/global.css` |
 | Metadata, favicon links, theme script | `src/layouts/Base.astro` |

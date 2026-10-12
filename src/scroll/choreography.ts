@@ -56,7 +56,6 @@ async function start(body: HTMLElement, mode: Exclude<ChoreoMode, "static">): Pr
     import("gsap"),
     import("gsap/ScrollTrigger"),
     Promise.all([
-      import("./sections/featured"),
       import("./sections/work"),
       import("./sections/services"),
       import("./sections/process"),
@@ -77,9 +76,8 @@ async function start(body: HTMLElement, mode: Exclude<ChoreoMode, "static">): Pr
     distance: mode === "full" ? MOTION.distance.wide : MOTION.distance.narrow,
   };
 
-  const [featured, work, services, process, about, contact] = sections;
+  const [work, services, process, about, contact] = sections;
   const gsapCtx = gsap.context(() => {
-    featured.setupFeatured(ctx);
     work.setupWork(ctx);
     services.setupServices(ctx);
     process.setupProcess(ctx);
