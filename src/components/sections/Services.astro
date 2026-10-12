@@ -31,7 +31,7 @@ const art: Record<ServiceIcon, "layout" | "wrench" | "app" | "server"> = {
             id={service.icon === "wrench" ? "troubleshooting" : undefined}
             class="outlined flex h-full flex-col rounded-card bg-surface p-5 transition-transform duration-200 hover:-translate-y-0.5"
           >
-            <div class="rounded-[12px] border-2 border-border-strong bg-background-deep p-3" data-service-art={art[service.icon]}>
+            <div class="rounded-[12px] bg-background-deep p-3" data-service-art={art[service.icon]}>
               <ServiceArt kind={art[service.icon]} />
             </div>
             <p class="label-mono mt-4 text-muted">Station 0{i + 1}</p>
