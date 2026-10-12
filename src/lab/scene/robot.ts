@@ -27,13 +27,15 @@ export class Robot {
   /** Walk the loop when true (overview); stops while a station is focused. */
   roaming = true;
   /** Lines the robot "thinks" while pausing on its walk. */
+  /** Thought-bubble lines while roaming; each must fit two short lines. */
   idleLines = [
-    "What are you looking for?",
-    "Try the repair bench!",
-    "The console runs Panda Central.",
-    "Need a website fixed?",
-    "Drag to look around.",
+    "Welcome to DexterDevLab!",
+    "Want to build a project with me?",
+    "Got a WordPress problem? Let's fix it.",
+    "Need a new website? Let's talk.",
+    "Drag to look around the lab.",
     "Client sites are on the shelves.",
+    "The console runs Panda Central.",
   ];
 
   private readonly bubble: Sprite;

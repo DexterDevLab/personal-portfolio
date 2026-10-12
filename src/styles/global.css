@@ -165,6 +165,34 @@ h3 {
   background-size: 64px 64px;
 }
 
+/* Header logo: src/assets/logo.svg rendered inline. Kept outside the
+   components layer so it overrides the SVG's own (unlayered) <style>. The artwork is drawn
+   for a cream background (charcoal outlines, charcoal "Dexter"); in the
+   dark theme charcoal and cream swap so it keeps the same contrast. */
+.logo {
+  display: inline-flex;
+  align-items: center;
+}
+.logo svg {
+  display: block;
+  height: 2.75rem;
+  width: auto;
+}
+.dark .logo [fill="#25252b"] {
+  fill: #f5eedc;
+}
+.dark .logo [stroke="#25252b"],
+.dark .logo .logo-outline {
+  stroke: #f5eedc;
+}
+.dark .logo [fill="#f5eedc"] {
+  fill: #25252b;
+}
+.dark .logo [stroke="#f5eedc"],
+.dark .logo .logo-word {
+  stroke: #25252b;
+}
+
 /* ---------------------------------- */
 /* Lab components                     */
 /* ---------------------------------- */

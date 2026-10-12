@@ -648,6 +648,8 @@ function buildLab(root: HTMLElement, canvas: HTMLCanvasElement, options: LabOpti
     frames++;
     setPhase("overview");
     emit("lab:ready", undefined);
+    // The assistant greets the visitor once the room is up.
+    if (!state.reducedMotion) robot?.say("Welcome to DexterDevLab!", 4);
     schedule();
   })();
   ready.catch((error) => {
