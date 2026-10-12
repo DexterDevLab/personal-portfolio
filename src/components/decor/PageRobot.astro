@@ -62,9 +62,9 @@ const ink = "#25252b";
   .page-robot {
     position: fixed;
     top: 0;
-    /* Centred in the margin left of the content column; the margin must be
-       at least 7.5rem (≈ 1360px viewport) for the robot to fit with air. */
-    left: calc((var(--col-left) - 4.5rem) / 2);
+    /* Beside the content column (2.5rem gap), however wide the margin is;
+       the margin must be at least 7.5rem (≈ 1360px viewport) to fit it. */
+    left: max(0.75rem, calc(var(--col-left) - 4.5rem - 2.5rem));
     z-index: 40; /* under the header (50) and station panels (60) */
     width: 4.5rem;
     display: none;

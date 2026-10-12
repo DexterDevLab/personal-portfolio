@@ -17,7 +17,7 @@ Branch: `astro-migration`. Commits so far: Next.js → Astro migration + redesig
 - Double line under the header on `#about` / `#contact`: gone with the removed section borders. Anchors land with the section top 16 px under the header (`scroll-padding-top: 5rem`) and the heading in view.
 
 ### Visual fixes
-- Page robot: centred in the left margin (`left: (col-left − robot width) / 2`) instead of hanging off the edge; shown only from 1360 px where the margin fits it (CSS + a live media-query check in `robot.ts`); bubble centred above its head. At 1440 it sits at x 44–116 with the column at 160.
+- Page robot: beside the content column with a 2.5rem gap (`left: col-left − 4.5rem − 2.5rem`) instead of hanging off the edge or floating in a wide margin; shown only from 1360 px where the margin fits it (CSS + a live media-query check in `robot.ts`); bubble centred above its head. At 1440 it sits at x 44–116 with the column at 160.
 - Contact console header: the small mono email label on the teal strip is removed; "Open channel" remains, the prominent email link stays under "Direct channels".
 
 ### Checks
