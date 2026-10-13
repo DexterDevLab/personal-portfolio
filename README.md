@@ -50,7 +50,7 @@ npm run brand                # regenerate favicon / og.png from scripts/generate
 | Colours, fonts, motion, prose styles | `src/styles/global.css` |
 | Metadata, favicon links, theme script | `src/layouts/Base.astro` |
 | Résumé PDF | `scripts/resume/resume.html`, then `npm run resume` (writes `public/resume.pdf` with headless Chrome) |
-| Contact delivery (Brevo) | `src/lib/contact.ts`; messages in `src/lib/contact-messages.ts`; validation in `src/lib/contact-schema.ts` |
+| Contact delivery + confirmation email (Brevo) | `src/lib/contact.ts`; messages in `src/lib/contact-messages.ts`; validation in `src/lib/contact-schema.ts` |
 | Résumé | `public/resume.pdf` |
 
 ### Adding a project
