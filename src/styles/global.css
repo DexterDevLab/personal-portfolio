@@ -239,12 +239,13 @@ h3 {
     align-items: center;
     gap: 0.4rem;
     padding: 0.2rem 0.6rem 0.2rem 0.5rem;
-    border: 1px solid var(--line-soft);
+    border: 1px solid color-mix(in srgb, var(--line) 38%, transparent);
     border-radius: 6px;
     background: var(--surface);
-    color: var(--ink-soft);
+    color: var(--ink);
     font-family: var(--font-geist-mono);
     font-size: 11px;
+    font-weight: 500;
     line-height: 1.5;
     letter-spacing: 0.02em;
     white-space: nowrap;
@@ -258,9 +259,9 @@ h3 {
     flex: none;
   }
   .tag-ink {
-    border-color: rgba(245, 238, 220, 0.2);
-    background: rgba(245, 238, 220, 0.06);
-    color: #d8d2c6;
+    border-color: rgba(245, 238, 220, 0.38);
+    background: rgba(245, 238, 220, 0.08);
+    color: #f3eee4;
   }
   .tag-ink::before {
     background: #2fb3a4;
