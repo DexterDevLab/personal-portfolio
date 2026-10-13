@@ -6,7 +6,6 @@ role: Planning and development, with substantial AI assistance
 stack: [Next.js, TypeScript, BullMQ, Postgres]
 screenshot: ../../assets/projects/panda-central.jpg
 screenshotAlt: Panda Central dashboard showing the managed-sites overview, queue health, sites requiring updates, and a recent activity log.
-liveUrl: https://manager.pandavisuals.cloud/
 order: 1
 featured: true
 caseStudy: true
