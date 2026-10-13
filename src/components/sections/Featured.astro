@@ -90,7 +90,7 @@ const markers = [
       <h3 class="mt-6 text-base font-semibold">{featuredCopy.builtTitle}</h3>
       <p class="mt-2 leading-relaxed text-[#d8d2c6]"><PartnerText text={featuredCopy.built} /></p>
       <div class="mt-5 flex flex-wrap gap-2">
-        {data.stack.map((tag) => <Tag>{tag}</Tag>)}
+        {data.stack.map((tag) => <Tag class="tag-ink">{tag}</Tag>)}
       </div>
       <div class="mt-7 flex flex-wrap gap-3">
         <Button href={`/work/${project.id}`}>
