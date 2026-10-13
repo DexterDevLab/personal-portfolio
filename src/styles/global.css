@@ -232,6 +232,40 @@ h3 {
     box-shadow: 3px 3px 0 0 var(--shadow);
   }
 
+  /* Stack tag: a quiet label chip with a small teal marker (not an outlined
+     object — it sits under the card copy rather than competing with it). */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.6rem 0.2rem 0.5rem;
+    border: 1px solid var(--line-soft);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-family: var(--font-geist-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .tag::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--teal);
+    flex: none;
+  }
+  .tag-ink {
+    border-color: rgba(245, 238, 220, 0.2);
+    background: rgba(245, 238, 220, 0.06);
+    color: #d8d2c6;
+  }
+  .tag-ink::before {
+    background: #2fb3a4;
+  }
+
   /* Button: outlined, flat; hover tints the surface, press nudges it down */
   .btn {
     display: inline-flex;

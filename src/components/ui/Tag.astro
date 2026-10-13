@@ -1,5 +1,15 @@
-<span
-  class="inline-flex items-center rounded-full border-2 border-border-strong bg-paper px-2.5 py-0.5 font-mono text-[11px] font-medium text-foreground"
->
+---
+/**
+ * Small stack label: a quiet rounded chip with a teal marker, in the
+ * mono voice of the kickers. `class="tag-ink"` tunes it for the dark
+ * (ink) sections, which stay dark in both themes.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<span class:list={["tag", className]}>
   <slot />
 </span>
