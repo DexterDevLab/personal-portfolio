@@ -95,10 +95,58 @@ export async function sendContact(input: unknown, meta: { ip?: string | null } =
       console.error("Brevo error:", res.status, await res.text());
       return { ok: false, code: "failed", error: CONTACT_MESSAGES.failed, status: 502 };
     }
+    // The lead is in. A short confirmation goes back to the sender; if it
+    // fails, that's logged and the submission still counts as delivered.
+    await sendConfirmation(apiKey, to, { name, email, message });
     return { ok: true };
   } catch (err) {
     console.error("sendContact failed:", err);
     return { ok: false, code: "failed", error: CONTACT_MESSAGES.failed, status: 502 };
+  }
+}
+
+/**
+ * Plain-text receipt to the person who wrote in: thanks, when to expect a
+ * reply, and a copy of their message. Only reached after the honeypot, timing
+ * and Turnstile checks, so the form can't be used to mail strangers.
+ */
+async function sendConfirmation(
+  apiKey: string,
+  from: string,
+  { name, email, message }: { name: string; email: string; message: string },
+): Promise<void> {
+  const firstName = name.trim().split(/\s+/)[0] || name;
+  const text = [
+    `Hi ${firstName},`,
+    "",
+    "Thanks for getting in touch. I've received your message and will reply within one business day.",
+    "",
+    `If you'd like to add anything in the meantime, just reply to this email or write to ${from}.`,
+    "",
+    "Best,",
+    site.person,
+    site.url,
+    "",
+    "----------------------------------------",
+    "Your message:",
+    "",
+    message,
+  ].join("\n");
+  try {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": apiKey, "content-type": "application/json", accept: "application/json" },
+      body: JSON.stringify({
+        sender: { name: site.person, email: from },
+        to: [{ email, name }],
+        replyTo: { email: from, name: site.person },
+        subject: `Got your message, ${site.person}`,
+        textContent: text,
+      }),
+    });
+    if (!res.ok) console.error("Confirmation email failed:", res.status, await res.text());
+  } catch (err) {
+    console.error("Confirmation email failed:", err);
   }
 }
 
